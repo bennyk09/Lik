@@ -57,8 +57,8 @@ header h1 {
     font-style: italic;
     cursor: pointer;
     background: linear-gradient(180deg, #ffffff 0%, #a1a1a1 100%);
-    background-clip: text;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -82,7 +82,7 @@ header h1 {
     color: var(--text-main);
 }
 
-/* STRICT FIX: Pushes mobile footer strip off desktop/laptop resolutions completely */
+/* Mobile footer menu is hidden on laptop resolutions */
 nav.bottom-nav {
     display: none !important;
 }
@@ -235,7 +235,7 @@ main {
     font-weight: 500; 
 }
 
-/* Interactive Like Controls */
+/* Interactive Layout Control Elements Alignment */
 .moment-footer {
     display: flex;
     justify-content: space-between;
@@ -258,6 +258,40 @@ main {
     justify-content: center;
     gap: 6px;
     transition: var(--transition-smooth);
+}
+
+/* Vector Heart SVG Graphic Geometry Alignment Parameters */
+.like-btn svg {
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+    transition: var(--transition-smooth);
+}
+
+.like-btn:hover {
+    background: #ff3b30;
+    color: #ffffff;
+    border-color: #ff3b30;
+}
+
+/* Inline Creator Action Delete Link Mechanism Button */
+.btn-delete-moment {
+    background: transparent;
+    border: 1px solid rgba(255, 59, 48, 0.2);
+    color: var(--accent-red);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.btn-delete-moment:hover {
+    background: var(--accent-red);
+    color: #ffffff;
+    border-color: var(--accent-red);
+    transform: translateY(-1px);
 }
 
 /* Buttons & System Form Layouts */
@@ -509,7 +543,7 @@ main {
 .mb-20 { margin-bottom: 20px; }
 
 /* =======================================================
-   📱 PHONE/TOUCH RESPONSIVE LAYER (TRIPS UNDER 768PX)
+   📱 PHONE RESPONSIVE MEDIA LAYER (AUTOMATIC UNDER 768PX)
    ======================================================= */
 @media (max-width: 768px) {
     header { 
@@ -520,7 +554,6 @@ main {
         display: none !important; 
     }
 
-    /* Activates and displays the bottom navigation row on small displays */
     nav.bottom-nav {
         display: flex !important;
         position: fixed;
@@ -613,14 +646,13 @@ main {
 }
 
 @media (hover: hover) {
-    .like-btn:hover { background: var(--text-main); color: var(--bg-color); }
     .story-node:hover { opacity: 0.8; }
 }
 
 html { scroll-behavior: smooth; }
 .loading { opacity: 0.6; pointer-events: none; }
 
-/* Custom Scrollbar styling */
+/* Custom Scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #0a0a0a; }
 ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
