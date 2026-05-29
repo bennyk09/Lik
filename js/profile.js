@@ -1,17 +1,22 @@
 import { auth, db } from './firebase-config.deploy.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const profileCard = document.getElementById('profile-card');
 const userMoments = document.getElementById('user-moments');
 
-// Modal DOM elements
+// Modals DOM elements
 const editModal = document.getElementById('edit-profile-modal');
-const openModalBtn = document.getElementById('open-edit-modal-btn');
-const closeModalBtn = document.getElementById('close-edit-modal-btn');
+const openEditModalBtn = document.getElementById('open-edit-modal-btn');
+const closeEditModalBtn = document.getElementById('close-edit-modal-btn');
 const editForm = document.getElementById('edit-profile-form');
 const editNameInput = document.getElementById('edit-user-name');
 const editAgeInput = document.getElementById('edit-user-age');
+
+const deleteModal = document.getElementById('delete-profile-modal');
+const openDeleteModalBtn = document.getElementById('open-delete-modal-btn');
+const closeDeleteModalBtn = document.getElementById('close-delete-modal-btn');
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 
 // Avatar DOM elements
 const avatarPreview = document.getElementById('avatar-preview');
@@ -22,33 +27,33 @@ onAuthStateChanged(auth, async (user) => {
     if (!user) return;
     
     try {
-        // 1. Fetch base user profile documentation data
+        // 1. Fetch base user profile data
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
         
         if(!userSnap.exists()) {
             if(profileCard) {
-                profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">No profile records found. Please register via the home page.</p>`;
+                profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">No profile records found.</p>`;
             }
             return;
         }
         const userData = userSnap.data();
 
-        // Reveal the edit button once data is validated
-        if (openModalBtn) openModalBtn.style.display = 'block';
+        // Reveal view actions options buttons
+        if (openEditModalBtn) openEditModalBtn.style.display = 'block';
+        if (openDeleteModalBtn) openDeleteModalBtn.style.display = 'block';
 
-        // Pre-populate input placeholders for modal fields
+        // Pre-populate input configurations
         if (editNameInput) editNameInput.value = userData.name || "";
         if (editAgeInput) editAgeInput.value = userData.age || "";
 
-        // Render profile picture avatar or structural letter fallback
+        // TIMING FIX: Render profile avatar directly using Firestore values
         if (avatarPreview) {
             if (userData.profilePic) {
                 avatarPreview.innerHTML = `<img src="${userData.profilePic}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
                 if (removePicBtn) removePicBtn.style.display = 'block';
             } else {
-                // Take the first character of the username as a minimalist letter placeholder
-                const initial = (userData.name || user.email || "U").charAt(0).toUpperCase();
+                const initial = (userData.name || "U").charAt(0).toUpperCase();
                 avatarPreview.innerHTML = initial;
                 if (removePicBtn) removePicBtn.style.display = 'none';
             }
@@ -61,13 +66,12 @@ onAuthStateChanged(auth, async (user) => {
         );
         
         const postSnap = await getDocs(q);
-        const dayAgo = Date.now() - (24 * 60 * 60 * 1000); // 24-hour expiration threshold
+        const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
         
         let liveCount = 0;
         let activeLikes = 0;
         let activeMoments = [];
 
-        // 3. Filter the 24-hour expiration window manually in memory safely
         postSnap.forEach(d => {
             const m = d.data();
             if (m.uploadTimestamp > dayAgo) {
@@ -77,10 +81,8 @@ onAuthStateChanged(auth, async (user) => {
             }
         });
 
-        // 4. Sort moments chronologically in memory (Newest first)
         activeMoments.sort((a, b) => b.uploadTimestamp - a.uploadTimestamp);
 
-        // 5. Generate UI feed elements string
         let momentsHtml = "";
         activeMoments.forEach(m => {
             momentsHtml += `
@@ -90,10 +92,8 @@ onAuthStateChanged(auth, async (user) => {
                 </div>`;
         });
 
-        // 6. Compute gamified engagement stats parameters
         const averageLikScore = liveCount > 0 ? (activeLikes / liveCount).toFixed(1) : 0;
 
-        // 7. Inject into the DOM profile card interface element
         if(profileCard) {
             profileCard.innerHTML = `
                 <h2 style="margin:0 0 4px 0; font-weight:700;">${userData.name || "User"}</h2>
@@ -113,57 +113,42 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         // ==========================================
-        // PROFILE IMAGE ACTIONS INTERFACES
+        // PROFILE IMAGE HANDLERS
         // ==========================================
-        
-        // Trigger file picker selection overlay on avatar container tap
         if (avatarPreview && avatarInput) {
             avatarPreview.onclick = () => { avatarInput.click(); };
         }
 
-        // Handle selected file array serialization
         if (avatarInput) {
             avatarInput.onchange = async (e) => {
                 if (e.target.files.length === 0) return;
                 const file = e.target.files[0];
-                
-                // Keep image files light so Base64 strings don't cross Firestore limits (Max 1MB per document)
                 if (file.size > 800000) { 
-                    alert("Image too large! Please select an image under 800KB to keep things optimal.");
+                    alert("Image too large! Select an image under 800KB.");
                     return;
                 }
-
                 try {
                     const base64String = await toBase64(file);
                     await updateDoc(userDocRef, { profilePic: base64String });
                     window.location.reload();
-                } catch (err) {
-                    console.error("Avatar conversion failure: ", err);
-                }
+                } catch (err) { console.error(err); }
             };
         }
 
-        // Wipe photo parameters out of document snapshot context entirely
         if (removePicBtn) {
             removePicBtn.onclick = async () => {
                 try {
                     await updateDoc(userDocRef, { profilePic: "" });
                     window.location.reload();
-                } catch (err) {
-                    console.error("Failed removing profile avatar data parameters: ", err);
-                }
+                } catch (err) { console.error(err); }
             };
         }
 
         // ==========================================
-        // MODAL DIALOGS ACTIONS INTERFACES
+        // EDIT PROFILE MODAL INTERACTION
         // ==========================================
-        if (openModalBtn) {
-            openModalBtn.onclick = () => { editModal.style.display = 'flex'; };
-        }
-        if (closeModalBtn) {
-            closeModalBtn.onclick = () => { editModal.style.display = 'none'; };
-        }
+        if (openEditModalBtn) openEditModalBtn.onclick = () => { editModal.style.display = 'flex'; };
+        if (closeEditModalBtn) closeEditModalBtn.onclick = () => { editModal.style.display = 'none'; };
 
         if (editForm) {
             editForm.onsubmit = async (e) => {
@@ -174,28 +159,58 @@ onAuthStateChanged(auth, async (user) => {
                 if (!updatedName || !updatedAge) return;
 
                 try {
-                    await updateDoc(userDocRef, {
-                        name: updatedName,
-                        age: updatedAge
-                    });
+                    await updateDoc(userDocRef, { name: updatedName, age: updatedAge });
                     editModal.style.display = 'none';
                     window.location.reload();
-                } catch (updateError) {
-                    console.error("Error saving updates:", updateError);
-                    alert("Failed to save changes. Try again.");
+                } catch (err) { alert("Failed to save adjustments."); }
+            };
+        }
+
+        // ==========================================
+        // ACCOUNT REMOVAL PIPELINE LOGIC (NEW)
+        // ==========================================
+        if (openDeleteModalBtn) openDeleteModalBtn.onclick = () => { deleteModal.style.display = 'flex'; };
+        if (closeDeleteModalBtn) closeDeleteModalBtn.onclick = () => { deleteModal.style.display = 'none'; };
+
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.onclick = async () => {
+                confirmDeleteBtn.disabled = true;
+                confirmDeleteBtn.textContent = "Purging records...";
+                
+                try {
+                    // 1. Fetch and query all post elements uploaded by user
+                    const postsQuery = query(collection(db, "moments"), where("userId", "==", user.uid));
+                    const postsSnap = await getDocs(postsQuery);
+                    
+                    // 2. Drop all moments from Firestore
+                    const deletePromises = [];
+                    postsSnap.forEach((postDoc) => {
+                        deletePromises.push(deleteDoc(doc(db, "moments", postDoc.id)));
+                    });
+                    await Promise.all(deletePromises);
+
+                    // 3. Drop user profile record doc
+                    await deleteDoc(userDocRef);
+
+                    // 4. Drop authentication token registration session profile entirely
+                    await deleteUser(user);
+
+                    alert("Account purged successfully.");
+                    window.location.href = "index.html";
+
+                } catch (err) {
+                    console.error("Purge failure structural execution issue: ", err);
+                    alert("Security Exception: To delete your account, you must have logged in very recently. Please log out, log back in, and retry.");
+                    confirmDeleteBtn.disabled = false;
+                    confirmDeleteBtn.textContent = "Delete My Data";
+                    deleteModal.style.display = 'none';
                 }
             };
         }
 
-    } catch(err) { 
-        console.error("Profile view processing failed: ", err); 
-        if(profileCard) {
-            profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Failed to balance profile analytics calculations.</p>`;
-        }
-    }
+    } catch(err) { console.error(err); }
 });
 
-// Helper base64 transformer converter promise module
 const toBase64 = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);

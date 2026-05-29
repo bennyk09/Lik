@@ -6,7 +6,6 @@
     <title>LIK - Profile</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Profile Picture Styling Layout */
         .avatar-container {
             display: flex;
             flex-direction: column;
@@ -72,8 +71,12 @@
                 <p style="text-align:center; color:var(--text-muted);">Syncing profile info...</p>
             </div>
             
-            <button id="open-edit-modal-btn" class="btn-primary" style="background: transparent; color: var(--text-main); border: 1px solid var(--border-color); margin-bottom: 24px; display: none;">
+            <button id="open-edit-modal-btn" class="btn-primary" style="background: transparent; color: var(--text-main); border: 1px solid var(--border-color); margin-bottom: 12px; display: none;">
                 Edit Profile
+            </button>
+
+            <button id="open-delete-modal-btn" class="btn-primary" style="background: transparent; color: #ff3b30; border: 1px solid #ff3b30; margin-bottom: 24px; display: none;">
+                Delete Account
             </button>
 
             <h4 style="margin: 24px 0 12px 0; color:var(--text-muted);">Your Live Moments</h4>
@@ -98,6 +101,17 @@
                     <button type="submit" class="btn-primary">Save Changes</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="delete-profile-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="border: 1px solid #ff3b30;">
+            <h3 style="margin-top: 0; color: #ff3b30;">Delete Account Permanently?</h3>
+            <p style="font-size: 0.9rem; line-height: 1.4; color: var(--text-muted);">Warning: This action cannot be undone. Your profile data, active scores, and active posts will be purged permanently.</p>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button type="button" id="close-delete-modal-btn" class="btn-primary" style="background: transparent; color: var(--text-main); border: 1px solid var(--border-color);">Cancel</button>
+                <button type="button" id="confirm-delete-btn" class="btn-primary" style="background: #ff3b30; color: #ffffff;">Delete My Data</button>
+            </div>
         </div>
     </div>
 
