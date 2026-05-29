@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.deploy.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const profileCard = document.getElementById('profile-card');
 const userMoments = document.getElementById('user-moments');
@@ -9,40 +9,58 @@ onAuthStateChanged(auth, async (user) => {
     if (!user) return;
     
     try {
-        // Fetch base user profile card data
-        const userSnap = await getDoc(doc(db, "users", user.uid));
+        // 1. Fetch base user profile documentation data
+        const userDocRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userDocRef);
+        
         if(!userSnap.exists()) {
-            if(profileCard) profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">No profile records initialized. Visit home page.</p>`;
+            if(profileCard) {
+                profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">No profile records found. Please register via the home page.</p>`;
+            }
             return;
         }
         const userData = userSnap.data();
 
-        // Query user's specific moments within the 24h expiration threshold
-        const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
+        // 2. Query user's specific moments (Using a basic single-field query to bypass complex composite indexing crashes)
         const q = query(
             collection(db, "moments"), 
-            where("userId", "==", user.uid), 
-            where("uploadTimestamp", ">", dayAgo),
-            orderBy("uploadTimestamp", "desc")
+            where("userId", "==", user.uid)
         );
         
         const postSnap = await getDocs(q);
-        let liveCount = postSnap.size;
+        const dayAgo = Date.now() - (24 * 60 * 60 * 1000); // 24-hour expiration threshold
+        
+        let liveCount = 0;
         let activeLikes = 0;
-        let momentsHtml = "";
+        let activeMoments = [];
 
+        // 3. Filter the 24-hour expiration window manually in memory safely
         postSnap.forEach(d => {
             const m = d.data();
-            activeLikes += m.likesCount || 0;
+            if (m.uploadTimestamp > dayAgo) {
+                liveCount++;
+                activeLikes += m.likesCount || 0;
+                activeMoments.push(m);
+            }
+        });
+
+        // 4. Sort moments chronologically in memory (Newest first)
+        activeMoments.sort((a, b) => b.uploadTimestamp - a.uploadTimestamp);
+
+        // 5. Generate UI feed elements string
+        let momentsHtml = "";
+        activeMoments.forEach(m => {
             momentsHtml += `
                 <div class="card" style="padding:12px; font-size:0.9rem; margin-bottom: 8px;">
-                    ${m.text ? `<p style="margin:0 0 8px 0;">${m.text}</p>` : '<em>Image post</em>'}
+                    ${m.text ? `<p style="margin:0 0 8px 0; line-height:1.4;">${m.text}</p>` : '<em>Image post</em>'}
                     <small style="color:var(--text-muted);">✕ Likes: ${m.likesCount || 0}</small>
                 </div>`;
         });
 
+        // 6. Compute gamified engagement stats parameters
         const averageLikScore = liveCount > 0 ? (activeLikes / liveCount).toFixed(1) : 0;
 
+        // 7. Inject into the DOM profile card interface element
         if(profileCard) {
             profileCard.innerHTML = `
                 <h2 style="margin:0 0 4px 0; font-weight:700;">${userData.name || "User"}</h2>
@@ -63,6 +81,8 @@ onAuthStateChanged(auth, async (user) => {
 
     } catch(err) { 
         console.error("Profile view processing failed: ", err); 
-        if(profileCard) profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Failed to balance profile analytics calculations.</p>`;
+        if(profileCard) {
+            profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Failed to balance profile analytics calculations.</p>`;
+        }
     }
 });
