@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK</title>
-    <link rel="stylesheet" href="./css/style.css?v=9.9.9">
+    <link rel="stylesheet" href="./css/style.css?v=10.0.1">
 </head>
 <body>
     <div class="app-container">
@@ -20,9 +20,9 @@
 
         <main>
             <div id="auth-gateway-view" style="display: none;">
-                <div id="wall-feed" style="text-align: center; padding-top: 40px;">
+                <div style="text-align: center; padding: 40px 20px; max-width: 400px; margin: 0 auto;">
                     <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">A temporary space for real-time moments.</p>
-                    <button id="google-login-btn" class="btn-primary btn-google">
+                    <button id="google-login-btn" class="btn-primary btn-google" style="width: 100%;">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16" alt="Google">
                         Continue with Google
                     </button>
@@ -30,9 +30,14 @@
             </div>
 
             <div id="app-feed-view" style="display: none;">
-                <div class="stories-wrapper" id="stories-tray"></div>
-                <div id="wall-feed">
-                    <p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size:0.9rem;">Syncing feed streams...</p>
+                <div id="wall-feed-container" style="max-width: 600px; margin: 0 auto;">
+                    
+                    <div class="stories-wrapper" id="stories-tray"></div>
+                    
+                    <div id="wall-feed">
+                        <p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size:0.9rem;">Syncing feed streams...</p>
+                    </div>
+                    
                 </div>
             </div>
         </main>

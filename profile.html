@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK - Profile</title>
-    <link rel="stylesheet" href="./css/style.css?v=9.9.9">
+    <link rel="stylesheet" href="./css/style.css?v=10.0.1">
 </head>
 <body>
     <div class="app-container">
@@ -19,32 +19,32 @@
         </header>
         
         <main>
-            <div class="profile-meta-block">
-                <div class="avatar-container">
-                    <div id="avatar-preview" class="profile-avatar">-</div>
-                    <input type="file" id="avatar-input" accept="image/*" style="display: none;">
-                    <button id="remove-pic-btn" class="remove-pic-btn">Remove Photo</button>
-                </div>
-                <div class="profile-identity-details">
-                    <h2 id="lbl-username-display">User</h2>
-                    <div class="stats-row" id="stats-numbers-tray"></div>
-                    <div id="profile-bio-container" class="profile-bio-text">No biography set. Click edit profile to add yours!</div>
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-bottom: 32px; max-width: 600px; margin: 0 auto 32px auto;">
-                <button id="open-edit-modal-btn" class="btn-secondary" style="flex: 1; display:none;">
-                    Edit Profile
-                </button>
-                <button id="open-about-modal-btn" class="btn-secondary" style="flex: 1;">
-                    Platform Info (About)
-                </button>
-                <button id="open-delete-modal-btn" class="btn-secondary" style="color: var(--accent-red); border-color: rgba(255,59,48,0.2); display:none;">
-                    Delete
-                </button>
-            </div>
-
             <div style="max-width: 600px; margin: 0 auto;">
+                <div class="profile-meta-block">
+                    <div class="avatar-container">
+                        <div id="avatar-preview" class="profile-avatar">-</div>
+                        <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                        <button id="remove-pic-btn" class="remove-pic-btn">Remove Photo</button>
+                    </div>
+                    <div class="profile-identity-details">
+                        <h2 id="lbl-username-display">User</h2>
+                        <div class="stats-row" id="stats-numbers-tray"></div>
+                        <div id="profile-bio-container" class="profile-bio-text">No biography set. Click edit profile to add yours!</div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-bottom: 32px;">
+                    <button id="open-edit-modal-btn" class="btn-secondary" style="flex: 1; display:none;">
+                        Edit Profile
+                    </button>
+                    <button id="open-about-modal-btn" class="btn-secondary" style="flex: 1;">
+                        Platform Info (About)
+                    </button>
+                    <button id="open-delete-modal-btn" class="btn-secondary" style="color: var(--accent-red); border-color: rgba(255,59,48,0.2); display:none;">
+                        Delete
+                    </button>
+                </div>
+
                 <h4 style="margin: 24px 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Live Timeline</h4>
                 <div id="user-moments"></div>
             </div>
@@ -91,7 +91,7 @@
             <h4 style="margin:20px 0 8px 0; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing: 0.5px;">Release History</h4>
             <div class="version-log">
                 <span class="version-tag">v0.1.0</span>
-                <p style="font-size:0.8rem; color:var(--text-muted); margin:6px 0 0 0; line-height: 1.4;">Dual responsive layout matrix layout strategy completely updated across production streams.</p>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin:6px 0 0 0; line-height: 1.4;">Dual responsive layout matrix engine fully updated across production streams.</p>
             </div>
             <button type="button" id="close-about-modal-btn" class="btn-primary" style="margin-top:24px; width: 100%;">Close</button>
         </div>
