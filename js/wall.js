@@ -1,4 +1,4 @@
-import { db, auth } from './firebase-config.js';
+import { auth, db } from './firebase-config.deploy.js';
 import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const feed = document.getElementById('wall-feed');

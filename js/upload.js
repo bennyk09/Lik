@@ -1,4 +1,4 @@
-import { auth, db } from './firebase-config.js';
+import { auth, db } from './firebase-config.deploy.js';
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const uploadForm = document.getElementById('upload-form');
