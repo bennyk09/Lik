@@ -1,0 +1,8 @@
+{
+  "userId": "String (Foreign Key Mapping Back to Creator UID)",
+  "text": "String (Optional Text Field Post Payload Data)",
+  "imageUrl": "String (Optional Base64 Data URI Media String)",
+  "uploadTimestamp": "Integer (Epoch Millisecond Creation Track Marker)",
+  "expirationTimestamp": "Integer (Upload Timestamp + 86,400,000 Milliseconds)",
+  "likesCount": "Integer (Real-time Accumulation Metric Variable)"
+}
