@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.deploy.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const profileCard = document.getElementById('profile-card');
 const userMoments = document.getElementById('user-moments');
@@ -9,14 +9,24 @@ onAuthStateChanged(auth, async (user) => {
     if (!user) return;
     
     try {
+        // Fetch base user profile card data
         const userSnap = await getDoc(doc(db, "users", user.uid));
-        if(!userSnap.exists()) return;
+        if(!userSnap.exists()) {
+            if(profileCard) profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">No profile records initialized. Visit home page.</p>`;
+            return;
+        }
         const userData = userSnap.data();
 
+        // Query user's specific moments within the 24h expiration threshold
         const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
-        const q = query(collection(db, "moments"), where("userId", "==", user.uid), where("uploadTimestamp", ">", dayAgo));
-        const postSnap = await getDocs(q);
+        const q = query(
+            collection(db, "moments"), 
+            where("userId", "==", user.uid), 
+            where("uploadTimestamp", ">", dayAgo),
+            orderBy("uploadTimestamp", "desc")
+        );
         
+        const postSnap = await getDocs(q);
         let liveCount = postSnap.size;
         let activeLikes = 0;
         let momentsHtml = "";
@@ -25,9 +35,9 @@ onAuthStateChanged(auth, async (user) => {
             const m = d.data();
             activeLikes += m.likesCount || 0;
             momentsHtml += `
-                <div class="card" style="padding:12px; font-size:0.9rem;">
+                <div class="card" style="padding:12px; font-size:0.9rem; margin-bottom: 8px;">
                     ${m.text ? `<p style="margin:0 0 8px 0;">${m.text}</p>` : '<em>Image post</em>'}
-                    <small style="color:var(--text-muted);">⚡ Likes: ${m.likesCount || 0}</small>
+                    <small style="color:var(--text-muted);">✕ Likes: ${m.likesCount || 0}</small>
                 </div>`;
         });
 
@@ -35,7 +45,7 @@ onAuthStateChanged(auth, async (user) => {
 
         if(profileCard) {
             profileCard.innerHTML = `
-                <h2 style="margin:0 0 4px 0;">${userData.name || "User"}</h2>
+                <h2 style="margin:0 0 4px 0; font-weight:700;">${userData.name || "User"}</h2>
                 <p style="margin:0 0 16px 0; font-size:0.85rem; color:var(--text-muted);">Age: ${userData.age || "N/A"}</p>
                 
                 <div class="stats-grid">
@@ -48,8 +58,11 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         if(userMoments) {
-            userMoments.innerHTML = momentsHtml || `<p style="color:var(--text-muted); font-size:0.9rem;">No moments published in the last 24 hours.</p>`;
+            userMoments.innerHTML = momentsHtml || `<p style="color:var(--text-muted); font-size:0.9rem; text-align:center; padding:16px 0;">No active moments in the last 24 hours.</p>`;
         }
 
-    } catch(err) { console.error(err); }
+    } catch(err) { 
+        console.error("Profile view processing failed: ", err); 
+        if(profileCard) profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Failed to balance profile analytics calculations.</p>`;
+    }
 });

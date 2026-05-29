@@ -38,17 +38,34 @@ function bindLikes() {
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             if(!auth.currentUser) return;
-            const momentId = e.target.getAttribute('data-id');
-            const authorId = e.target.getAttribute('data-author');
+            
+            const buttonElement = e.target;
+            const momentId = buttonElement.getAttribute('data-id');
+            const authorId = buttonElement.getAttribute('data-author');
+            
+            // OPTIMISTIC UI: Instantly change the value visually on click
+            const currentLikes = parseInt(buttonElement.textContent.replace('✕ ', '')) || 0;
+            buttonElement.textContent = `✕ ${currentLikes + 1}`;
+            buttonElement.style.opacity = "0.7";
+            buttonElement.disabled = true; // Prevent spam clicks while processing
+
             try {
-                await updateDoc(doc(db, "moments", momentId), { likesCount: increment(1) });
-                await updateDoc(doc(db, "users", authorId), { totalLikes: increment(1) });
-                renderFeed();
-            } catch(err) { console.error(err); }
+                // Update Firestore collections concurrently
+                await Promise.all([
+                    updateDoc(doc(db, "moments", momentId), { likesCount: increment(1) }),
+                    updateDoc(doc(db, "users", authorId), { totalLikes: increment(1) })
+                ]);
+            } catch(err) { 
+                console.error("Failed to commit interaction record: ", err);
+                // Rollback if something went wrong
+                buttonElement.textContent = `✕ ${currentLikes}`;
+            } finally {
+                buttonElement.style.opacity = "1";
+                buttonElement.disabled = false;
+            }
         });
     });
 }
-
 function calcTime(ts) {
     const diff = Date.now() - ts;
     const mins = Math.floor(diff/60000);
