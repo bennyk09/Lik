@@ -52,6 +52,7 @@ if (onboardingForm) {
                 name: document.getElementById('user-name').value.trim(),
                 age: parseInt(document.getElementById('user-age').value),
                 bio: "",
+                profilePic: "",
                 totalLikes: 0,
                 averageLikScore: 0,
                 rank: "Unranked"
@@ -63,12 +64,15 @@ if (onboardingForm) {
 }
 
 function showAppInterface() {
+    const desktopNav = document.getElementById('app-nav-desktop');
     if (authView) authView.style.display = 'none';
     if (feedView) feedView.style.display = 'block';
     if (appNav) appNav.style.display = 'flex';
+    if (desktopNav) desktopNav.style.display = 'flex';
 }
 
 function showAuthInterface() {
+    const desktopNav = document.getElementById('app-nav-desktop');
     if (!authView) {
         window.location.href = "index.html";
         return;
@@ -76,4 +80,5 @@ function showAuthInterface() {
     if (authView) authView.style.display = 'flex';
     if (feedView) feedView.style.display = 'none';
     if (appNav) appNav.style.display = 'none';
+    if (desktopNav) desktopNav.style.display = 'none';
 }

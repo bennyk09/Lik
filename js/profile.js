@@ -2,7 +2,6 @@ import { auth, db } from './firebase-config.deploy.js';
 import { onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Layout Target Nodes
 const userMoments = document.getElementById('user-moments');
 const statsTray = document.getElementById('stats-numbers-tray');
 const bioContainer = document.getElementById('profile-bio-container');
@@ -38,7 +37,6 @@ onAuthStateChanged(auth, async (user) => {
         if(!userSnap.exists()) return;
         const userData = userSnap.data();
 
-        // Bind data parameters dynamically into structural label slots
         if (usernameLabel) usernameLabel.textContent = userData.name || "User";
         if (bioContainer) bioContainer.textContent = userData.bio || "No biography set yet.";
         
@@ -52,14 +50,13 @@ onAuthStateChanged(auth, async (user) => {
         if (avatarPreview) {
             if (userData.profilePic) {
                 avatarPreview.innerHTML = `<img src="${userData.profilePic}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-                if (removePicBtn) removePicBtn.style.display = 'block';
+                if (removePicBtn) removePicBtn.style.display = 'inline-block';
             } else {
                 avatarPreview.innerHTML = (userData.name || "U").charAt(0).toUpperCase();
                 if (removePicBtn) removePicBtn.style.display = 'none';
             }
         }
 
-        // Fetch User Moments Metrics Data List
         const q = query(collection(db, "moments"), where("userId", "==", user.uid));
         const postSnap = await getDocs(q);
         const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
@@ -79,19 +76,18 @@ onAuthStateChanged(auth, async (user) => {
 
         activeMoments.sort((a, b) => b.uploadTimestamp - a.uploadTimestamp);
 
+        // Grid presentation array construction format
         let momentsHtml = "";
         activeMoments.forEach(m => {
             momentsHtml += `
-                <div class="card" style="padding:16px; font-size:0.95rem; margin-bottom: 12px; background:#050505;">
-                    ${m.text ? `<p style="margin:0 0 8px 0; line-height:1.4;">${m.text}</p>` : '<em>Image post</em>'}
-                    <small style="color:var(--text-muted); font-weight:500;">✕ Likes: ${m.likesCount || 0}</small>
+                <div class="user-moment-card">
+                    ${m.imageUrl ? `<img src="${m.imageUrl}" style="width:100%; height:100%; object-fit:cover;">` : `<p style="line-height:1.4; font-size:0.9rem; padding:8px; margin:0; text-align:center;">${m.text}</p>`}
                 </div>`;
         });
-        if(userMoments) userMoments.innerHTML = momentsHtml || `<p style="color:var(--text-muted); font-size:0.9rem; text-align:center; padding:24px 0;">No active moments running on the feed.</p>`;
+        if(userMoments) userMoments.innerHTML = momentsHtml || `<p style="color:var(--text-muted); font-size:0.9rem; text-align:center; padding:24px 0; grid-column: 1 / -1;">No active moments running on the feed.</p>`;
 
         const averageLikScore = liveCount > 0 ? (activeLikes / liveCount).toFixed(1) : 0;
 
-        // Render horizontal stats row modules elements array segments slots
         if (statsTray) {
             statsTray.innerHTML = `
                 <div class="stat-node"><div class="stat-node-val">${userData.totalLikes || 0}</div><div class="stat-node-lbl">Likes</div></div>
@@ -101,7 +97,6 @@ onAuthStateChanged(auth, async (user) => {
             `;
         }
 
-        // Action Interactions Listeners Setup
         if (avatarPreview && avatarInput) avatarPreview.onclick = () => { avatarInput.click(); };
         if (avatarInput) {
             avatarInput.onchange = async (e) => {
@@ -120,7 +115,6 @@ onAuthStateChanged(auth, async (user) => {
             };
         }
 
-        // Modals Open/Close triggers
         if(openEditModalBtn) openEditModalBtn.onclick = () => { editModal.style.display='flex'; };
         if(closeEditModalBtn) closeEditModalBtn.onclick = () => { editModal.style.display='none'; };
         if(openAboutModalBtn) openAboutModalBtn.onclick = () => { aboutModal.style.display='flex'; };
@@ -134,7 +128,7 @@ onAuthStateChanged(auth, async (user) => {
                 await updateDoc(userDocRef, {
                     name: editNameInput.value.trim(),
                     age: parseInt(editAgeInput.value),
-                    bio: editBioInput.value.trim() // Save updated biography narrative string
+                    bio: editBioInput.value.trim()
                 });
                 window.location.reload();
             };
