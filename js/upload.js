@@ -2,22 +2,32 @@ import { auth, db } from './firebase-config.deploy.js';
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const uploadForm = document.getElementById('upload-form');
+const fileInput = document.getElementById('moment-file');
+const previewBox = document.getElementById('frame-preview-box');
+const previewImg = document.getElementById('img-render-target');
+
+// Instant Upload Image Selection Rendering Preview Pipeline Link (NEW)
+if (fileInput && previewBox && previewImg) {
+    fileInput.onchange = async (e) => {
+        if (e.target.files.length === 0) return;
+        const file = e.target.files[0];
+        try {
+            const base64Data = await toBase64(file);
+            previewImg.src = base64Data;
+            previewBox.style.display = 'flex'; // Reveal the preview frame element container
+        } catch(err) { console.error(err); }
+    };
+}
 
 if(uploadForm) {
-    uploadForm.addEventListener('submit', async (e) => {
+    uploadForm.onsubmit = async (e) => {
         e.preventDefault();
         if(!auth.currentUser) return;
 
         const text = document.getElementById('moment-text').value;
-        const fileInput = document.getElementById('moment-file');
-        let imageUrl = "";
+        let imageUrl = previewImg ? previewImg.src : "";
 
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            imageUrl = await toBase64(file);
-        }
-
-        if(!text && !imageUrl) { alert("Please write a post or select an image."); return; }
+        if(!text && !imageUrl) { alert("Please provide text or an image payload."); return; }
 
         try {
             const now = Date.now();
@@ -31,7 +41,7 @@ if(uploadForm) {
             });
             window.location.href = "index.html";
         } catch(err) { alert(err.message); }
-    });
+    };
 }
 
 const toBase64 = file => new Promise((resolve, reject) => {
