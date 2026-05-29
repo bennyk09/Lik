@@ -22,8 +22,6 @@ body {
     font-family: var(--font-stack);
     background-color: var(--bg-color);
     color: var(--text-main);
-    margin: 0;
-    padding: 0;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
 }
@@ -83,9 +81,9 @@ header h1 {
     color: var(--text-main);
 }
 
-/* Mobile Bottom Navigation Strip (Hidden on Desktop) */
+/* STRICT FIX: Pushes mobile footer strip off desktop/laptop resolutions completely */
 nav.bottom-nav {
-    display: none;
+    display: none !important;
 }
 
 /* Main Content Workspace */
@@ -259,12 +257,6 @@ main {
     justify-content: center;
     gap: 6px;
     transition: var(--transition-smooth);
-}
-
-.like-btn:hover {
-    background: var(--text-main);
-    color: var(--bg-color);
-    border-color: var(--text-main);
 }
 
 /* Buttons & System Form Layouts */
@@ -510,24 +502,13 @@ main {
 }
 
 /* Utility Classes */
-.text-muted {
-    color: var(--text-muted);
-}
-
-.text-center {
-    text-align: center;
-}
-
-.mt-20 {
-    margin-top: 20px;
-}
-
-.mb-20 {
-    margin-bottom: 20px;
-}
+.text-muted { color: var(--text-muted); }
+.text-center { text-align: center; }
+.mt-20 { margin-top: 20px; }
+.mb-20 { margin-bottom: 20px; }
 
 /* =======================================================
-   📱 RESPONSIVE PHONE LAYER (AUTOMATIC UNDER 768PX)
+   📱 PHONE/TOUCH RESPONSIVE LAYER (TRIPS UNDER 768PX)
    ======================================================= */
 @media (max-width: 768px) {
     header { 
@@ -535,11 +516,12 @@ main {
     }
     
     .desktop-nav { 
-        display: none; 
+        display: none !important; 
     }
 
+    /* Activates and displays the bottom navigation row on small displays */
     nav.bottom-nav {
-        display: flex;
+        display: flex !important;
         position: fixed;
         bottom: 0; 
         left: 0; 
@@ -622,61 +604,23 @@ main {
     }
 }
 
-/* Small Mobile Devices */
+/* Small Devices */
 @media (max-width: 480px) {
-    .profile-meta-block {
-        gap: 16px;
-    }
-    
-    .stat-node {
-        font-size: 0.85rem;
-    }
-    
-    .btn-primary, 
-    .btn-secondary {
-        padding: 8px 16px;
-        font-size: 0.85rem;
-    }
+    .profile-meta-block { gap: 16px; }
+    .stat-node { font-size: 0.85rem; }
+    .btn-primary, .btn-secondary { padding: 8px 16px; font-size: 0.85rem; }
 }
 
-/* Touch Device Optimizations */
 @media (hover: hover) {
-    .like-btn:hover {
-        background: var(--text-main);
-        color: var(--bg-color);
-    }
-    
-    .story-node:hover {
-        opacity: 0.8;
-    }
+    .like-btn:hover { background: var(--text-main); color: var(--bg-color); }
+    .story-node:hover { opacity: 0.8; }
 }
 
-/* Smooth Scroll Behavior */
-html {
-    scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
+.loading { opacity: 0.6; pointer-events: none; }
 
-/* Loading States */
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #0a0a0a;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--card-border);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
+/* Custom Scrollbar styling */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

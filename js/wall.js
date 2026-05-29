@@ -77,11 +77,17 @@ function bindLikes() {
         btn.onclick = async (e) => {
             if(!auth.currentUser) return;
             
-            // FIX: Using currentTarget safely tracks the button element bounds
             const btnEl = e.currentTarget;
+            const authorId = btnEl.getAttribute('data-author');
+            
+            // 🛑 CRITICAL RESTRICTION: Blocks likes if current user matches the post author ID
+            if (auth.currentUser.uid === authorId) {
+                alert("You cannot like your own moments!");
+                return;
+            }
+            
             const currentLikes = parseInt(btnEl.textContent.replace('✕ ', '')) || 0;
             const momentId = btnEl.getAttribute('data-id');
-            const authorId = btnEl.getAttribute('data-author');
             
             btnEl.textContent = `✕ ${currentLikes + 1}`;
             btnEl.disabled = true;
