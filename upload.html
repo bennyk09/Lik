@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIK - Upload</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>LIK</h1>
+            <nav>
+                <a href="index.html">Wall</a>
+                <a href="upload.html" class="active">Upload</a>
+                <a href="profile.html">Profile</a>
+                <a href="about.html">About</a>
+                <a href="#" id="logout-btn">Logout</a>
+            </nav>
+        </header>
+        <main>
+            <div class="card">
+                <h3 style="margin-top:0;">Share a Moment</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">This post automatically completely disappears in 24 hours.</p>
+                <form id="upload-form">
+                    <div class="form-group">
+                        <label for="moment-text">Text Content</label>
+                        <textarea id="moment-text" placeholder="What's on your mind?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="moment-file">Image (Optional)</label>
+                        <input type="file" id="moment-file" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn-primary">Post Moment</button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <script type="module" src="js/auth-google.js"></script>
+    <script type="module" src="js/upload.js"></script>
+</body>
+</html>

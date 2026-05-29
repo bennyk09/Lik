@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIK - Profile</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>LIK</h1>
+            <nav>
+                <a href="index.html">Wall</a>
+                <a href="upload.html">Upload</a>
+                <a href="profile.html" class="active">Profile</a>
+                <a href="about.html">About</a>
+                <a href="#" id="logout-btn">Logout</a>
+            </nav>
+        </header>
+        <main>
+            <div class="card" id="profile-card">
+                <p style="text-align:center; color:var(--text-muted);">Syncing profile info...</p>
+            </div>
+            <h4 style="margin: 24px 0 12px 0; color:var(--text-muted);">Your Live Moments</h4>
+            <div id="user-moments"></div>
+        </main>
+    </div>
+    <script type="module" src="js/auth-google.js"></script>
+    <script type="module" src="js/profile.js"></script>
+</body>
+</html>
