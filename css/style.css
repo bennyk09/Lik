@@ -57,6 +57,7 @@ header h1 {
     font-style: italic;
     cursor: pointer;
     background: linear-gradient(180deg, #ffffff 0%, #a1a1a1 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
