@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK - Create</title>
-    <link rel="stylesheet" href="css/style.css?v=1.0.1">
+    <link rel="stylesheet" href="./css/style.css?v=1.0.3">
 </head>
 <body>
     <div class="app-container">
@@ -14,33 +14,40 @@
                 <a href="index.html">Wall</a>
                 <a href="upload.html" class="active">Upload</a>
                 <a href="profile.html">Profile</a>
+                <a href="#" id="logout-btn-desktop">Logout</a>
             </nav>
         </header>
+        
         <main>
-            <div class="upload-preview-frame" id="frame-preview-box">
-                <img src="" id="img-render-target" alt="Staged Preview">
-            </div>
+            <div id="wall-feed">
+                <div class="upload-preview-frame" id="frame-preview-box" style="display: none;">
+                    <img src="" id="img-render-target" alt="Staged Preview">
+                </div>
 
-            <form id="upload-form">
-                <div class="form-group">
-                    <label for="moment-text">Caption Content</label>
-                    <textarea id="moment-text" placeholder="Write a caption or text moment..."></textarea>
+                <div class="post-card" style="padding: 24px;">
+                    <form id="upload-form">
+                        <div class="form-group">
+                            <label for="moment-text">Caption Content</label>
+                            <textarea id="moment-text" rows="3" placeholder="Write a caption or text moment..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="moment-file" style="background: rgba(255,255,255,0.02); border: 1px dashed var(--card-border); padding: 24px; text-align:center; border-radius:8px; cursor:pointer; display:block; font-weight: 500;">
+                                Select Photo Source
+                            </label>
+                            <input type="file" id="moment-file" accept="image/*" style="display: none;">
+                        </div>
+                        <button type="submit" class="btn-primary" style="margin-top: 12px; width: 100%;">Share Moment</button>
+                    </form>
+                    <p style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:16px; margin-bottom: 0;">This post automatically disappears in 24 hours.</p>
                 </div>
-                <div class="form-group">
-                    <label for="moment-file" style="background: rgba(255,255,255,0.02); border: 1px dashed var(--card-border); padding: 24px; text-align:center; border-radius:8px; cursor:pointer; display:block;">
-                        Select Photo Source
-                    </label>
-                    <input type="file" id="moment-file" accept="image/*" style="display: none;">
-                </div>
-                <button type="submit" class="btn-primary" style="margin-top: 12px;">Share Moment</button>
-            </form>
-            <p style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:16px;">This post automatically disappears in 24 hours.</p>
+            </div>
         </main>
 
         <nav class="bottom-nav">
             <a href="index.html">Wall</a>
             <a href="upload.html" class="active">Upload</a>
             <a href="profile.html">Profile</a>
+            <a href="#" id="logout-btn-mobile">Logout</a>
         </nav>
     </div>
     <script type="module" src="js/auth-google.js"></script>

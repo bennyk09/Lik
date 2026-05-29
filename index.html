@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK</title>
-    <link rel="stylesheet" href="./css/style.css?v=1.0.2">
+    <link rel="stylesheet" href="./css/style.css?v=1.0.3">
 </head>
 <body>
     <div class="app-container">
@@ -20,15 +20,18 @@
 
         <main>
             <div id="auth-gateway-view" style="display: none;">
-                <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">A temporary space for real-time moments.</p>
-                <button id="google-login-btn" class="btn-primary btn-google">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16" alt="Google">
-                    Continue with Google
-                </button>
+                <div id="wall-feed" style="text-align: center; padding-top: 40px;">
+                    <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">A temporary space for real-time moments.</p>
+                    <button id="google-login-btn" class="btn-primary btn-google">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16" alt="Google">
+                        Continue with Google
+                    </button>
+                </div>
             </div>
 
             <div id="app-feed-view" style="display: none;">
                 <div class="stories-wrapper" id="stories-tray"></div>
+                
                 <div id="wall-feed">
                     <p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size:0.9rem;">Syncing feed streams...</p>
                 </div>
@@ -45,7 +48,7 @@
 
     <div id="onboarding-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
-            <h3 style="margin-top: 0; font-weight:700;">Complete Profile</h3>
+            <h3 style="margin-top: 0; font-weight:700; margin-bottom: 16px;">Complete Profile</h3>
             <form id="onboarding-form">
                 <div class="form-group">
                     <label for="user-name">Display Name</label>
@@ -55,7 +58,7 @@
                     <label for="user-age">Age</label>
                     <input type="number" id="user-age" required min="13" placeholder="Your age">
                 </div>
-                <button type="submit" class="btn-primary" style="margin-top: 8px;">Create Profile</button>
+                <button type="submit" class="btn-primary" style="margin-top: 8px; width: 100%;">Create Profile</button>
             </form>
         </div>
     </div>
