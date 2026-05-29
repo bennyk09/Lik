@@ -25,7 +25,6 @@ async function renderAppFeed() {
         for (const docData of snap.docs) {
             const moment = docData.data();
             
-            // Query specific author details for matching avatars
             if (!userCacheMap.has(moment.userId)) {
                 const authorSnap = await getDocs(query(collection(db, "users"), where("uid", "==", moment.userId)));
                 if (!authorSnap.empty) {
@@ -35,19 +34,18 @@ async function renderAppFeed() {
             
             const authorData = userCacheMap.get(moment.userId) || { name: "User", profilePic: "" };
             
-            // 1. Generate Feed Post Element Layout
             const card = document.createElement('div');
             card.className = "post-card";
             card.innerHTML = `
                 <div class="post-header">
                     <div class="post-avatar">
-                        ${authorData.profilePic ? `<img src="${authorData.profilePic}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">` : (authorData.name || "U").charAt(0).toUpperCase()}
+                        ${authorData.profilePic ? `<img src="${authorData.profilePic}">` : (authorData.name || "U").charAt(0).toUpperCase()}
                     </div>
                     <div class="post-username">${authorData.name || "Anonymous"}</div>
                 </div>
                 ${moment.imageUrl ? `<div class="post-media-container"><img src="${moment.imageUrl}" class="post-img"></div>` : ''}
                 ${moment.text ? `<p class="post-caption"><strong>${authorData.name || "User"}</strong> ${moment.text}</p>` : ''}
-                <div class="moment-footer" style="margin-top: 10px;">
+                <div class="moment-footer">
                     <button class="like-btn" data-id="${docData.id}" data-author="${moment.userId}">✕ ${moment.likesCount || 0}</button>
                     <small style="color:var(--text-muted); font-size:0.75rem;">${calcTime(moment.uploadTimestamp)}</small>
                 </div>
@@ -55,7 +53,6 @@ async function renderAppFeed() {
             feed.appendChild(card);
         }
 
-        // 2. Generate Instagram-Style Top Row Stories Components
         userCacheMap.forEach((userProfile) => {
             if (!storiesTray) return;
             const node = document.createElement('div');
@@ -63,7 +60,7 @@ async function renderAppFeed() {
             node.innerHTML = `
                 <div class="story-ring">
                     <div class="story-inner">
-                        ${userProfile.profilePic ? `<img src="${userProfile.profilePic}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">` : (userProfile.name || "U").charAt(0).toUpperCase()}
+                        ${userProfile.profilePic ? `<img src="${userProfile.profilePic}">` : (userProfile.name || "U").charAt(0).toUpperCase()}
                     </div>
                 </div>
                 <div class="story-label">${userProfile.name || "User"}</div>
@@ -79,6 +76,8 @@ function bindLikes() {
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async (e) => {
             if(!auth.currentUser) return;
+            
+            // FIX: Using currentTarget safely tracks the button element bounds
             const btnEl = e.currentTarget;
             const currentLikes = parseInt(btnEl.textContent.replace('✕ ', '')) || 0;
             const momentId = btnEl.getAttribute('data-id');
@@ -92,8 +91,11 @@ function bindLikes() {
                     updateDoc(doc(db, "moments", momentId), { likesCount: increment(1) }),
                     updateDoc(doc(db, "users", authorId), { totalLikes: increment(1) })
                 ]);
-            } catch(err) { btnEl.textContent = `✕ ${currentLikes}`; }
-            finally { btnEl.disabled = false; }
+            } catch(err) { 
+                btnEl.textContent = `✕ ${currentLikes}`; 
+            } finally { 
+                btnEl.disabled = false; 
+            }
         };
     });
 }
