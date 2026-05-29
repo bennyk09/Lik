@@ -63,6 +63,20 @@ if (onboardingForm) {
     };
 }
 
+// Handle Logout click events safely across desktop and mobile containers
+const executeLogout = (e) => {
+    e.preventDefault();
+    signOut(auth).then(() => {
+        window.location.href = "index.html";
+    }).catch(err => console.error("Logout failed:", err));
+};
+
+const logoutDesktop = document.getElementById('logout-btn-desktop');
+const logoutMobile = document.getElementById('logout-btn-mobile');
+
+if (logoutDesktop) logoutDesktop.onclick = executeLogout;
+if (logoutMobile) logoutMobile.onclick = executeLogout;
+
 function showAppInterface() {
     const desktopNav = document.getElementById('app-nav-desktop');
     if (authView) authView.style.display = 'none';
