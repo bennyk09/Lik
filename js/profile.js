@@ -13,6 +13,11 @@ const editForm = document.getElementById('edit-profile-form');
 const editNameInput = document.getElementById('edit-user-name');
 const editAgeInput = document.getElementById('edit-user-age');
 
+// Avatar DOM elements
+const avatarPreview = document.getElementById('avatar-preview');
+const avatarInput = document.getElementById('avatar-input');
+const removePicBtn = document.getElementById('remove-pic-btn');
+
 onAuthStateChanged(auth, async (user) => {
     if (!user) return;
     
@@ -35,6 +40,19 @@ onAuthStateChanged(auth, async (user) => {
         // Pre-populate input placeholders for modal fields
         if (editNameInput) editNameInput.value = userData.name || "";
         if (editAgeInput) editAgeInput.value = userData.age || "";
+
+        // Render profile picture avatar or structural letter fallback
+        if (avatarPreview) {
+            if (userData.profilePic) {
+                avatarPreview.innerHTML = `<img src="${userData.profilePic}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                if (removePicBtn) removePicBtn.style.display = 'block';
+            } else {
+                // Take the first character of the username as a minimalist letter placeholder
+                const initial = (userData.name || user.email || "U").charAt(0).toUpperCase();
+                avatarPreview.innerHTML = initial;
+                if (removePicBtn) removePicBtn.style.display = 'none';
+            }
+        }
 
         // 2. Query user's specific moments
         const q = query(
@@ -94,7 +112,52 @@ onAuthStateChanged(auth, async (user) => {
             userMoments.innerHTML = momentsHtml || `<p style="color:var(--text-muted); font-size:0.9rem; text-align:center; padding:16px 0;">No active moments in the last 24 hours.</p>`;
         }
 
-        // 8. Handle Modal Open / Close Click Actions
+        // ==========================================
+        // PROFILE IMAGE ACTIONS INTERFACES
+        // ==========================================
+        
+        // Trigger file picker selection overlay on avatar container tap
+        if (avatarPreview && avatarInput) {
+            avatarPreview.onclick = () => { avatarInput.click(); };
+        }
+
+        // Handle selected file array serialization
+        if (avatarInput) {
+            avatarInput.onchange = async (e) => {
+                if (e.target.files.length === 0) return;
+                const file = e.target.files[0];
+                
+                // Keep image files light so Base64 strings don't cross Firestore limits (Max 1MB per document)
+                if (file.size > 800000) { 
+                    alert("Image too large! Please select an image under 800KB to keep things optimal.");
+                    return;
+                }
+
+                try {
+                    const base64String = await toBase64(file);
+                    await updateDoc(userDocRef, { profilePic: base64String });
+                    window.location.reload();
+                } catch (err) {
+                    console.error("Avatar conversion failure: ", err);
+                }
+            };
+        }
+
+        // Wipe photo parameters out of document snapshot context entirely
+        if (removePicBtn) {
+            removePicBtn.onclick = async () => {
+                try {
+                    await updateDoc(userDocRef, { profilePic: "" });
+                    window.location.reload();
+                } catch (err) {
+                    console.error("Failed removing profile avatar data parameters: ", err);
+                }
+            };
+        }
+
+        // ==========================================
+        // MODAL DIALOGS ACTIONS INTERFACES
+        // ==========================================
         if (openModalBtn) {
             openModalBtn.onclick = () => { editModal.style.display = 'flex'; };
         }
@@ -102,25 +165,21 @@ onAuthStateChanged(auth, async (user) => {
             closeModalBtn.onclick = () => { editModal.style.display = 'none'; };
         }
 
-        // 9. Process Profile Form Updates
         if (editForm) {
             editForm.onsubmit = async (e) => {
                 e.preventDefault();
-                
                 const updatedName = editNameInput.value.trim();
                 const updatedAge = parseInt(editAgeInput.value);
 
                 if (!updatedName || !updatedAge) return;
 
                 try {
-                    // Update only targeted parameters safely in document context
                     await updateDoc(userDocRef, {
                         name: updatedName,
                         age: updatedAge
                     });
-                    
                     editModal.style.display = 'none';
-                    window.location.reload(); // Refresh to update UI changes instantly
+                    window.location.reload();
                 } catch (updateError) {
                     console.error("Error saving updates:", updateError);
                     alert("Failed to save changes. Try again.");
@@ -134,4 +193,12 @@ onAuthStateChanged(auth, async (user) => {
             profileCard.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Failed to balance profile analytics calculations.</p>`;
         }
     }
+});
+
+// Helper base64 transformer converter promise module
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
 });
