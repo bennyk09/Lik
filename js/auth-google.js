@@ -19,68 +19,26 @@ onAuthStateChanged(auth, async (user) => {
             const userSnap = await getDoc(userDocRef);
 
             if (!userSnap.exists()) {
-                if (modal) {
-                    modal.style.display = 'flex';
-                } else {
+                // If they are on a sub-page but haven't onboarding yet, send them to index to complete it
+                if (!modal) {
                     window.location.href = "index.html";
+                    return;
                 }
+                modal.style.display = 'flex';
             } else {
                 showAppInterface();
             }
         } catch (err) {
-            console.error(err);
-            alert("Database Error: Verify Firestore is created and rules are set to public.");
+            console.error("Auth observation caught an error: ", err);
+            // Only show alert if it's an actual critical error, not an empty document path
+            if (modal || window.location.pathname.endsWith('index.html')) {
+                alert("Database Connection Pending: Please try logging in again or refresh the page.");
+            }
         }
     } else {
         showAuthInterface();
     }
 });
-
-if (loginBtn) {
-    loginBtn.addEventListener('click', async () => {
-        try {
-            await signInWithPopup(auth, provider);
-        } catch (err) {
-            console.error(err);
-        }
-    });
-}
-
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        signOut(auth).then(() => {
-            window.location.href = "index.html";
-        });
-    });
-}
-
-if (onboardingForm) {
-    onboardingForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const name = document.getElementById('user-name').value;
-        const age = parseInt(document.getElementById('user-age').value);
-
-        try {
-            await setDoc(doc(db, "users", user.uid), {
-                uid: user.uid,
-                name: name,
-                age: age,
-                totalLikes: 0,
-                averageLikScore: 0,
-                rank: "Unranked"
-            });
-            modal.style.display = 'none';
-            showAppInterface();
-        } catch (err) {
-            alert("Error saving profile: " + err.message);
-        }
-    });
-}
-
 function showAppInterface() {
     if (authView) authView.style.display = 'none';
     if (feedView) feedView.style.display = 'block';

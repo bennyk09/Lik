@@ -1,5 +1,6 @@
-import { auth, db } from './firebase-config.deploy.js';
+import { db, auth } from './firebase-config.deploy.js';
 import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const feed = document.getElementById('wall-feed');
 
@@ -12,7 +13,7 @@ async function renderFeed() {
         const snap = await getDocs(q);
         feed.innerHTML = "";
         if(snap.empty) {
-            feed.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding: 40px 0;">No live moments active.</p>`;
+            feed.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding: 40px 0;">No live moments active right now.</p>`;
             return;
         }
         snap.forEach((docData) => {
@@ -30,7 +31,7 @@ async function renderFeed() {
             feed.appendChild(card);
         });
         bindLikes();
-    } catch(err) { console.error(err); }
+    } catch(err) { console.error("Feed error: ", err); }
 }
 
 function bindLikes() {
@@ -55,4 +56,9 @@ function calcTime(ts) {
     return `${Math.floor(mins/60)}h ago`;
 }
 
-setTimeout(renderFeed, 600);
+// Only trigger feed load once user is verified securely
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        renderFeed();
+    }
+});
