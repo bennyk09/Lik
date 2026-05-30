@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.deploy.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, updateDoc, collection, query, where, getDocs, deleteDoc, arrayUnion, arrayRemove, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, updateDoc, collection, query, where, getDocs, arrayUnion, arrayRemove, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const usernameLabel = document.getElementById('lbl-username-display');
 const bioContainer = document.getElementById('profile-bio-container');
@@ -35,35 +35,33 @@ async function loadProfileData(uid, isViewingSelf) {
 
         let statusBadgeHtml = "";
         if (userData.relationshipStatus === "couple") {
-            statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 59, 48, 0.12); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700;">Committed</span>`;
+            statusBadgeHtml = `<span id="relationship-status-badge">Committed</span>`;
             if (partnerStatusDisplayFrame && userData.partnerUid) {
                 renderPartnerDetailsCard(userData.partnerUid, isViewingSelf);
             }
         } else {
-            statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 255, 255, 0.04); color: var(--text-muted); border: 1px solid var(--card-border); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 600;">Single</span>`;
+            statusBadgeHtml = `<span id="relationship-status-badge">Single</span>`;
             if (partnerStatusDisplayFrame) partnerStatusDisplayFrame.innerHTML = "";
         }
 
         if (usernameLabel) {
             usernameLabel.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 8px; width: 100%; flex-wrap: wrap;">
-                    <span style="color: var(--text-main); font-weight: 700; font-size: 1.35rem;">${userData.name || "User"}</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px; width: 100%;">
-                    <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: 400;">${userData.username || '/user'}</span>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-weight: 800; font-size: 1.7rem; color: var(--text-main); letter-spacing:-0.5px;">${userData.name || "User"}</span>
                     ${statusBadgeHtml}
-                </div>`;
+                </div>
+                <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: 500; margin-top: 2px; display:block;">${userData.username || '/user'}</span>
+            `;
         }
         
-        if (bioContainer) bioContainer.textContent = userData.bio || "No biography set yet.";
+        if (bioContainer) bioContainer.textContent = userData.bio || "No biography added yet.";
         
         if (avatarPreview) {
-            avatarPreview.style.cursor = isViewingSelf ? "pointer" : "default";
             if (userData.profilePic) {
                 avatarPreview.innerHTML = `<img src="${userData.profilePic}" alt="Avatar">`;
                 if (removePicBtn) removePicBtn.style.display = isViewingSelf ? "block" : "none";
             } else {
-                avatarPreview.textContent = (userData.name || "U").charAt(0).toUpperCase();
+                avatarPreview.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#eee; font-weight:bold; font-size:1.5rem; color:#666;">${(userData.name || "U").charAt(0).toUpperCase()}</div>`;
                 if (removePicBtn) removePicBtn.style.display = "none";
             }
         }
@@ -96,7 +94,8 @@ async function loadProfileData(uid, isViewingSelf) {
                 <div class="stat-node"><span class="stat-node-val">${swappedArray.length}</span><span class="stat-node-lbl">Swaps</span></div>
                 <div class="stat-node"><span class="stat-node-val">${activeMomentsCount}</span><span class="stat-node-lbl">Moments</span></div>
                 <div class="stat-node"><span class="stat-node-val">${scoreLikes}</span><span class="stat-node-lbl">Score</span></div>
-                <div class="stat-node"><span class="stat-node-val">${computedRankPosition}</span><span class="stat-node-lbl">Rank</span></div>`;
+                <div class="stat-node"><span class="stat-node-val">${computedRankPosition}</span><span class="stat-node-lbl">Rank</span></div>
+            `;
         }
 
         if (isViewingSelf) {
@@ -133,24 +132,27 @@ async function loadProfileData(uid, isViewingSelf) {
 
 async function renderPartnerDetailsCard(partnerUid, isViewingSelf) {
     try {
-        const partnerSnap = await getDoc(doc(db, "users", partnerUid)); if (!partnerSnap.exists()) return;
+        const partnerSnap = await getDoc(doc(db, "users", partnerUid));
+        if (!partnerSnap.exists()) return;
         const partnerData = partnerSnap.data();
 
         partnerStatusDisplayFrame.innerHTML = `
-            <div class="post-card" style="margin-bottom: 0; padding: 14px; display: flex; align-items: center; gap: 12px; background: rgba(255, 59, 48, 0.03); border-color: rgba(255, 59, 48, 0.15); cursor: pointer;">
-                <div class="post-avatar" style="width: 38px; height: 38px; font-size: 0.85rem; border-color: rgba(255, 59, 48, 0.2);" onclick="window.location.href='profile.html?uid=${partnerUid}'">
+            <div class="timeline-post-node" style="margin-bottom: 20px; background: white; border: 1px solid var(--card-border); border-radius: var(--radius-img); padding: 14px; display: flex; align-items: center; gap: 12px;">
+                <div class="post-avatar-circle" style="width: 40px; height: 40px; cursor: pointer;" onclick="window.location.href='profile.html?uid=${partnerUid}'">
                     ${partnerData.profilePic ? `<img src="${partnerData.profilePic}">` : (partnerData.name || "U").charAt(0).toUpperCase()}
                 </div>
-                <div style="display: flex; flex-direction: column; flex: 1;" onclick="window.location.href='profile.html?uid=${partnerUid}'">
-                    <span style="font-size: 0.82rem; color: #ff3b30; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Partner</span>
-                    <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-main);">${partnerData.name}</span>
+                <div style="display: flex; flex-direction: column; flex: 1; cursor: pointer;" onclick="window.location.href='profile.html?uid=${partnerUid}'">
+                    <span style="font-size: 0.8rem; color: #ff3b30; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Partner</span>
+                    <span style="font-size: 1.05rem; font-weight: 700; color: var(--text-main);">${partnerData.name}</span>
                 </div>
-                ${isViewingSelf ? `<button id="btn-break-up-direct" class="btn-secondary" style="padding: 6px 14px; font-size: 0.78rem; font-weight: 700; color: var(--accent-red); border-color: rgba(255,59,48,0.2); border-radius: 20px;">Break Up</button>` : ''}
-            </div>`;
+                ${isViewingSelf ? `<button id="btn-break-up-direct" class="sidebar-bottom-pill-btn" style="background:#ff3b30; width:auto; padding: 10px 18px; font-size:0.85rem;">Break Up</button>` : ''}
+            </div>
+        `;
 
         if (isViewingSelf) {
             partnerStatusDisplayFrame.querySelector('#btn-break-up-direct').onclick = async (e) => {
-                e.stopPropagation(); if (!confirm("Are you sure you want to break up?")) return;
+                e.stopPropagation();
+                if (!confirm("Break up relationship link parameters?")) return;
                 const currentUserId = auth.currentUser.uid;
                 try {
                     await Promise.all([
@@ -170,8 +172,11 @@ function removeDynamicProfileButtons() {
 }
 
 async function injectForeignProfileButtons(targetUid) {
-    const currentUserId = auth.currentUser.uid; removeDynamicProfileButtons();
-    const myProfileSnap = await getDoc(doc(db, "users", currentUserId)); const myData = myProfileSnap.data();
+    const currentUserId = auth.currentUser.uid;
+    removeDynamicProfileButtons();
+
+    const myProfileSnap = await getDoc(doc(db, "users", currentUserId));
+    const myData = myProfileSnap.data();
     
     const mutualIds = myData.swappedWith || [];
     const incomingIds = myData.swapRequestsIn || [];
@@ -182,19 +187,27 @@ async function injectForeignProfileButtons(targetUid) {
     const myCoupleReqOut = myData.coupleRequestOut || "";
     const myCoupleReqIn = myData.coupleRequestIn || "";
 
-    const swapContainer = document.createElement('div'); swapContainer.id = "profile-dynamic-swap-btn"; swapContainer.style = "margin-bottom: 12px;";
-    const swapBtn = document.createElement('button'); swapBtn.className = "btn-primary"; swapBtn.style.width = "100%";
+    const swapContainer = document.createElement('div');
+    swapContainer.id = "profile-dynamic-swap-btn";
+    swapContainer.style = "margin-bottom: 12px; width: 100%;";
+
+    const swapBtn = document.createElement('button');
+    swapBtn.className = "sidebar-bottom-pill-btn";
+    swapBtn.style.maxWidth = "100%";
     
     if (mutualIds.includes(targetUid)) {
-        swapBtn.textContent = "Unswap Connection"; swapBtn.className = "btn-secondary";
+        swapBtn.textContent = "Unswap Connection"; swapBtn.style.background = "#666";
     } else if (sentIds.includes(targetUid)) {
-        swapBtn.textContent = "Requested"; swapBtn.className = "btn-secondary";
+        swapBtn.textContent = "Requested"; swapBtn.style.background = "#888";
     } else if (incomingIds.includes(targetUid)) {
         swapBtn.textContent = "Accept Swap Request";
-    } else { swapBtn.textContent = "Swap Profile"; }
+    } else {
+        swapBtn.textContent = "Swap Profile";
+    }
 
     swapBtn.onclick = async () => {
-        swapBtn.disabled = true; const currentLabel = swapBtn.textContent;
+        swapBtn.disabled = true;
+        const currentLabel = swapBtn.textContent;
         try {
             if (currentLabel === "Swap Profile") {
                 await updateDoc(doc(db, "users", currentUserId), { swapRequestsOut: arrayUnion(targetUid) });
@@ -211,14 +224,19 @@ async function injectForeignProfileButtons(targetUid) {
         } catch(err) { console.error(err); }
         finally { swapBtn.disabled = false; }
     };
-    swapContainer.appendChild(swapBtn); userMomentsGrid.parentNode.insertBefore(swapContainer, userMomentsGrid);
+    swapContainer.appendChild(swapBtn);
+    userMomentsGrid.parentNode.insertBefore(swapContainer, userMomentsGrid);
 
     if (mutualIds.includes(targetUid)) {
-        const coupleContainer = document.createElement('div'); coupleContainer.id = "profile-dynamic-couple-btn"; coupleContainer.style = "margin-bottom: 32px;";
+        const coupleContainer = document.createElement('div');
+        coupleContainer.id = "profile-dynamic-couple-btn";
+        coupleContainer.style = "margin-bottom: 32px; width: 100%;";
+
         if (myCoupleStatus === "couple" && myPartnerUid !== targetUid) return;
 
         if (myCoupleStatus === "couple" && myPartnerUid === targetUid) {
-            const breakBtn = document.createElement('button'); breakBtn.className = "btn-secondary"; breakBtn.style.width = "100%"; breakBtn.style.color = "var(--accent-red)";
+            const breakBtn = document.createElement('button');
+            breakBtn.className = "sidebar-bottom-pill-btn"; breakBtn.style.background = "#ff3b30"; breakBtn.style.maxWidth = "100__";
             breakBtn.textContent = "Break Up (Remove Couple)";
             breakBtn.onclick = async () => {
                 if (!confirm("Are you sure?")) return;
@@ -228,13 +246,17 @@ async function injectForeignProfileButtons(targetUid) {
             };
             coupleContainer.appendChild(breakBtn);
         } else if (myCoupleReqOut === targetUid) {
-            const pendingBtn = document.createElement('button'); pendingBtn.className = "btn-secondary"; pendingBtn.style.width = "100%"; pendingBtn.disabled = true;
-            pendingBtn.textContent = "Couple Proposal Sent..."; coupleContainer.appendChild(pendingBtn);
+            const pendingBtn = document.createElement('button');
+            pendingBtn.className = "sidebar-bottom-pill-btn"; pendingBtn.style.background = "#888"; pendingBtn.style.maxWidth = "100%"; pendingBtn.disabled = true;
+            pendingBtn.textContent = "Couple Proposal Sent...";
+            coupleContainer.appendChild(pendingBtn);
         } else if (myCoupleReqIn === targetUid) {
-            const rowWrapper = document.createElement('div'); rowWrapper.style = "display: flex; gap: 12px; width: 100%;";
+            const rowWrapper = document.createElement('div');
+            rowWrapper.style = "display: flex; gap: 12px; width: 100%;";
             rowWrapper.innerHTML = `
-                <button id="btn-accept-couple" class="btn-primary" style="flex: 1; background: #ff453a;">Accept</button>
-                <button id="btn-reject-couple" class="btn-secondary" style="flex: 1;">Reject</button>`;
+                <button id="btn-accept-couple" class="sidebar-bottom-pill-btn" style="flex: 1; background: #ff3b30;">Accept</button>
+                <button id="btn-reject-couple" class="sidebar-bottom-pill-btn" style="flex: 1; background: #666;">Reject</button>
+            `;
             rowWrapper.querySelector('#btn-accept-couple').onclick = async () => {
                 await updateDoc(doc(db, "users", currentUserId), { coupleRequestIn: "", relationshipStatus: "couple", partnerUid: targetUid });
                 await updateDoc(doc(db, "users", targetUid), { coupleRequestOut: "", relationshipStatus: "couple", partnerUid: currentUserId });
@@ -247,7 +269,8 @@ async function injectForeignProfileButtons(targetUid) {
             };
             coupleContainer.appendChild(rowWrapper);
         } else if (myCoupleStatus === "single") {
-            const proposeBtn = document.createElement('button'); proposeBtn.className = "btn-secondary"; proposeBtn.style.width = "100%";
+            const proposeBtn = document.createElement('button');
+            proposeBtn.className = "sidebar-bottom-pill-btn"; proposeBtn.style.maxWidth = "100%";
             proposeBtn.textContent = "Add Couple";
             proposeBtn.onclick = async () => {
                 await updateDoc(doc(db, "users", currentUserId), { coupleRequestOut: targetUid });
@@ -272,17 +295,14 @@ if (editForm) {
                 age: parseInt(document.getElementById('edit-user-age').value),
                 bio: document.getElementById('edit-user-bio').value.trim()
             });
-            editModal.style.display = 'none'; await loadProfileData(auth.currentUser.uid, true);
+            editModal.style.display = 'none';
+            await loadProfileData(auth.currentUser.uid, true);
         } catch (err) { alert(err.message); }
     };
 }
 
 if (avatarPreview && avatarInput) {
-    avatarPreview.onclick = () => {
-        const urlParamsCheck = new URLSearchParams(window.location.search);
-        const currentProfileUid = urlParamsCheck.get('uid');
-        if (!currentProfileUid || currentProfileUid === auth.currentUser.uid) avatarInput.click();
-    };
+    avatarPreview.onclick = () => { avatarInput.click(); };
 }
 
 if (avatarInput) {
@@ -295,18 +315,5 @@ if (avatarInput) {
                 await loadProfileData(auth.currentUser.uid, true);
             } catch (err) { alert(err.message); }
         };
-    };
-}
-
-const themeBtn = document.getElementById('theme-toggle-btn');
-if (themeBtn) {
-    const savedTheme = localStorage.getItem('lik-theme') || 'dark';
-    themeBtn.innerHTML = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-    themeBtn.onclick = () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('lik-theme', newTheme);
-        themeBtn.innerHTML = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
     };
 }
