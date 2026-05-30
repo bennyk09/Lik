@@ -84,22 +84,39 @@ async function loadProfileData(uid, isViewingSelf) {
         const scoreLikes = userData.totalLikes || 0;
 
         // 🪐 LEADERBOARD RANK GENERATOR PIPELINE: Computes real positional index based on overall Score
-        let computedRankPosition = "#--";
-        try {
-            const rankQuery = query(collection(db, "users"), orderBy("totalLikes", "desc"));
-            const rankSnapshot = await getDocs(rankQuery);
-            let indexPosition = 1;
+// 🪐 FIXED LEADERBOARD RANK GENERATOR: Handles zero scores and ties cleanly
+let computedRankPosition = "Unranked"; 
+try {
+    if (scoreLikes > 0) {
+        const rankQuery = query(collection(db, "users"), orderBy("totalLikes", "desc"));
+        const rankSnapshot = await getDocs(rankQuery);
+        let indexPosition = 1;
+        let trueRank = 1;
+        let previousLikes = -1;
+
+        for (const docData of rankSnapshot.docs) {
+            const currentDocLikes = docData.data().totalLikes || 0;
             
-            for (const docData of rankSnapshot.docs) {
-                if (docData.id === uid) {
-                    computedRankPosition = `#${indexPosition}`;
-                    break;
-                }
-                indexPosition++;
+            // If the score drops, push the rank down to the current loop index
+            if (currentDocLikes < previousLikes) {
+                trueRank = indexPosition;
             }
-        } catch (rankErr) {
-            console.warn("Rank computation index delay fallback initialized.", rankErr);
+            
+            if (docData.id === uid) {
+                computedRankPosition = `#${trueRank}`;
+                break;
+            }
+            
+            previousLikes = currentDocLikes;
+            indexPosition++;
         }
+    } else {
+        // 🪐 If your score is 0, you remain unranked until you get your first like!
+        computedRankPosition = "None";
+    }
+} catch (rankErr) {
+    console.warn("Rank computation index delay fallback initialized.", rankErr);
+}
 
         // 🪐 RENDER PARAMETERS METRICS GRID AS REQUESTED: Swaps | Moments | Score(likes) | Rank(most likes)
         if (statsTray) {
