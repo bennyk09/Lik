@@ -1,5 +1,5 @@
 /* ==========================================================================
-   🪐 LIK PREMIUM MASTER DESIGN SYSTEM - LOGO INDEPENDENT DESIGN (LIGHT THEME)
+   🪐 LIK CORE MASTER DESIGN SCHEMA - CLEAN LOGO-ONLY MINIMALIST APPEARANCE
    ========================================================================== */
 
 :root {
@@ -17,7 +17,7 @@
     --radius-pill: 50px;
     --radius-card: 24px;
     --radius-img: 16px;
-    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", sans-serif;
+    --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --transition-smooth: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -40,7 +40,7 @@ body {
 
 .app-container {
     display: grid;
-    grid-template-columns: 100px 1fr; /* Optimized strictly around the standalone logo width bounds */
+    grid-template-columns: 90px 1fr; /* Slimmed column container to surround the logo icon cleanly */
     width: 100%;
     min-height: 100vh;
 }
@@ -49,7 +49,7 @@ header {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100px;
+    width: 90px;
     height: 100vh;
     border-right: 1px solid var(--sidebar-line);
     padding: 40px 0;
@@ -61,7 +61,7 @@ header {
     z-index: 1000;
 }
 
-/* Standalone Logo Icon Box Setup */
+/* Standalone Clean Logo Layout Box Configuration */
 .brand-wrapper {
     display: flex;
     justify-content: center;
@@ -71,6 +71,7 @@ header {
     margin-bottom: 32px;
 }
 
+/* Enforces the logo asset size parameters */
 .brand-logo-img {
     width: 44px;
     height: 44px;
@@ -88,7 +89,7 @@ header {
 
 .desktop-nav a {
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 700;
     text-decoration: none;
     text-transform: uppercase;
@@ -103,7 +104,7 @@ header {
     border-bottom-color: var(--text-main);
 }
 
-/* Circular Iconized Settings Nav Switch at Sidebar Bottom */
+/* Sidebar Circle Lower Control Toggle Button */
 .sidebar-bottom-pill-btn {
     background-color: var(--pill-dark-bg);
     color: #ffffff !important;
@@ -124,8 +125,8 @@ header {
 }
 
 main {
-    margin-left: 100px;
-    padding: 40px var(--main-pad, 48px);
+    margin-left: 90px;
+    padding: 40px 24px;
     width: 100%;
     background-color: var(--bg-outside);
     display: flex;
@@ -153,117 +154,167 @@ main {
 }
 
 /* ==========================================================================
-   🖼️ FEED TIMELINE MATRIX HOUSING CARDS
+   🖼️ HOME TIMELINE CARD MATRIX LOOKUPS
    ========================================================================== */
 
-#wall-feed-container, .feed-column-wrapper {
+#wall-feed-container {
     width: 100%;
-    max-width: 500px;
+    max-width: 480px;
 }
 
+/* Master Column Envelope Card Housing the Content Streams */
 .feed-master-card-shell {
     background-color: #ffffff;
     border: 1px solid var(--card-border);
     border-radius: var(--radius-card);
     width: 100%;
     padding: 24px;
-}
-
-.search-wrapper-block { width: 100%; margin-bottom: 24px; }
-
-.timeline-post-node { width: 100%; margin-bottom: 28px; display: flex; flex-direction: column; }
-.post-media-box-wrapper { width: 100%; aspect-ratio: 1/1; border-radius: var(--radius-img); overflow: hidden; background-color: var(--card-color); margin-bottom: 14px; border: 1px solid var(--card-border); }
-.post-media-box-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-
-.post-metadata-tray { display: flex; align-items: center; gap: 12px; }
-.post-avatar-circle { width: 44px; height: 44px; border-radius: 50%; border: 1px solid #000; overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 700; background: #fff; }
-.post-avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
-.post-identity-block { display: flex; flex-direction: column; }
-.post-author-title-label { font-size: 1.1rem; font-weight: 700; }
-.post-timestamp-caption-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 1px; }
-
-.post-actions-overlay-strip { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-.action-icon-trigger { background: transparent; border: none; cursor: pointer; color: var(--text-main); display: flex; align-items: center; }
-
-/* ==========================================================================
-   👤 PROFILE CANVAS COMPONENT LAYOUT
-   ========================================================================== */
-
-.profile-meta-block {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    background-color: #ffffff;
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-card);
-    padding: 28px;
-    margin-bottom: 20px;
+    gap: 24px;
 }
 
-.profile-meta-top-row {
+.search-wrapper-block {
+    width: 100%;
+}
+
+.search-input-field {
+    width: 100%;
+    background-color: var(--input-bg);
+    color: var(--text-main);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    outline: none;
+}
+
+/* Traditional Stream Post Layout Block Containers */
+.timeline-post-node {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+.post-media-box-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-img);
+    overflow: hidden;
+    background-color: #e2e2e6;
+    margin-bottom: 16px;
+    border: 1px solid var(--card-border);
+}
+
+.post-media-box-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post-metadata-tray {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 16px;
+    gap: 12px;
+    padding: 0 4px;
 }
 
-.profile-identity-details h2 {
-    font-size: 1.6rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-}
-
-.profile-avatar {
-    width: 72px;
-    height: 72px;
+.post-avatar-circle {
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
-    border: 1px solid var(--card-border);
+    border: 1px solid #1c1c1e;
+    background-color: #ffffff;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+.post-avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post-identity-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-author-title-label {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+
+.post-timestamp-caption-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.post-actions-overlay-strip {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.action-icon-trigger {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+}
+.action-icon-trigger:hover { opacity: 0.7; }
+.action-icon-trigger.delete-mode:hover { color: var(--accent-red); }
+
+/* Sticky Lower Corner Profile Pill Layout Component Links */
+.floating-right-account-pill {
+    position: fixed;
+    bottom: 40px;
+    right: 48px;
+    background-color: var(--pill-dark-bg);
+    color: #ffffff !important;
+    border-radius: var(--radius-pill);
+    padding: 10px 24px 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    z-index: 2000;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+}
+.floating-right-account-pill:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+}
+
+.floating-pill-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #ffffff;
     overflow: hidden;
 }
-.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-.remove-pic-btn {
-    background: none; border: none; color: var(--accent-red); font-size: 0.72rem; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: 6px;
-}
-
-#relationship-status-badge {
-    background-color: #f1f1f4;
-    color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: var(--radius-pill);
-    display: inline-block;
-    margin-top: 4px;
-}
-
-.stats-row { display: flex; gap: 20px; margin: 16px 0 8px 0; }
-.stat-node { display: flex; gap: 4px; font-size: 0.88rem; }
-.stat-node-val { font-weight: 700; }
-.stat-node-lbl { color: var(--text-muted); }
-
-.profile-bio-text { font-size: 0.95rem; line-height: 1.5; margin-top: 4px; color: #333; }
-
-#user-moments {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    width: 100%;
-}
-.user-moment-card { aspect-ratio: 1/1; border-radius: var(--radius-img); overflow: hidden; border: 1px solid var(--card-border); }
-.user-moment-card img { width: 100%; height: 100%; object-fit: cover; }
-
-/* FLOATING FOOTER ACCOUNT SWITCH PILL */
-.floating-right-account-pill {
-    position: fixed; bottom: 32px; right: 48px; background-color: var(--pill-dark-bg); color: #fff !important; border-radius: var(--radius-pill); padding: 10px 20px 10px 10px; display: flex; align-items: center; gap: 10px; text-decoration: none; z-index: 2000;
-}
-.floating-pill-avatar { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; background: #fff; }
 .floating-pill-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.floating-pill-label-text { font-size: 0.88rem; font-weight: 600; }
+.floating-pill-label-text { font-size: 0.92rem; font-weight: 600; }
 
-@media (max-width: 1100px) { .floating-right-account-pill { position: static; margin: 20px auto 0 auto; width: max-content; } }
-
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.3); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 16px; }
-.modal-content { background: #fff; border: 1px solid var(--card-border); border-radius: var(--radius-card); width: 100%; max-width: 440px; padding: 32px; }
+@media (max-width: 1200px) {
+    .floating-right-account-pill {
+        position: static;
+        margin: 24px auto 0 auto;
+        width: max-content;
+    }
+}
