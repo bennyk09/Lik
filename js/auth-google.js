@@ -44,12 +44,17 @@ if (onboardingForm) {
     onboardingForm.onsubmit = async (e) => {
         e.preventDefault();
         const user = auth.currentUser;
-        if (!user) return;
+        if (!user || !user.email) return;
 
         try {
+            // 🪐 STEP 1: Extract email prefix and format as an unchangeable handle (/prefix)
+            const emailPrefix = user.email.split('@')[0];
+            const generatedHandle = `/${emailPrefix}`;
+
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
-                name: document.getElementById('user-name').value.trim(),
+                name: document.getElementById('user-name').value.trim(), // Editable Display Name
+                username: generatedHandle, // 🛑 STOPS MODIFICATION: Saved permanently as /handle
                 age: parseInt(document.getElementById('user-age').value),
                 bio: "",
                 profilePic: "",
@@ -63,7 +68,6 @@ if (onboardingForm) {
     };
 }
 
-// Handle Logout click events safely across desktop and mobile containers
 const executeLogout = (e) => {
     e.preventDefault();
     signOut(auth).then(() => {

@@ -33,26 +33,26 @@ async function renderAppFeed() {
                 }
             }
             
-            const authorData = userCacheMap.get(moment.userId) || { name: "User", profilePic: "" };
-            
-            // Map individual runtime identification verification parameter rules
+            const authorData = userCacheMap.get(moment.userId) || { name: "User", username: "/user", profilePic: "" };
             const isMyMoment = auth.currentUser && auth.currentUser.uid === moment.userId;
 
             const card = document.createElement('div');
             card.className = "post-card";
-            card.id = `moment-card-${momentId}`; // Anchor container ID to target for instant DOM pruning
+            card.id = `moment-card-${momentId}`;
             card.innerHTML = `
-                <div class="post-header">
+                <div class="post-header" style="display: flex; align-items: center; gap: 12px;">
                     <div class="post-avatar">
                         ${authorData.profilePic ? `<img src="${authorData.profilePic}">` : (authorData.name || "U").charAt(0).toUpperCase()}
                     </div>
-                    <div class="post-username">${authorData.name || "Anonymous"}</div>
+                    <div style="display: flex; flex-direction: column;">
+                        <span class="post-username" style="font-weight: 600; font-size: 0.9rem; color: var(--text-main); line-height: 1.2;">${authorData.name || "Anonymous"}</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 500; margin-top: 2px;">${authorData.username || "/user"}</span>
+                    </div>
                 </div>
                 ${moment.imageUrl ? `<div class="post-media-container"><img src="${moment.imageUrl}" class="post-img"></div>` : ''}
                 ${moment.text ? `<p class="post-caption"><strong>${authorData.name || "User"}</strong> ${moment.text}</p>` : ''}
                 <div class="moment-footer">
                     <button class="like-btn" data-id="${momentId}" data-author="${moment.userId}">
-                        <!-- Clean Vector Heart SVG Graphic Element Asset -->
                         <svg viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
@@ -68,23 +68,8 @@ async function renderAppFeed() {
             feed.appendChild(card);
         }
 
-        userCacheMap.forEach((userProfile) => {
-            if (!storiesTray) return;
-            const node = document.createElement('div');
-            node.className = "story-node";
-            node.innerHTML = `
-                <div class="story-ring">
-                    <div class="story-inner">
-                        ${userProfile.profilePic ? `<img src="${userProfile.profilePic}">` : (userProfile.name || "U").charAt(0).toUpperCase()}
-                    </div>
-                </div>
-                <div class="story-label">${userProfile.name || "User"}</div>
-            `;
-            storiesTray.appendChild(node);
-        });
-
         bindLikes();
-        bindDeletions(); // Connect action click listeners 
+        bindDeletions();
     } catch(err) { console.error("Feed pipeline error: ", err); }
 }
 
@@ -134,18 +119,14 @@ function bindDeletions() {
             e.currentTarget.textContent = "Removing...";
 
             try {
-                // Delete explicit document from Firestore mapping configurations
                 await deleteDoc(doc(db, "moments", momentId));
-                
-                // Animate and remove specific HTML post card directly from user interface view bounds
                 const postCardTarget = document.getElementById(`moment-card-${momentId}`);
                 if (postCardTarget) {
                     postCardTarget.style.opacity = '0';
                     setTimeout(() => postCardTarget.remove(), 250);
                 }
             } catch (err) {
-                console.error("Purge action failed:", err);
-                alert("Failed to delete moment. Please try again.");
+                console.error(err);
                 e.currentTarget.disabled = false;
                 e.currentTarget.textContent = "Delete";
             }
