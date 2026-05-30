@@ -26,7 +26,6 @@ async function renderSwapsDashboard(myUid) {
         const sentIds = myData.swapRequestsOut || [];
         const mutualIds = myData.swappedWith || [];
 
-        // 1. POPULATE INCOMING REQUESTS
         incomingContainer.innerHTML = incomingIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No new swap requests.</p>` : "";
         for (const targetUid of incomingIds) {
             const profile = await fetchProfile(targetUid);
@@ -50,7 +49,6 @@ async function renderSwapsDashboard(myUid) {
             }
         }
 
-        // 2. POPULATE PENDING SENT INVITATIONS
         sentContainer.innerHTML = sentIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No pending sent invitations.</p>` : "";
         for (const targetUid of sentIds) {
             const profile = await fetchProfile(targetUid);
@@ -71,7 +69,6 @@ async function renderSwapsDashboard(myUid) {
             }
         }
 
-        // 3. POPULATE MUTUAL SWAPPED FRIENDS
         mutualContainer.innerHTML = mutualIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No mutual connections formed yet.</p>` : "";
         for (const targetUid of mutualIds) {
             const profile = await fetchProfile(targetUid);
@@ -184,12 +181,6 @@ if (searchInput) {
             searchResultsTray.style.display = "block";
         } catch (err) { console.error(err); }
     };
-    
-    document.addEventListener('click', (e) => {
-        if (e.target !== searchInput && e.target !== searchResultsTray) {
-            if (searchResultsTray) searchResultsTray.style.display = "none";
-        }
-    });
 }
 
 async function fetchProfile(uid) { 

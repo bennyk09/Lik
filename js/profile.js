@@ -269,7 +269,13 @@ if (editForm) {
 }
 
 if (avatarPreview && avatarInput) {
-    avatarPreview.onclick = () => { if(auth.currentUser) avatarInput.click(); };
+    avatarPreview.onclick = () => {
+        const urlParamsCheck = new URLSearchParams(window.location.search);
+        const currentProfileUid = urlParamsCheck.get('uid');
+        if (!currentProfileUid || currentProfileUid === auth.currentUser.uid) {
+            avatarInput.click();
+        }
+    };
 }
 
 if (avatarInput) {
