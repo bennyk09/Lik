@@ -1,29 +1,28 @@
 /* ==========================================================================
-   🪐 LIK CORE SYSTEM STYLE MATRIX - MODERN HIGH-CONTRAST DARK MODE UI
+   🪐 LIK CORE RE-DESIGN CANVAS - MINIMALIST HIGH-CONTRAST PITCH-BLACK & WHITE
    ========================================================================== */
 
 :root {
-    --bg-main: #0a0a0c;
-    --card-color: #1a1a1f;
-    --card-border: #26262b;
-    --text-main: #f3f4f6;
-    --text-muted: #8e8e93;
+    /* 🪐 Completely inverted colors to match wall.jpg white-space aesthetic */
+    --bg-main: #ffffff;
+    --card-color: #333333;       /* Deep dark gray post frame */
+    --card-border: #222222;
+    --text-main: #111111;       /* Dark charcoal bold text layer */
+    --text-muted: #666666;
+    --text-light: #ffffff;      /* Inline white text for inside cards */
     
-    /* Premium High-Contrast Color Variables */
-    --accent-color: #2f80ed;
-    --accent-glow: rgba(47, 128, 237, 0.15);
-    --accent-red: #ff3b30;
-    --accent-red-glow: rgba(255, 59, 48, 0.12);
+    --accent-color: #0066cc;
+    --accent-red: #da251d;
     
-    /* Layout Constants */
-    --radius-sm: 8px;
-    --radius-md: 16px;
-    --radius-lg: 28px;
-    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* Layout Geometric Constants */
+    --radius-sm: 12px;
+    --radius-md: 24px;
+    --radius-lg: 32px;
+    --transition-smooth: all 0.2s ease-in-out;
+    --font-stack: "Arial Black", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Base Document Reset Layer */
+/* Base Canvas Setup */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -33,510 +32,181 @@
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
-    font-family: var(--font-stack);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-    min-height: 100vh;
 }
 
 /* ==========================================================================
-   🧱 GLOBAL SYSTEM CONTAINER FRAME LAYOUTS
+   🧱 HEADER & PLATFORM LOGO BRANDING
    ========================================================================== */
 
-.app-container {
-    max-width: 100%;
-    min-height: 100vh;
-    padding-bottom: 90px; /* Safe padding space above bottom navigation rows */
-}
-
 header {
-    background: rgba(10, 10, 12, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--card-border);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    padding: 16px 24px;
+    background: var(--bg-main);
+    padding: 24px 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-bottom: none;
 }
 
+/* Matches the heavy geometric branding style of LIKIN in your photo */
 header h1 {
-    font-size: 1.5rem;
+    font-family: var(--font-stack);
+    font-size: 2rem;
     font-weight: 900;
-    letter-spacing: -1.5px;
+    letter-spacing: -2px;
     color: var(--text-main);
-    cursor: pointer;
     text-transform: uppercase;
-    transition: var(--transition-smooth);
+    cursor: pointer;
 }
 
-header h1:hover {
-    opacity: 0.8;
-}
-
-main {
-    padding: 24px 16px;
+/* Center Search Container Element Layout */
+.search-wrapper {
+    max-width: 400px;
     width: 100%;
+    margin: 0 auto;
 }
 
-/* Navigation System Layout Structures */
-.desktop-nav {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-}
-
-.desktop-nav a, .bottom-nav a {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: var(--transition-smooth);
-}
-
-.desktop-nav a:hover, .desktop-nav a.active {
-    color: var(--text-main);
-}
-
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(26, 26, 31, 0.85);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border-top: 1px solid var(--card-border);
-    height: 68px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 1000;
-    padding: 0 12px;
-}
-
-.bottom-nav a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.75rem;
-    font-weight: 500;
-    gap: 4px;
-}
-
-.bottom-nav a.active {
-    color: var(--accent-color);
-}
-
-@media (max-width: 768px) {
-    .desktop-nav { display: none !important; }
-}
-@media (min-width: 769px) {
-    .bottom-nav { display: none !important; }
+#user-search-input, #swaps-search-input {
+    background: #e5e5ea !important;
+    border: none !important;
+    border-radius: 6px !important;
+    color: #000000 !important;
+    height: 36px !important;
+    font-size: 0.85rem !important;
 }
 
 /* ==========================================================================
-   🖼️ SOCIAL POST CARDS & TIMELINE COMPONENTS (Ref: wall.jpg Layout)
+   🖼️ REFERENCE CARD POST STRUCTURES (As seen in wall.jpg)
    ========================================================================== */
 
+#wall-feed-container, #wall-feed {
+    max-width: 580px;
+    margin: 40px auto 0 auto;
+}
+
 .post-card {
-    background: var(--card-color);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
-    padding: 20px;
-    margin-bottom: 24px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    transition: var(--transition-smooth);
+    background: var(--card-color) !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    padding: 28px !important;
+    margin-bottom: 20px !important;
+    color: var(--text-light) !important;
 }
 
-.post-card:hover {
-    border-color: rgba(255, 255, 255, 0.08);
-}
-
+/* Left-shifted detached floating profile header block style */
 .post-header {
+    position: absolute;
+    transform: translateX(-130px);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    text-align: center;
+    gap: 6px;
+    width: 100px;
+}
+
+@media (max-width: 880px) {
+    .post-header {
+        position: relative;
+        transform: none;
+        flex-direction: row;
+        text-align: left;
+        width: 100%;
+        margin-bottom: 16px;
+    }
+    #wall-feed-container { padding: 0 16px; }
 }
 
 .post-avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: var(--card-border);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--text-main);
-    overflow: hidden;
+    width: 64px !important;
+    height: 64px !important;
+    border: 1px solid #111111 !important;
+    background: #e5e5ea !important;
 }
 
-.post-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.post-username {
+    color: var(--text-main) !important;
+    font-weight: 800 !important;
+    font-size: 0.9rem !important;
 }
 
 .post-media-container {
-    width: 100%;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-sm) !important;
     overflow: hidden;
-    background: #111115;
-    border: 1px solid rgba(255, 255, 255, 0.02);
-    margin-bottom: 16px;
-}
-
-.post-img {
-    width: 100%;
-    height: auto;
-    display: block;
-    max-height: 520px;
-    object-fit: cover;
 }
 
 .post-caption {
-    font-size: 0.92rem;
-    line-height: 1.5;
-    color: var(--text-main);
-    margin-bottom: 16px;
-    word-break: break-word;
+    color: var(--text-light) !important;
+    font-size: 0.95rem !important;
+    margin-top: 16px;
 }
 
-.post-caption strong {
-    font-weight: 700;
-    margin-right: 6px;
-}
+/* ==========================================================================
+   🔘 CUSTOM ACTION CONTROLS (Bolds, Hearts, Bottom Account Button)
+   ========================================================================== */
 
 .moment-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding-top: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    gap: 16px;
+    border-top: none !important;
+    padding-top: 16px !important;
 }
 
-/* ==========================================================================
-   🔘 BUTTON SYSTEM COMPONENTS & INTERACTIONS
-   ========================================================================== */
-
-/* Like Button Interface Configs */
+/* Circular Heart Like Structure Layout Element */
 .like-btn {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--card-border);
-    color: var(--text-muted);
-    padding: 8px 16px;
-    border-radius: 24px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.85rem;
-    transition: var(--transition-smooth);
-}
-
-.like-btn svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.like-btn:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-main);
-    border-color: rgba(255, 255, 255, 0.15);
-}
-
-.like-btn:hover svg {
-    transform: scale(1.15);
-}
-
-/* Master Primary Buttons Configuration */
-.btn-primary {
-    background-color: var(--text-main);
-    color: var(--bg-main);
-    border: none;
-    padding: 12px 24px;
-    border-radius: var(--radius-sm);
-    font-weight: 700;
-    font-size: 0.92rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50% !important;
+    background: #222222 !important;
+    border: none !important;
+    color: #ffffff !important;
     justify-content: center;
-    gap: 8px;
-    transition: var(--transition-smooth);
+    padding: 0 !important;
 }
 
-.btn-primary:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+/* Custom black graphic UNFOLLOW style format from reference image */
+.btn-unswap, [id*="swap-action-btn"], [id*="-swap-btn"] button {
+    font-family: var(--font-stack) !important;
+    text-transform: uppercase !important;
+    background: #222222 !important;
+    color: #ffffff !important;
+    border-radius: 20px !important;
+    padding: 10px 24px !important;
+    font-size: 0.8rem !important;
+    letter-spacing: -0.5px;
+    border: none !important;
 }
 
-/* Secondary Button Frames */
-.btn-secondary {
-    background: transparent;
-    color: var(--text-main);
-    border: 1px solid var(--card-border);
-    padding: 12px 24px;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    font-size: 0.92rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition-smooth);
+/* Dynamic Floating Right Corner Profile Menu Indicator */
+.desktop-nav {
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
+    background: #222222;
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.15);
-}
-
-/* Platform Delete/Unswap Buttons */
-.btn-delete-moment {
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition-smooth);
-}
-
-.btn-delete-moment:hover {
-    color: var(--accent-red);
-}
-
-/* ==========================================================================
-   📝 INPUT FORMS & SEARCH ARCHITECTURE COMPONENTS
-   ========================================================================= */
-
-.form-group {
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.form-group label {
-    font-size: 0.78rem;
-    font-weight: 700;
+.desktop-nav a {
+    color: #ffffff !important;
+    font-family: var(--font-stack);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
+    font-size: 0.75rem !important;
 }
 
-input[type="text"],
-input[type="number"],
-textarea {
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    color: var(--text-main);
-    font-family: inherit;
-    font-size: 0.92rem;
-    outline: none;
-    transition: var(--transition-smooth);
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-textarea:focus {
-    border-color: rgba(255, 255, 255, 0.18);
-    background-color: rgba(0, 0, 0, 0.3);
-}
-
-textarea {
-    resize: none;
-}
-
-/* ==========================================================================
-   👤 PROFILE DASHBOARD NETWORKS & LOOKUPS
-   ========================================================================== */
-
+/* Profile Identity Panels Refactor */
 .profile-meta-block {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    margin-bottom: 32px;
-    padding: 4px;
-}
-
-.avatar-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.profile-avatar {
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    background: var(--card-color);
-    border: 2px solid var(--card-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 2.2rem;
-    color: var(--text-main);
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-}
-
-.profile-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.remove-pic-btn {
-    background: none;
-    border: none;
-    color: var(--accent-red);
-    font-size: 0.72rem;
-    font-weight: 700;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-top: 4px;
-}
-
-.profile-identity-details {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-/* Metric Nodes Grid Dashboard Parameters Mapping styles */
-.stats-row {
-    display: flex;
-    gap: 20px;
-    margin: 14px 0;
-}
-
-.stat-node {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    max-width: 600px;
+    margin: 40px auto;
 }
 
 .stat-node-val {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--text-main);
-}
-
-.stat-node-lbl {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-.profile-bio-text {
-    font-size: 0.88rem;
-    line-height: 1.5;
-    color: var(--text-muted);
-    word-break: break-word;
-}
-
-/* 3-Column Image Layout Timeline Grid Configuration */
-#user-moments {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-}
-
-.user-moment-card {
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    background: #111115;
-    border: 1px solid rgba(255, 255, 255, 0.01);
-}
-
-.user-moment-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.user-moment-card:hover img {
-    transform: scale(1.04);
-}
-
-/* ==========================================================================
-   🪐 OVERLAY MODAL DISPLAY LAYERS
-   ========================================================================== */
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(5, 5, 6, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-    padding: 16px;
-}
-
-.modal-content {
-    background: var(--card-color);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
-    width: 100%;
-    max-width: 440px;
-    padding: 28px;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
-    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes modalSlideUp {
-    from {
-        transform: translateY(12px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Upload Page Picture Container Layout rules */
-.upload-preview-frame {
-    width: 100%;
-    max-height: 380px;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    border: 1px solid var(--card-border);
-    margin-bottom: 24px;
-    background: #111115;
-}
-
-.upload-preview-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
+    font-family: var(--font-stack);
+    font-size: 1.4rem !important;
 }
