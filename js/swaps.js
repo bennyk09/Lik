@@ -1,169 +1,90 @@
 import { db, auth } from './firebase-config.deploy.js';
+import { collection, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const incomingContainer = document.getElementById('incoming-requests-list');
-const sentContainer = document.getElementById('sent-requests-list');
-const mutualContainer = document.getElementById('mutual-swaps-list');
-const searchInput = document.getElementById('swaps-search-input');
-const searchResultsTray = document.getElementById('swaps-search-results');
+const feed = document.getElementById('wall-feed');
+const searchInput = document.getElementById('user-search-input');
+const searchResultsTray = document.getElementById('search-results-tray');
+const floatingPillAvatarTarget = document.getElementById('floating-pill-avatar-target');
 
-onAuthStateChanged(auth, async (user) => {
-    if (user) { await renderSwapsDashboard(user.uid); } else { window.location.href = "index.html"; }
-});
-
-async function renderSwapsDashboard(myUid) {
+async function renderAppFeed() {
+    if (!feed) return;
+    const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
+    const q = query(collection(db, "moments"), where("uploadTimestamp", ">", dayAgo), orderBy("uploadTimestamp", "desc"));
+    
     try {
-        const mySnap = await getDoc(doc(db, "users", myUid)); if (!mySnap.exists()) return;
-        const myData = mySnap.data();
-
-        const incomingIds = myData.swapRequestsIn || [];
-        const sentIds = myData.swapRequestsOut || [];
-        const mutualIds = myData.swappedWith || [];
-
-        const allTargetUids = [...new Set([...incomingIds, ...sentIds, ...mutualIds])];
-        const profileFetchPromises = allTargetUids.map(uid => getDoc(doc(db, "users", uid)));
-        const profileSnapshots = await Promise.all(profileFetchPromises);
+        const snap = await getDocs(q);
+        feed.innerHTML = "";
         
-        const profileCacheMap = new Map();
-        profileSnapshots.forEach(snap => { if (snap.exists()) { const data = snap.data(); profileCacheMap.set(data.uid, data); } });
+        if (snap.empty) {
+            feed.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size:0.9rem;">No moments active right now.</p>`;
+            return;
+        }
 
-        incomingContainer.innerHTML = incomingIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No new swap requests.</p>` : "";
-        incomingIds.forEach(targetUid => {
-            const profile = profileCacheMap.get(targetUid);
-            if (profile) {
-                const item = document.createElement('div'); item.className = "post-card";
-                item.style = "display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px;";
-                item.innerHTML = `
-                    <div class="post-avatar" style="width:36px; height:36px; font-size:0.85rem; cursor:pointer;" onclick="window.location.href='profile.html?uid=${targetUid}'">
-                        ${profile.profilePic ? `<img src="${profile.profilePic}">` : (profile.name || "U").charAt(0).toUpperCase()}
+        const fragment = document.createDocumentFragment();
+        
+        snap.forEach(docSnap => {
+            const moment = docSnap.data();
+            
+            const authorName = moment.authorName || "User";
+            const authorProfilePic = moment.authorProfilePic || "";
+            const textCaption = moment.text || "";
+            
+            const timelinePostCardNode = document.createElement('div');
+            timelinePostCardNode.className = "timeline-post-node";
+            
+            // Re-map structural grid layouts: image block container goes on TOP, parameters bar metadata falls underneath
+            timelinePostCardNode.innerHTML = `
+                <div class="post-media-box-wrapper" style="cursor: pointer;" data-uid="${moment.userId}">
+                    ${moment.imageUrl ? `<img src="${moment.imageUrl}" loading="lazy">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#eee; color:#aaa; font-weight:bold;">${textCaption}</div>`}
+                </div>
+                <div class="post-metadata-tray">
+                    <div class="post-avatar-circle" style="cursor: pointer;" data-uid="${moment.userId}">
+                        ${authorProfilePic ? `<img src="${authorProfilePic}">` : authorName.charAt(0).toUpperCase()}
                     </div>
-                    <div style="display: flex; flex-direction: column; flex: 1; cursor:pointer;" onclick="window.location.href='profile.html?uid=${targetUid}'">
-                        <span style="font-size: 0.85rem; font-weight: 600;">${profile.name}</span>
-                        <span style="font-size: 0.75rem; color: var(--text-muted);">${profile.username}</span>
+                    <div class="post-identity-block" style="cursor: pointer;" data-uid="${moment.userId}">
+                        <span class="post-author-title-label">${authorName}</span>
+                        <span class="post-timestamp-caption-label">${calcTime(moment.uploadTimestamp)}${textCaption && moment.imageUrl ? ` • ${textCaption}` : ''}</span>
                     </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-primary btn-accept" data-uid="${targetUid}" style="padding: 6px 14px; font-size: 0.75rem;">Accept</button>
-                        <button class="btn-secondary btn-reject" data-uid="${targetUid}" style="padding: 6px 14px; font-size: 0.75rem;">Reject</button>
-                    </div>`;
-                incomingContainer.appendChild(item);
-            }
+                </div>
+            `;
+            
+            timelinePostCardNode.querySelectorAll('[data-uid]').forEach(el => {
+                el.onclick = () => { window.location.href = `profile.html?uid=${el.getAttribute('data-uid')}`; };
+            });
+            fragment.appendChild(timelinePostCardNode);
         });
 
-        sentContainer.innerHTML = sentIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No pending sent invitations.</p>` : "";
-        sentIds.forEach(targetUid => {
-            const profile = profileCacheMap.get(targetUid);
-            if (profile) {
-                const item = document.createElement('div'); item.className = "post-card";
-                item.style = "display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px; opacity: 0.75;";
-                item.innerHTML = `
-                    <div class="post-avatar" style="width:36px; height:36px; font-size:0.85rem; cursor:pointer;" onclick="window.location.href='profile.html?uid=${targetUid}'">
-                        ${profile.profilePic ? `<img src="${profile.profilePic}">` : (profile.name || "U").charAt(0).toUpperCase()}
-                    </div>
-                    <div style="display: flex; flex-direction: column; flex: 1; cursor:pointer;" onclick="window.location.href='profile.html?uid=${targetUid}'">
-                        <span style="font-size: 0.85rem; font-weight: 600;">${profile.name}</span>
-                        <span style="font-size: 0.75rem; color: var(--accent-color);">${profile.username}</span>
-                    </div>
-                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight:600;">Requested</span>`;
-                sentContainer.appendChild(item);
+        feed.appendChild(fragment);
+    } catch (err) { console.error("Feed error:", err); }
+}
+
+// Hydrate the sticky floating lower account corner pill with the active session user's picture context profile data
+async function syncFloatingAccountPillElement(uid) {
+    if (!floatingPillAvatarTarget) return;
+    try {
+        const userSnap = await getDoc(doc(db, "users", uid));
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            if (userData.profilePic) {
+                floatingPillAvatarTarget.innerHTML = `<img src="${userData.profilePic}" style="width:100%; height:100%; object-fit:cover;">`;
+            } else {
+                floatingPillAvatarTarget.innerHTML = `<div style="width:100%; height:100%; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:0.8rem; color:#fff;">${(userData.name || "U").charAt(0).toUpperCase()}</div>`;
             }
-        });
-
-        mutualContainer.innerHTML = mutualIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No mutual connections formed yet.</p>` : "";
-        mutualIds.forEach(targetUid => {
-            const profile = profileCacheMap.get(targetUid);
-            if (profile) {
-                const item = document.createElement('div'); item.className = "post-card";
-                item.style = "display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px;";
-                item.innerHTML = `
-                    <div class="post-avatar" style="width:36px; height:36px; font-size:0.85rem; cursor:pointer;" onclick="window.location.href='profile.html?uid=${targetUid}'">
-                        ${profile.profilePic ? `<img src="${profile.profilePic}">` : (profile.name || "U").charAt(0).toUpperCase()}
-                    </div>
-                    <div style="display: flex; flex-direction: column; flex: 1; cursor:pointer;" onclick="window.location.href='profile.html?uid=${targetUid}'">
-                        <span style="font-size: 0.85rem; font-weight: 600;">${profile.name}</span>
-                        <span style="font-size: 0.75rem; color: var(--accent-color);">${profile.username}</span>
-                    </div>
-                    <button class="btn-secondary btn-unswap" data-uid="${targetUid}" style="padding: 6px 14px; font-size: 0.75rem; color: var(--accent-red);">Unswap</button>`;
-                mutualContainer.appendChild(item);
-            }
-        });
-        bindActionButtons(myUid);
-    } catch (err) { console.error(err); }
+        }
+    } catch (err) { console.warn(err); }
 }
 
-function bindActionButtons(myUid) {
-    document.querySelectorAll('.btn-accept').forEach(btn => {
-        btn.onclick = async (e) => {
-            const targetUid = e.currentTarget.getAttribute('data-uid'); e.currentTarget.disabled = true;
-            try {
-                await Promise.all([
-                    updateDoc(doc(db, "users", myUid), { swapRequestsIn: arrayRemove(targetUid), swappedWith: arrayUnion(targetUid) }),
-                    updateDoc(doc(db, "users", targetUid), { swapRequestsOut: arrayRemove(myUid), swappedWith: arrayUnion(myUid) })
-                ]);
-                await renderSwapsDashboard(myUid);
-            } catch (err) { console.error(err); }
-        };
-    });
-
-    document.querySelectorAll('.btn-reject').forEach(btn => {
-        btn.onclick = async (e) => {
-            const targetUid = e.currentTarget.getAttribute('data-uid'); e.currentTarget.disabled = true;
-            try {
-                await Promise.all([
-                    updateDoc(doc(db, "users", myUid), { swapRequestsIn: arrayRemove(targetUid) }),
-                    updateDoc(doc(db, "users", targetUid), { swapRequestsOut: arrayRemove(myUid) })
-                ]);
-                await renderSwapsDashboard(myUid);
-            } catch (err) { console.error(err); }
-        };
-    });
-
-    document.querySelectorAll('.btn-unswap').forEach(btn => {
-        btn.onclick = async (e) => {
-            const targetUid = e.currentTarget.getAttribute('data-uid'); if (!confirm("Are you sure you want to unswap with this user?")) return;
-            e.currentTarget.disabled = true;
-            try {
-                await Promise.all([
-                    updateDoc(doc(db, "users", myUid), { swappedWith: arrayRemove(targetUid), relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" }),
-                    updateDoc(doc(db, "users", targetUid), { swappedWith: arrayRemove(myUid), relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" })
-                ]);
-                await renderSwapsDashboard(myUid);
-            } catch (err) { console.error(err); }
-        };
-    });
+function calcTime(ts) {
+    const diff = Date.now() - ts;
+    const mins = Math.floor(diff/60000);
+    if (mins < 60) return `${mins} mins`;
+    return `${Math.floor(mins/60)} hours`;
 }
 
-if (searchInput) {
-    let debounceTimer;
-    searchInput.oninput = async (e) => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(async () => {
-            let keyword = e.target.value.trim().toLowerCase();
-            if (!keyword) { searchResultsTray.innerHTML = ""; searchResultsTray.style.display = "none"; return; }
-            if (!keyword.startsWith("/")) keyword = "/" + keyword;
-
-            try {
-                const endThreshold = keyword + "\uf8ff";
-                const q = query(collection(db, "users"), where("username", ">=", keyword), where("username", "<=", endThreshold), limit(5));
-                const snapshot = await getDocs(q);
-                if (snapshot.empty) { searchResultsTray.innerHTML = `<p style="padding:12px; font-size:0.85rem; color:var(--text-muted); text-align:center; margin:0;">No users matched</p>`; searchResultsTray.style.display = "block"; return; }
-
-                searchResultsTray.innerHTML = "";
-                snapshot.forEach(docData => {
-                    const userProfile = docData.data(); const row = document.createElement('div');
-                    row.style = "display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid var(--card-border); cursor: pointer;";
-                    row.innerHTML = `
-                        <div class="post-avatar" style="width:34px; height:34px; font-size:0.8rem;">
-                            ${userProfile.profilePic ? `<img src="${userProfile.profilePic}">` : (userProfile.name || "U").charAt(0).toUpperCase()}
-                        </div>
-                        <div style="display: flex; flex-direction: column;">
-                            <span style="font-size: 0.85rem; font-weight: 600;">${userProfile.name || "User"}</span>
-                            <span style="font-size: 0.75rem; color: var(--accent-color);">${userProfile.username}</span>
-                        </div>`;
-                    row.onclick = () => { window.location.href = `profile.html?uid=${userProfile.uid}`; }; searchResultsTray.appendChild(row);
-                });
-                searchResultsTray.style.display = "block";
-            } catch (err) { console.error(err); }
-        }, 200);
-    };
-}
+onAuthStateChanged(auth, (user) => { 
+    if (user) { 
+        renderAppFeed(); 
+        syncFloatingAccountPillElement(user.uid);
+    } 
+});
