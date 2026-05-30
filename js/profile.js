@@ -11,6 +11,12 @@ const editModal = document.getElementById('edit-profile-modal');
 const openEditBtn = document.getElementById('open-edit-modal-btn');
 const closeEditBtn = document.getElementById('close-edit-modal-btn');
 const editForm = document.getElementById('edit-profile-form');
+
+const deleteModal = document.getElementById('delete-profile-modal');
+const openDeleteBtn = document.getElementById('open-delete-modal-btn');
+const closeDeleteBtn = document.getElementById('close-delete-modal-btn');
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
 const avatarPreview = document.getElementById('avatar-preview');
 const avatarInput = document.getElementById('avatar-input');
 const removePicBtn = document.getElementById('remove-pic-btn');
@@ -101,10 +107,12 @@ async function loadProfileData(uid, isViewingSelf) {
 
         if (isViewingSelf) {
             if (openEditBtn) openEditBtn.style.display = "block";
+            if (openDeleteBtn) openDeleteBtn.style.display = "block";
             if (profileLogoutBtn) profileLogoutBtn.style.display = "block";
             removeDynamicProfileButtons();
         } else {
             if (openEditBtn) openEditBtn.style.display = "none";
+            if (openDeleteBtn) openDeleteBtn.style.display = "none";
             if (profileLogoutBtn) profileLogoutBtn.style.display = "none";
             await injectForeignProfileButtons(uid);
         }
@@ -253,6 +261,9 @@ async function injectForeignProfileButtons(targetUid) {
 if (openEditBtn) openEditBtn.onclick = () => editModal.style.display = 'flex';
 if (closeEditBtn) closeEditBtn.onclick = () => editModal.style.display = 'none';
 
+if (openDeleteBtn) openDeleteBtn.onclick = () => deleteModal.style.display = 'flex';
+if (closeDeleteBtn) closeDeleteBtn.onclick = () => deleteModal.style.display = 'none';
+
 if (editForm) {
     editForm.onsubmit = async (e) => {
         e.preventDefault();
@@ -298,15 +309,34 @@ if (profileLogoutBtn) {
     };
 }
 
+if (confirmDeleteBtn) {
+    confirmDeleteBtn.onclick = async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.textContent = "Deleting Account...";
+        try {
+            await deleteDoc(doc(db, "users", user.uid));
+            const { signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+            signOut(auth).then(() => { window.location.href = "index.html"; });
+        } catch (err) { 
+            alert(err.message); 
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.textContent = "Confirm Delete";
+        }
+    };
+}
+
 const themeBtn = document.getElementById('theme-toggle-btn');
 if (themeBtn) {
     const savedTheme = localStorage.getItem('lik-theme') || 'dark';
-    themeBtn.innerHTML = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-    themeBtn.onclick = () => {
+    themeBtn.innerHTML = savedTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
+    themeBtn.onclick = (e) => {
+        e.preventDefault();
         const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('lik-theme', newTheme);
-        themeBtn.innerHTML = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+        themeBtn.innerHTML = newTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
     };
 }

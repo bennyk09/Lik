@@ -40,7 +40,6 @@
     --text-main: #1c1c1e;
     --text-muted: #8e8e93;
     
-    /* Theme Transparencies & Overlays */
     --header-bg: rgba(242, 242, 247, 0.85);
     --nav-bg: rgba(255, 255, 255, 0.9);
     --modal-bg: rgba(255, 255, 255, 0.6);
@@ -166,6 +165,11 @@ main {
    🖼️ SOCIAL POST CARDS & TIMELINE COMPONENTS
    ========================================================================== */
 
+#wall-feed-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 .post-card {
     background: var(--card-color);
     border: 1px solid var(--card-border);
@@ -202,6 +206,7 @@ main {
 
 .post-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
+/* 🪐 PREVENTS IMAGE DISTORTION STRETCHING */
 .post-media-container {
     width: 100%;
     border-radius: var(--radius-sm);
@@ -209,14 +214,17 @@ main {
     background: var(--bg-main);
     border: 1px solid var(--hover-border);
     margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .post-img {
     width: 100%;
     height: auto;
-    display: block;
     max-height: 520px;
-    object-fit: cover;
+    object-fit: contain; /* Correctly displays wide shots natively without squishing */
+    display: block;
 }
 
 .post-caption {
@@ -241,7 +249,6 @@ main {
    🔘 BUTTON SYSTEM COMPONENTS & INTERACTIONS
    ========================================================================== */
 
-/* Like Button Interface */
 .like-btn {
     background: var(--hover-bg);
     border: 1px solid var(--card-border);
@@ -271,7 +278,6 @@ main {
 }
 .like-btn:hover svg { transform: scale(1.15); }
 
-/* Master Primary Buttons - Restored to gorgeous Accent Blue! */
 .btn-primary {
     background-color: var(--accent-color);
     color: #ffffff !important;
@@ -293,17 +299,13 @@ main {
     transform: translateY(-1px);
 }
 
-/* Dedicated Google Login Button Fix */
 #google-login-btn {
     background-color: var(--card-color);
     color: var(--text-main) !important;
     border: 1px solid var(--card-border);
 }
-#google-login-btn:hover {
-    background-color: var(--hover-bg);
-}
+#google-login-btn:hover { background-color: var(--hover-bg); }
 
-/* Secondary Button Frames */
 .btn-secondary {
     background: transparent;
     color: var(--text-main);
@@ -388,6 +390,9 @@ textarea { resize: none; }
     gap: 24px;
     margin-bottom: 32px;
     padding: 4px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .avatar-container {
@@ -468,9 +473,11 @@ textarea { resize: none; }
 #user-moments {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
+    gap: 12px;
     border-radius: var(--radius-sm);
     overflow: hidden;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .user-moment-card {
@@ -478,6 +485,7 @@ textarea { resize: none; }
     overflow: hidden;
     background: var(--bg-main);
     border: 1px solid var(--hover-bg);
+    border-radius: var(--radius-sm);
 }
 
 .user-moment-card img {
@@ -486,11 +494,10 @@ textarea { resize: none; }
     object-fit: cover;
     transition: transform 0.3s ease;
 }
-
 .user-moment-card:hover img { transform: scale(1.04); }
 
 /* ==========================================================================
-   🪐 OVERLAY MODAL DISPLAY LAYERS (Fixed layout for image_5a8122.png)
+   🪐 OVERLAY MODAL DISPLAY LAYERS
    ========================================================================== */
 
 .modal-overlay {
@@ -521,7 +528,6 @@ textarea { resize: none; }
     animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* OVERRIDE: Strip the ugly input-style borders off the Modal Bio Text */
 #view-user-bio {
     background: transparent !important;
     border: none !important;
