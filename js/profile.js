@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.deploy.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, updateDoc, collection, query, where, getDocs, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, updateDoc, collection, query, where, getDocs, deleteDoc, arrayUnion, arrayRemove, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const usernameLabel = document.getElementById('lbl-username-display');
 const bioContainer = document.getElementById('profile-bio-container');
@@ -42,7 +42,7 @@ async function loadProfileData(uid, isViewingSelf) {
         if (!userSnap.exists()) return;
         const userData = userSnap.data();
 
-        // 🪐 DYNAMIC RELATIONSHIP BADGE ENGINE: Displays Single vs Committed
+        // Relationship Indicator Tag Configuration
         let statusBadgeHtml = "";
         if (userData.relationshipStatus === "couple") {
             statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 59, 48, 0.12); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; letter-spacing: 0.3px; margin-left: 2px;">❤️ Committed</span>`;
@@ -75,20 +75,43 @@ async function loadProfileData(uid, isViewingSelf) {
             }
         }
 
+        // Fetch user transient moments count
         const momentsQuery = query(collection(db, "moments"), where("userId", "==", uid));
         const momentsSnap = await getDocs(momentsQuery);
         const activeMomentsCount = momentsSnap.size;
-        const swappedArray = userData.swappedWith || [];
 
+        const swappedArray = userData.swappedWith || [];
+        const scoreLikes = userData.totalLikes || 0;
+
+        // 🪐 LEADERBOARD RANK GENERATOR PIPELINE: Computes real positional index based on overall Score
+        let computedRankPosition = "#--";
+        try {
+            const rankQuery = query(collection(db, "users"), orderBy("totalLikes", "desc"));
+            const rankSnapshot = await getDocs(rankQuery);
+            let indexPosition = 1;
+            
+            for (const docData of rankSnapshot.docs) {
+                if (docData.id === uid) {
+                    computedRankPosition = `#${indexPosition}`;
+                    break;
+                }
+                indexPosition++;
+            }
+        } catch (rankErr) {
+            console.warn("Rank computation index delay fallback initialized.", rankErr);
+        }
+
+        // 🪐 RENDER PARAMETERS METRICS GRID AS REQUESTED: Swaps | Moments | Score(likes) | Rank(most likes)
         if (statsTray) {
             statsTray.innerHTML = `
-                <div class="stat-node"><span class="stat-node-val">${userData.totalLikes || 0}</span><span class="stat-node-lbl">Likes</span></div>
-                <div class="stat-node"><span class="stat-node-val">${activeMomentsCount}</span><span class="stat-node-lbl">Moments</span></div>
                 <div class="stat-node"><span class="stat-node-val">${swappedArray.length}</span><span class="stat-node-lbl">Swaps</span></div>
+                <div class="stat-node"><span class="stat-node-val">${activeMomentsCount}</span><span class="stat-node-lbl">Moments</span></div>
+                <div class="stat-node"><span class="stat-node-val">${scoreLikes}</span><span class="stat-node-lbl">Score</span></div>
+                <div class="stat-node"><span class="stat-node-val">${computedRankPosition}</span><span class="stat-node-lbl">Rank</span></div>
             `;
         }
 
-        // Configure View Boundaries
+        // Configure Layout Control Options Bounds
         if (isViewingSelf) {
             if (openEditBtn) openEditBtn.style.display = "block";
             if (openDeleteBtn) openDeleteBtn.style.display = "block";
@@ -100,7 +123,6 @@ async function loadProfileData(uid, isViewingSelf) {
             if (openDeleteBtn) openDeleteBtn.style.display = "none";
             if (profileLogoutBtn) profileLogoutBtn.style.display = "none";
             
-            // Build the dynamic interaction button rows
             await injectForeignProfileButtons(uid);
         }
 
@@ -150,7 +172,7 @@ async function injectForeignProfileButtons(targetUid) {
     const myCoupleReqOut = myData.coupleRequestOut || "";
     const myCoupleReqIn = myData.coupleRequestIn || "";
 
-    // 🌐 BUTTON CONTAINER A: SWAP COMPONENT MANAGER
+    // SWAP ACTIONS ROW
     const swapContainer = document.createElement('div');
     swapContainer.id = "profile-dynamic-swap-btn";
     swapContainer.style = "margin-bottom: 12px;";
@@ -202,19 +224,15 @@ async function injectForeignProfileButtons(targetUid) {
     swapContainer.appendChild(swapBtn);
     userMomentsGrid.parentNode.insertBefore(swapContainer, userMomentsGrid);
 
-    // 🌐 BUTTON CONTAINER B: RELATIONSHIP SUB-ENGINE (Only activates if users are swapped)
+    // RELATIONSHIP ROW
     if (mutualIds.includes(targetUid)) {
         const coupleContainer = document.createElement('div');
         coupleContainer.id = "profile-dynamic-couple-btn";
         coupleContainer.style = "margin-bottom: 32px;";
 
-        // Enforce block rule: If already coupled with someone else, hide choice completely
-        if (myCoupleStatus === "couple" && myPartnerUid !== targetUid) {
-            return;
-        }
+        if (myCoupleStatus === "couple" && myPartnerUid !== targetUid) return;
 
         if (myCoupleStatus === "couple" && myPartnerUid === targetUid) {
-            // State: Already Committed -> Render Break Up
             const breakBtn = document.createElement('button');
             breakBtn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; background: transparent; color: var(--accent-red); border: 1px solid rgba(255,59,48,0.2);";
             breakBtn.textContent = "Break Up (Remove Couple)";
@@ -228,14 +246,12 @@ async function injectForeignProfileButtons(targetUid) {
             coupleContainer.appendChild(breakBtn);
 
         } else if (myCoupleReqOut === targetUid) {
-            // State: Proposal Sent -> Render Pending Label
             const pendingBtn = document.createElement('button');
             pendingBtn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); color: var(--text-muted); background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); cursor: default;";
             pendingBtn.textContent = "Couple Proposal Sent...";
             coupleContainer.appendChild(pendingBtn);
 
         } else if (myCoupleReqIn === targetUid) {
-            // State: Incoming Request -> Render Accept & Reject Inline Decision Row
             const rowWrapper = document.createElement('div');
             rowWrapper.style = "display: flex; gap: 12px; width: 100%;";
             rowWrapper.innerHTML = `
@@ -258,7 +274,6 @@ async function injectForeignProfileButtons(targetUid) {
             coupleContainer.appendChild(rowWrapper);
 
         } else if (myCoupleStatus === "single") {
-            // State: Both Single -> Render Propose Button
             const proposeBtn = document.createElement('button');
             proposeBtn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; background: rgba(255,255,255,0.04); color: var(--text-main); border: 1px solid var(--card-border);";
             proposeBtn.textContent = "Add Couple ➕";
@@ -275,7 +290,7 @@ async function injectForeignProfileButtons(targetUid) {
     }
 }
 
-// Global modal toggle registrations
+// Global modal toggles
 if (openEditBtn) openEditBtn.onclick = () => editModal.style.display = 'flex';
 if (closeEditBtn) closeEditBtn.onclick = () => editModal.style.display = 'none';
 if (openDeleteBtn) openDeleteBtn.onclick = () => deleteModal.style.display = 'flex';

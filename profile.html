@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK - Profile</title>
-    <link rel="stylesheet" href="css/style.css?v=11.0.6">
+    <link rel="stylesheet" href="css/style.css?v=11.0.8">
 </head>
 <body>
     <div class="app-container">
@@ -28,16 +28,16 @@
                         <button id="remove-pic-btn" class="remove-pic-btn">Remove Photo</button>
                     </div>
                     <div class="profile-identity-details">
-                        <!-- 🪐 Flex row header container enables perfect layout wrapping for relationship badges -->
                         <h2 id="lbl-username-display" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 0;">
                             User
                         </h2>
-                        <div class="stats-row" id="stats-numbers-tray"></div>
+                        <!-- 🪐 Dynamic Parameters Tray: Swaps | Moments | Score | Rank -->
+                        <div class="stats-row" id="stats-numbers-tray" style="display: flex; gap: 16px; margin: 12px 0;"></div>
                         <div id="profile-bio-container" class="profile-bio-text">Syncing profile metadata parameters...</div>
                     </div>
                 </div>
                 
-                <!-- Action Control Row featuring exclusive Logout layout button placement -->
+                <!-- Action Control Row -->
                 <div style="display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;">
                     <button id="open-edit-modal-btn" class="btn-secondary" style="flex: 1; display:none;">Edit Profile</button>
                     <button id="logout-btn-profile" class="btn-primary" style="background: var(--accent-red); color: #fff; flex: 1; font-weight:700;">Logout</button>
