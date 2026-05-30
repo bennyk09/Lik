@@ -9,11 +9,7 @@ const searchInput = document.getElementById('swaps-search-input');
 const searchResultsTray = document.getElementById('swaps-search-results');
 
 onAuthStateChanged(auth, async (user) => {
-    if (user) { 
-        await renderSwapsDashboard(user.uid); 
-    } else { 
-        window.location.href = "index.html"; 
-    }
+    if (user) { await renderSwapsDashboard(user.uid); } else { window.location.href = "index.html"; }
 });
 
 async function renderSwapsDashboard(myUid) {
@@ -26,9 +22,23 @@ async function renderSwapsDashboard(myUid) {
         const sentIds = myData.swapRequestsOut || [];
         const mutualIds = myData.swappedWith || [];
 
+        // Execute all user documentation profiling loads simultaneously in parallel batch channels
+        const allTargetUids = [...new Set([...incomingIds, ...sentIds, ...mutualIds])];
+        const profileFetchPromises = allTargetUids.map(uid => getDoc(doc(db, "users", uid)));
+        const profileSnapshots = await Promise.all(profileFetchPromises);
+        
+        const profileCacheMap = new Map();
+        profileSnapshots.forEach(snap => {
+            if (snap.exists()) {
+                const data = snap.data();
+                profileCacheMap.set(data.uid, data);
+            }
+        });
+
+        // 1. POPULATE INCOMING REQUESTS
         incomingContainer.innerHTML = incomingIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No new swap requests.</p>` : "";
-        for (const targetUid of incomingIds) {
-            const profile = await fetchProfile(targetUid);
+        incomingIds.forEach(targetUid => {
+            const profile = profileCacheMap.get(targetUid);
             if (profile) {
                 const item = document.createElement('div');
                 item.className = "post-card";
@@ -47,11 +57,12 @@ async function renderSwapsDashboard(myUid) {
                     </div>`;
                 incomingContainer.appendChild(item);
             }
-        }
+        });
 
+        // 2. POPULATE PENDING SENT INVITATIONS
         sentContainer.innerHTML = sentIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No pending sent invitations.</p>` : "";
-        for (const targetUid of sentIds) {
-            const profile = await fetchProfile(targetUid);
+        sentIds.forEach(targetUid => {
+            const profile = profileCacheMap.get(targetUid);
             if (profile) {
                 const item = document.createElement('div');
                 item.className = "post-card";
@@ -67,11 +78,12 @@ async function renderSwapsDashboard(myUid) {
                     <span style="font-size: 0.75rem; color: var(--text-muted); font-weight:600;">Requested</span>`;
                 sentContainer.appendChild(item);
             }
-        }
+        });
 
+        // 3. POPULATE MUTUAL SWAPPED FRIENDS
         mutualContainer.innerHTML = mutualIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No mutual connections formed yet.</p>` : "";
-        for (const targetUid of mutualIds) {
-            const profile = await fetchProfile(targetUid);
+        mutualIds.forEach(targetUid => {
+            const profile = profileCacheMap.get(targetUid);
             if (profile) {
                 const item = document.createElement('div');
                 item.className = "post-card";
@@ -87,10 +99,10 @@ async function renderSwapsDashboard(myUid) {
                     <button class="btn-secondary btn-unswap" data-uid="${targetUid}" style="padding: 6px 14px; font-size: 0.75rem; color: var(--accent-red);">Unswap</button>`;
                 mutualContainer.appendChild(item);
             }
-        }
+        });
         
         bindActionButtons(myUid);
-    } catch (err) { console.error("Swaps Render Matrix Error: ", err); }
+    } catch (err) { console.error(err); }
 }
 
 function bindActionButtons(myUid) {
@@ -139,51 +151,44 @@ function bindActionButtons(myUid) {
 }
 
 if (searchInput) {
+    let debounceTimer;
     searchInput.oninput = async (e) => {
-        let keyword = e.target.value.trim().toLowerCase();
-        if (!keyword) {
-            searchResultsTray.innerHTML = "";
-            searchResultsTray.style.display = "none";
-            return;
-        }
-        if (!keyword.startsWith("/")) keyword = "/" + keyword;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            let keyword = e.target.value.trim().toLowerCase();
+            if (!keyword) { searchResultsTray.innerHTML = ""; searchResultsTray.style.display = "none"; return; }
+            if (!keyword.startsWith("/")) keyword = "/" + keyword;
 
-        try {
-            const endThreshold = keyword + "\uf8ff";
-            const q = query(collection(db, "users"), where("username", ">=", keyword), where("username", "<=", endThreshold), limit(5));
-            const snapshot = await getDocs(q);
-            
-            if (snapshot.empty) {
-                searchResultsTray.innerHTML = `<p style="padding: 12px; font-size: 0.85rem; color: var(--text-muted); text-align: center; margin:0;">No users matched "${keyword}"</p>`;
-                searchResultsTray.style.display = "block";
-                return;
-            }
-
-            searchResultsTray.innerHTML = "";
-            snapshot.forEach(docData => {
-                const userProfile = docData.data();
-                const row = document.createElement('div');
-                row.style = "display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer;";
-                row.innerHTML = `
-                    <div class="post-avatar" style="width:34px; height:34px; font-size:0.8rem;">
-                        ${userProfile.profilePic ? `<img src="${userProfile.profilePic}">` : (userProfile.name || "U").charAt(0).toUpperCase()}
-                    </div>
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 0.85rem; font-weight: 600;">${userProfile.name || "User"}</span>
-                        <span style="font-size: 0.75rem; color: var(--accent-color);">${userProfile.username}</span>
-                    </div>`;
+            try {
+                const endThreshold = keyword + "\uf8ff";
+                const q = query(collection(db, "users"), where("username", ">=", keyword), where("username", "<=", endThreshold), limit(5));
+                const snapshot = await getDocs(q);
                 
-                row.onclick = () => {
-                    window.location.href = `profile.html?uid=${userProfile.uid}`;
-                };
-                searchResultsTray.appendChild(row);
-            });
-            searchResultsTray.style.display = "block";
-        } catch (err) { console.error(err); }
-    };
-}
+                if (snapshot.empty) {
+                    searchResultsTray.innerHTML = `<p style="padding: 12px; font-size: 0.85rem; color: var(--text-muted); text-align: center; margin:0;">No users matched</p>`;
+                    searchResultsTray.style.display = "block";
+                    return;
+                }
 
-async function fetchProfile(uid) { 
-    const s = await getDoc(doc(db, "users", uid)); 
-    return s.exists() ? s.data() : null; 
+                searchResultsTray.innerHTML = "";
+                snapshot.forEach(docData => {
+                    const userProfile = docData.data();
+                    const row = document.createElement('div');
+                    row.style = "display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid var(--card-border); cursor: pointer;";
+                    row.innerHTML = `
+                        <div class="post-avatar" style="width:34px; height:34px; font-size:0.8rem;">
+                            ${userProfile.profilePic ? `<img src="${userProfile.profilePic}">` : (userProfile.name || "U").charAt(0).toUpperCase()}
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 0.85rem; font-weight: 600;">${userProfile.name || "User"}</span>
+                            <span style="font-size: 0.75rem; color: var(--accent-color);">${userProfile.username}</span>
+                        </div>`;
+                    
+                    row.onclick = () => { window.location.href = `profile.html?uid=${userProfile.uid}`; };
+                    searchResultsTray.appendChild(row);
+                });
+                searchResultsTray.style.display = "block";
+            } catch (err) { console.error(err); }
+        }, 200);
+    };
 }
