@@ -1,11 +1,10 @@
 import { db, auth } from './firebase-config.deploy.js';
-import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc, arrayUnion, arrayRemove, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const feed = document.getElementById('wall-feed');
 const searchInput = document.getElementById('user-search-input');
 const searchResultsTray = document.getElementById('search-results-tray');
-const floatingPillAvatarTarget = document.getElementById('floating-pill-avatar-target');
 
 async function renderAppFeed() {
     if (!feed) return;
@@ -17,7 +16,7 @@ async function renderAppFeed() {
         feed.innerHTML = "";
         
         if (snap.empty) {
-            feed.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size:0.9rem;">No moments active right now.</p>`;
+            feed.innerHTML = `<div class="post-card" style="text-align:center; padding:32px; color:var(--text-muted);">No active moments right now.</div>`;
             return;
         }
 
@@ -29,57 +28,94 @@ async function renderAppFeed() {
             const momentId = docSnap.id;
             
             const authorName = moment.authorName || "User";
+            const authorUsername = moment.authorUsername || "/user";
             const authorProfilePic = moment.authorProfilePic || "";
-            const textCaption = moment.text || "";
             
+            const isMyMoment = currentUserId === moment.userId;
             const likedByArray = moment.likedBy || [];
             const hasLiked = currentUserId && likedByArray.includes(currentUserId);
-            const isMyMoment = currentUserId === moment.userId;
-            
-            const timelinePostCardNode = document.createElement('div');
-            timelinePostCardNode.className = "timeline-post-node";
-            
-            // Re-maps exact structural hierarchy layout order rules matching design specifications wireframe
-            timelinePostCardNode.innerHTML = `
-                <div class="post-media-box-wrapper" style="cursor: pointer;" data-uid="${moment.userId}">
-                    ${moment.imageUrl ? `<img src="${moment.imageUrl}" loading="lazy">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#e2e2e6; color:#7c7c80; font-weight:bold; padding:20px; text-align:center;">${textCaption}</div>`}
-                </div>
-                <div class="post-metadata-tray">
-                    <div class="post-avatar-circle" style="cursor: pointer;" data-uid="${moment.userId}">
+
+            const card = document.createElement('div');
+            card.className = "post-card";
+            card.id = `moment-card-${momentId}`;
+            card.innerHTML = `
+                <div class="post-header">
+                    <div class="post-avatar" style="cursor: pointer;" data-uid="${moment.userId}">
                         ${authorProfilePic ? `<img src="${authorProfilePic}">` : authorName.charAt(0).toUpperCase()}
                     </div>
                     <div class="post-identity-block" style="cursor: pointer;" data-uid="${moment.userId}">
-                        <span class="post-author-title-label">${authorName}</span>
-                        <span class="post-timestamp-caption-label">${calcTime(moment.uploadTimestamp)}${textCaption && moment.imageUrl ? ` • ${textCaption}` : ''}</span>
+                        <span class="post-username">${authorName}</span>
+                        <span class="post-timestamp">${authorUsername} • ${calcTime(moment.uploadTimestamp)}</span>
                     </div>
-                    
-                    <div class="post-actions-overlay-strip">
-                        <button class="action-icon-trigger like-toggle-trigger" data-id="${momentId}" data-author="${moment.userId}" data-liked="${hasLiked}">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="${hasLiked ? '#ff3b30' : 'none'}" stroke="${hasLiked ? '#ff3b30' : 'currentColor'}" stroke-width="2.5" style="transition: transform 0.1s ease;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                            <span style="font-size:0.85rem; font-weight:700; margin-left:5px; color:var(--text-main);">${likedByArray.length}</span>
-                        </button>
-                        ${isMyMoment ? `
-                        <button class="action-icon-trigger delete-mode delete-moment-trigger" data-id="${momentId}">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>` : ''}
-                    </div>
+                </div>
+                ${moment.imageUrl ? `<div class="post-media-container"><img src="${moment.imageUrl}" class="post-img" loading="lazy"></div>` : ''}
+                ${moment.text ? `<p class="post-caption">${moment.text}</p>` : ''}
+                <div class="moment-footer">
+                    <button class="like-btn" data-id="${momentId}" data-author="${moment.userId}" data-liked="${hasLiked}" style="${hasLiked ? 'color: var(--accent-red); font-weight:700;' : ''}">
+                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="${hasLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"/></svg>
+                        <span>Likes (${likedByArray.length})</span>
+                    </button>
+                    ${isMyMoment ? `<button class="btn-delete-moment" data-id="${momentId}">Delete</button>` : ''}
                 </div>
             `;
             
-            timelinePostCardNode.querySelectorAll('[data-uid]').forEach(el => {
+            card.querySelectorAll('[data-uid]').forEach(el => {
                 el.onclick = () => { window.location.href = `profile.html?uid=${el.getAttribute('data-uid')}`; };
             });
-            fragment.appendChild(timelinePostCardNode);
+            fragment.appendChild(card);
         });
 
         feed.appendChild(fragment);
-        bindLikeActionTriggers();
-        bindDeletionActionTriggers();
-    } catch (err) { console.error("Feed render error:", err); }
+        bindLikes();
+        bindDeletions();
+    } catch (err) { console.error(err); }
 }
 
-function bindLikeActionTriggers() {
-    document.querySelectorAll('.like-toggle-trigger').forEach(btn => {
+if (searchInput) {
+    let debounceTimer;
+    searchInput.oninput = (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            let keyword = e.target.value.trim().toLowerCase();
+            if (!keyword) { searchResultsTray.innerHTML = ""; searchResultsTray.style.display = "none"; return; }
+            if (!keyword.startsWith("/")) keyword = "/" + keyword;
+
+            try {
+                const endThreshold = keyword + "\uf8ff";
+                const q = query(collection(db, "users"), where("username", ">=", keyword), where("username", "<=", endThreshold), limit(5));
+                const snapshot = await getDocs(q);
+                
+                if (snapshot.empty) {
+                    searchResultsTray.innerHTML = `<p style="padding: 8px; font-size: 0.85rem; color: var(--text-muted); text-align: center;">No users matched</p>`;
+                    searchResultsTray.style.display = "block";
+                    return;
+                }
+
+                searchResultsTray.innerHTML = "";
+                snapshot.forEach(docData => {
+                    const userProfile = docData.data();
+                    const row = document.createElement('div');
+                    row.style = "display: flex; align-items: center; gap: 12px; padding: 8px; border-bottom: 1px solid var(--card-border); cursor: pointer;";
+                    row.innerHTML = `
+                        <div class="post-avatar" style="width:30px; height:30px; font-size:0.8rem;">
+                            ${userProfile.profilePic ? `<img src="${userProfile.profilePic}">` : (userProfile.name || "U").charAt(0).toUpperCase()}
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 0.85rem; font-weight: 600;">${userProfile.name || "User"}</span>
+                            <span style="font-size: 0.75rem; color: var(--accent-color);">${userProfile.username}</span>
+                        </div>`;
+                    
+                    row.onclick = () => { window.location.href = `profile.html?uid=${userProfile.uid}`; };
+                    searchResultsTray.appendChild(row);
+                });
+                searchResultsTray.style.display = "block";
+            } catch (err) { console.error(err); }
+        }, 200);
+    };
+}
+
+function bindLikes() {
+    document.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async (e) => {
             if (!auth.currentUser) return;
             const btnEl = e.currentTarget;
@@ -88,7 +124,6 @@ function bindLikeActionTriggers() {
             const currentUserId = auth.currentUser.uid;
             
             if (currentUserId === authorId) return;
-            
             const isLiked = btnEl.getAttribute('data-liked') === 'true';
             btnEl.disabled = true;
 
@@ -110,11 +145,11 @@ function bindLikeActionTriggers() {
     });
 }
 
-function bindDeletionActionTriggers() {
-    document.querySelectorAll('.delete-moment-trigger').forEach(btn => {
+function bindDeletions() {
+    document.querySelectorAll('.btn-delete-moment').forEach(btn => {
         btn.onclick = async (e) => {
             const momentId = e.currentTarget.getAttribute('data-id');
-            if (!confirm("Delete this moment?")) return;
+            if (!confirm("Are you sure you want to delete this post?")) return;
             try {
                 await deleteDoc(doc(db, "moments", momentId));
                 await renderAppFeed();
@@ -130,8 +165,4 @@ function calcTime(ts) {
     return `${Math.floor(mins/60)}h ago`;
 }
 
-onAuthStateChanged(auth, (user) => { 
-    if (user) { 
-        renderAppFeed(); 
-    } 
-});
+onAuthStateChanged(auth, (user) => { if (user) renderAppFeed(); });

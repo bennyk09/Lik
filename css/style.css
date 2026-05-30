@@ -1,29 +1,22 @@
 /* ==========================================================================
-   🪐 LIK CORE MASTER DESIGN SCHEMA - LIGHT MINIMALIST WIREFRAME MULTI-COLUMN
+   🪐 STANDARD SOCIAL MEDIA APP LAYOUT DESIGN CORE
    ========================================================================== */
 
 :root {
-    /* EXACT MAPPED PALETTE TRACE FROM DESIGN SPECIFICATION */
-    --bg-main: #ffffff;
-    --bg-outside: #fcfcfc;
-    --card-color: #f7f7f7;
-    --card-border: #e2e2e6;
-    --text-main: #000000;
-    --text-muted: #7c7c80;
+    --bg-main: #f5f7fb;
+    --card-color: #ffffff;
+    --card-border: #eef2f6;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --accent-color: #4f46e5;
+    --accent-hover: #4338ca;
+    --accent-red: #ef4444;
     
-    --input-bg: #d9d9d9;
-    --pill-dark-bg: #333333;
-    --sidebar-line: #b5b5b5;
-    
-    /* INTERFACE BOUNDARIES */
-    --radius-pill: 50px;
-    --radius-card: 20px;
-    --radius-img: 12px;
-    --font-stack: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --transition-smooth: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Document Reset Elements */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -35,230 +28,132 @@ body {
     color: var(--text-main);
     font-family: var(--font-stack);
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
     min-height: 100vh;
 }
 
 /* ==========================================================================
-   🧱 DESKTOP MULTI-COLUMN STRUCTURAL SYSTEM 
+   🧱 BASE LAYOUT GRID (CENTER COHESIVE TIMELINE AXIS)
    ========================================================================== */
 
 .app-container {
-    display: grid;
-    grid-template-columns: 280px 1fr;
     width: 100%;
     min-height: 100vh;
-    position: relative;
+    padding-bottom: 40px;
 }
 
-/* LEFT SIDEBAR NAVIGATION SECTION */
+/* TOP BLOCK GLOBAL HEADER NAVIGATION */
 header {
-    position: fixed;
+    background-color: var(--card-color);
+    border-bottom: 1px solid var(--card-border);
+    position: sticky;
     top: 0;
-    left: 0;
-    width: 280px;
-    height: 100vh;
-    border-right: 1px solid var(--sidebar-line);
-    padding: 48px 36px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: var(--bg-main);
     z-index: 1000;
-}
-
-/* Exact Brand Box Graphic Allocation */
-.brand-wrapper {
+    padding: 14px 24px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    margin-bottom: 24px;
+    justify-content: space-between;
 }
 
-.brand-logo-img {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+header .brand-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+header .brand-wrapper img {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
     object-fit: cover;
+}
+
+header h1 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
 }
 
 .desktop-nav {
     display: flex;
-    flex-direction: column;
-    gap: 24px;
-    width: 100%;
-    margin-top: 40px;
+    gap: 20px;
+    align-items: center;
 }
 
-.desktop-nav a {
-    color: var(--text-main);
-    font-size: 1.05rem;
-    font-weight: 600;
+.desktop-nav a, .bottom-nav a {
+    color: var(--text-muted);
     text-decoration: none;
-    padding: 8px 4px;
-    display: inline-block;
-    width: fit-content;
-    border-bottom: 2px solid transparent;
-    transition: var(--transition-smooth);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 .desktop-nav a:hover, .desktop-nav a.active {
-    border-bottom-color: var(--text-main);
+    color: var(--accent-color);
 }
 
-/* Exact Sidebar Bottom Left Settings Pill Button */
-.sidebar-bottom-pill-btn {
-    background-color: var(--pill-dark-bg);
-    color: #ffffff !important;
-    border: none;
-    width: 100%;
-    max-width: 200px;
-    padding: 16px 24px;
-    border-radius: var(--radius-pill);
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    transition: var(--transition-smooth);
-}
-.sidebar-bottom-pill-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
-
-/* MAIN VIEW FEED AXIS SPACE COLUMN */
-main {
-    margin-left: 280px;
-    padding: 40px 24px;
-    width: 100%;
-    background-color: var(--bg-outside);
-    display: flex;
-    justify-content: center;
-    position: relative;
-}
-
-/* HIDE RESPONSIVE SIDEBAR OVERIDES FOR MOBILE PORTS */
+/* MOBILE NAV BAR TRIGGER */
 .bottom-nav {
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    background-color: var(--bg-main);
+    background-color: var(--card-color);
     border-top: 1px solid var(--card-border);
-    height: 68px;
+    height: 60px;
     display: none;
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
 }
-.bottom-nav a {
-    color: var(--text-main);
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 0.85rem;
-}
-.bottom-nav a.active { color: var(--pill-dark-bg); }
-
-@media (max-width: 992px) {
-    .app-container { grid-template-columns: 80px 1fr; }
-    header { width: 80px; padding: 32px 10px; align-items: center; }
-    header h1, .desktop-nav a, .sidebar-bottom-pill-btn { display: none !important; }
-    main { margin-left: 80px; }
-}
 
 @media (max-width: 768px) {
-    .app-container { display: block; }
-    header { display: none !important; }
-    main { margin-left: 0; padding: 16px 12px 80px 12px; }
+    .desktop-nav { display: none !important; }
     .bottom-nav { display: flex; }
+    main { padding: 16px 12px 80px 12px !important; }
+}
+
+/* CENTRAL ALIGNED FEED AXIS BODY FRAME */
+main {
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    width: 100%;
 }
 
 /* ==========================================================================
-   🖼️ WALL PAGE COLUMN TIMELINE CARDS MATRIX
+   🖼️ TRADITIONAL USER ACTIVITY POST NODES
    ========================================================================== */
 
-#wall-feed-container, .feed-column-wrapper {
-    width: 100%;
-    max-width: 520px; /* Exact centered feed box card ratio proportions */
-}
-
-/* Outer Card Shell Housing the Search Input and Feed Grid Items */
-.feed-master-card-shell {
-    background-color: #ffffff;
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-card);
-    width: 100%;
-    padding: 24px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-}
-
-/* Wireframe Search Bar Parameters Grid Block */
-.search-wrapper-block {
-    width: 100%;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--card-border);
-    margin-bottom: 24px;
-}
-
-.search-input-field {
-    width: 100%;
-    background-color: var(--input-bg);
-    color: #333333;
-    border: none;
-    border-radius: var(--radius-img);
-    padding: 14px 20px;
-    font-size: 0.92rem;
-    font-weight: 500;
-    outline: none;
-    text-align: left;
-}
-.search-input-field::placeholder {
-    color: #666666;
-}
-
-/* Post Container Wrapper Framework Block */
-.timeline-post-node {
-    width: 100%;
-    margin-bottom: 36px;
-}
-
-.post-media-box-wrapper {
-    width: 100%;
-    aspect-ratio: 1 / 1; /* Forces perfectly square canvas matrix aspect matching output spec */
-    border-radius: var(--radius-img);
-    overflow: hidden;
+.post-card {
     background-color: var(--card-color);
     border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
     margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 
-.post-media-box-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Keeps imagery fill perfectly flush */
-}
-
-/* Metatray Placed UNDERNEATH Content Image Block Frame */
-.post-metadata-tray {
+.post-header {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding-left: 4px;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
-.post-avatar-circle {
-    width: 52px;
-    height: 52px;
+.post-avatar {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    border: 1px solid #000000;
-    background-color: var(--card-color);
+    background-color: #f1f5f9;
+    border: 1px solid var(--card-border);
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 1.1rem;
 }
-.post-avatar-circle img {
+
+.post-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -267,70 +162,127 @@ main {
 .post-identity-block {
     display: flex;
     flex-direction: column;
-    justify-content: center;
 }
 
-.post-author-title-label {
-    font-size: 1.25rem;
+.post-username {
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-main);
-    line-height: 1.2;
 }
 
-.post-timestamp-caption-label {
-    font-size: 0.85rem;
+.post-timestamp {
+    font-size: 0.78rem;
     color: var(--text-muted);
-    font-weight: 500;
-    margin-top: 2px;
 }
 
-/* Floating Sticky Right Corner Account Pill Layout Button Component */
-.floating-right-account-pill {
-    position: fixed;
-    bottom: 32px;
-    right: 48px;
-    background-color: var(--pill-dark-bg);
-    color: #ffffff !important;
-    border-radius: var(--radius-pill);
-    padding: 12px 28px 12px 14px;
+.post-caption {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.post-media-container {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background-color: #000;
+    margin-bottom: 12px;
+}
+
+.post-img {
+    width: 100%;
+    height: auto;
+    max-height: 450px;
+    object-fit: contain;
+    display: block;
+}
+
+.moment-footer {
     display: flex;
     align-items: center;
-    gap: 14px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    cursor: pointer;
-    z-index: 2000;
-    transition: var(--transition-smooth);
-    text-decoration: none;
-}
-.floating-right-account-pill:hover {
-    transform: translateY(-2px);
-    opacity: 0.95;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--card-border);
 }
 
-.floating-pill-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background-color: #ffffff;
-    border: 1px solid rgba(255,255,255,0.2);
-    overflow: hidden;
-}
-.floating-pill-avatar img {
+/* INPUT UI ELEMENTS */
+input[type="text"], input[type="number"], textarea {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.92rem;
+    outline: none;
+    transition: all 0.2s ease;
 }
 
-.floating-pill-label-text {
-    font-size: 0.95rem;
+input[type="text"]:focus, textarea:focus {
+    background-color: #ffffff;
+    border-color: var(--accent-color);
+}
+
+/* ==========================================================================
+   🔘 ACTION SYSTEM SUB-BUTTON ARCHITECTURES
+   ========================================================================== */
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: #ffffff !important;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
     font-weight: 600;
-    white-space: nowrap;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
+.btn-primary:hover { background-color: var(--accent-hover); }
 
-@media (max-width: 1200px) {
-    .floating-right-account-pill {
-        position: static;
-        margin: 24px auto 0 auto;
-        width: max-content;
-    }
+.btn-secondary {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1px solid #e2e8f0;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
+.btn-secondary:hover { background-color: #f8fafc; color: var(--text-main); }
+
+.like-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 0.88rem;
+}
+.like-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+.like-btn:hover { color: var(--accent-red); }
+
+.btn-delete-moment { background: transparent; border: none; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+.btn-delete-moment:hover { color: var(--accent-red); }
+
+/* GRID LAYOUTS FOR PROFILES */
+#user-moments {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+}
+.user-moment-card { aspect-ratio: 1/1; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--card-border); }
+.user-moment-card img { width: 100%; height: 100%; object-fit: cover; }
+
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 16px; }
+.modal-content { background-color: var(--card-color); border-radius: var(--radius-md); width: 100%; max-width: 440px; padding: 24px; }
