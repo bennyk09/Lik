@@ -1,9 +1,13 @@
 import { db, auth } from './firebase-config.deploy.js';
-import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc, arrayUnion, arrayRemove, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const feed = document.getElementById('wall-feed');
 const storiesTray = document.getElementById('stories-tray');
+
+// Handle Search Element Targets Registry
+const searchInput = document.getElementById('user-search-input');
+const searchResultsTray = document.getElementById('search-results-tray');
 
 async function renderAppFeed() {
     if (!feed) return;
@@ -36,8 +40,7 @@ async function renderAppFeed() {
             
             const authorData = userCacheMap.get(moment.userId) || { name: "User", username: "/user", profilePic: "" };
             const isMyMoment = currentUserId === moment.userId;
-
-            // 🪐 CHECK IF CURRENT USER ALREADY LIKED THIS POST
+            
             const likedByArray = moment.likedBy || [];
             const hasLiked = currentUserId && likedByArray.includes(currentUserId);
 
@@ -78,6 +81,83 @@ async function renderAppFeed() {
     } catch(err) { console.error("Feed pipeline error: ", err); }
 }
 
+// 🪐 Real-Time Username Search Event Loop Execution Block
+if (searchInput) {
+    searchInput.oninput = async (e) => {
+        let keyword = e.target.value.trim().toLowerCase();
+        
+        if (!keyword) {
+            searchResultsTray.innerHTML = "";
+            searchResultsTray.style.display = "none";
+            return;
+        }
+
+        // Standardize leading slash format query automatically
+        if (!keyword.startsWith("/")) {
+            keyword = "/" + keyword;
+        }
+
+        try {
+            // High-unicode bound marker enforces clean index range match prefix operations
+            const endThreshold = keyword + "\uf8ff";
+            const q = query(
+                collection(db, "users"),
+                where("username", ">=", keyword),
+                where("username", "<=", endThreshold),
+                limit(5)
+            );
+
+            const snapshot = await getDocs(q);
+            
+            if (snapshot.empty) {
+                searchResultsTray.innerHTML = `<p style="padding: 12px; font-size: 0.85rem; color: var(--text-muted); text-align: center; margin:0;">No users matched "${keyword}"</p>`;
+                searchResultsTray.style.display = "block";
+                return;
+            }
+
+            searchResultsTray.innerHTML = "";
+            snapshot.forEach(docData => {
+                const userProfile = docData.data();
+                const row = document.createElement('div');
+                
+                row.style = "display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; border-radius:4px;";
+                row.innerHTML = `
+                    <div class="post-avatar" style="width:34px; height:34px; font-size:0.8rem;">
+                        ${userProfile.profilePic ? `<img src="${userProfile.profilePic}">` : (userProfile.name || "U").charAt(0).toUpperCase()}
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); line-height:1.2;">${userProfile.name || "User"}</span>
+                        <span style="font-size: 0.75rem; color: var(--accent-color); font-weight: 500; margin-top:1px;">${userProfile.username}</span>
+                    </div>
+                `;
+                
+                // Clicking a targeted lookup card redirects browser session to profile view parameters
+                row.onclick = () => {
+                    alert(`Username Selected: ${userProfile.name} (${userProfile.username})`);
+                };
+
+                // Add simple hover effect dynamically via JS hooks definitions
+                row.onmouseenter = () => row.style.background = "rgba(255,255,255,0.03)";
+                row.onmouseleave = () => row.style.background = "transparent";
+
+                searchResultsTray.appendChild(row);
+            });
+            
+            searchResultsTray.style.display = "block";
+
+        } catch (err) {
+            console.error("Search index failed: ", err);
+        }
+    };
+
+    // Close dropdown dynamically when clicking outside input area boundary frames
+    document.addEventListener('click', (e) => {
+        if (e.target !== searchInput && e.target !== searchResultsTray) {
+            if (searchResultsTray) searchResultsTray.style.display = "none";
+        }
+    });
+}
+
 function bindLikes() {
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async (e) => {
@@ -100,7 +180,6 @@ function bindLikes() {
             btnEl.disabled = true;
 
             if (!isLiked) {
-                // 🪐 ACTION A: LIKE THE POST
                 countLabel.textContent = currentLikes + 1;
                 btnEl.setAttribute('data-liked', 'true');
                 btnEl.style.background = "#ff3b30";
@@ -109,32 +188,25 @@ function bindLikes() {
 
                 try {
                     await Promise.all([
-                        updateDoc(doc(db, "moments", momentId), { 
-                            likedBy: arrayUnion(currentUserId) 
-                        }),
+                        updateDoc(doc(db, "moments", momentId), { likedBy: arrayUnion(currentUserId) }),
                         updateDoc(doc(db, "users", authorId), { totalLikes: increment(1) })
                     ]);
                 } catch(err) {
-                    // Rollback on network failure
                     countLabel.textContent = currentLikes;
                     btnEl.setAttribute('data-liked', 'false');
                     btnEl.style = "";
                 } finally { btnEl.disabled = false; }
             } else {
-                // 🪐 ACTION B: UNLIKE THE POST
                 countLabel.textContent = Math.max(0, currentLikes - 1);
                 btnEl.setAttribute('data-liked', 'false');
                 btnEl.style = "";
 
                 try {
                     await Promise.all([
-                        updateDoc(doc(db, "moments", momentId), { 
-                            likedBy: arrayRemove(currentUserId) 
-                        }),
+                        updateDoc(doc(db, "moments", momentId), { likedBy: arrayRemove(currentUserId) }),
                         updateDoc(doc(db, "users", authorId), { totalLikes: increment(-1) })
                     ]);
                 } catch(err) {
-                    // Rollback on network failure
                     countLabel.textContent = currentLikes;
                     btnEl.setAttribute('data-liked', 'true');
                     btnEl.style.background = "#ff3b30";
