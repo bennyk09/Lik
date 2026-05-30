@@ -20,3 +20,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+---
+
+### 📦 2. Production Release Logs (`RELEASES.md` or GitHub Tags)
+
+Use these compilation notes to document your recent version changes for deployment tracking:
+
+```markdown
+# Production Deployment Release Log Matrix
+
+## [v2.0.0] — Modern Reset & Engine Stabilization
+### 🪐 Final Optimization Layer Deployment — 2026-05-30
+
+### ⚡ Added & Optimized
+- **Client-Side Denormalized Join Injection Engine**: Overhauled `js/upload.js` and `js/wall.js` to write account parameters directly to the post object. This eliminates cascading background network lookups, solving feed freeze frames and lag completely.
+- **Persistent Credential Locks**: Added explicit `browserLocalPersistence` authorization pipelines, keeping profile contexts securely stored across browser tab terminations.
+- **Parallel Swaps Tracking Systems**: Configured `Promise.all()` batch execution channels within `js/swaps.js` to update incoming, outgoing, and mutual connection fields simultaneously.
+
+### 🎨 Design & Structural Layout Adjustments
+- **Minimalist Logo-Only Header Sidebar**: Removed all text titles from side and top bars, setting the layout to focus purely on the clean square graphic asset (`logo.png`).
+- **Centered Timeline Post Hierarchy**: Reset the layout to a classic social media structure. Images render cleanly at a 1:1 aspect ratio right on top, while avatar indicators and metadata flow nicely beneath the content block.
+- **Decoupled Settings Panel Matrix**: Moved theme toggles, session logout actions, and database record cleanup utilities to a separate `settings.html` page to prevent layout congestion.
+- **GPU Layer Layering**: Added hardware rendering metrics (`will-change: transform`) to layout containers to keep browser execution frames hovering at a smooth 60fps.
+
+---
+
+## [v1.1.0] — Multi-Column Prototypes & Core Testing
+### 🧪 Experimental Structural Refactoring Phase — 2026-04-15
+
+### ⚙️ Added
+- Initial UI decoupled theme properties configuration.
+- Real-time Firestore document fetch loops mapping directly inside timeline UI layers.
+- Cross-Profile Relationship matching modules.
+
+---
+
+## [v1.0.0] — MVP Core Release Gateway
+### 🚀 Alpha Deployment Launch Launch — 2026-01-20
+
+### 🔒 Added
+- Native Google Authentication popup interface workflow integrations.
+- Single account user timeline initialization records.
+- Base image scaling frames and data arrays properties configurations setup.

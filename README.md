@@ -1,36 +1,41 @@
-# 🪐 LIK — Ephemeral Micro-Moments Space
+# LIK — Real-Time Moments Platform
 
-LIK is a minimalist, mobile-first temporary social media ecosystem built for immediate presence rather than permanent archives. Every shared moment (text thoughts or compressed base64 images) automatically drops off the universal feed timeline exactly 24 hours after creation.
+LIK is a hardware-accelerated, real-time social networking canvas engineered for fast moment sharing, mutual profile swapping, and relationship status synchronization. Built on top of a client-side denormalized architecture powered by Firebase, LIK prioritizes minimal network latency, strict image containment, and a signature clean, logo-only navigation system.
 
----
+## 🚀 Key Architectural Features
 
-## 📁 Repository Architecture & Component Responsibilities
+- **Denormalized Shallow Join Architecture**: To eliminate real-time synchronous network bottlenecks (`getDoc` or `getDocs` loops inside iterative UI loops), profile meta parameters (`authorName`, `authorUsername`, `authorProfilePic`) are baked directly into each `moment` payload at the exact second of publication. The Wall feed renders in a single database read.
+- **Asynchronous Parallel Promise Channels**: Swaps and social network dashboards fetch bulk user records using concurrent non-blocking loops via `Promise.all()`.
+- **Indefinite Session Persistence Engine**: Configured via `setPersistence(auth, browserLocalPersistence)` to enforce persistent local credential records across browser session terminations.
+- **Hardware-Accelerated UI**: Implements rendering hints (`will-change: transform, opacity`) to offload heavy interface components directly to the GPU for smooth scrolling and modal animations.
+- **Minimalist Logo-Only Interface**: Designed with an iconic layout configuration that strips out textual brand labels from headers to rely strictly on an icon graphic asset (`logo.png`).
+- **Dynamic Relationship Binder Matrix**: Complete data tracing loops for mutual Profile Swapping, incoming/outgoing request validation, and an active, cross-profile dissolving loop ("Break Up" trigger) that resets status schemas instantaneously across paired accounts.
 
-The codebase separates visual template elements (`HTML`/`CSS`) from operational lifecycle engines (`JavaScript`/`Firebase NoSQL`):
+## 🛠️ Technology Stack & Dependencies
 
-### 🌐 Presentation Interface Files (HTML/CSS)
-* **`index.html`** — The primary application gateway. Handles rendering conditional workspace states (the public Google login form for unauthenticated sessions vs. the horizontal feed stream for verified profiles).
-* **`upload.html`** — Staging sandbox for post creation. Houses the drop area for files and binds text areas to transient moment objects.
-* **`profile.html`** — Personal user dashboard. Displays calculated points tracking tables, user bio fields, and a dense 3-column chronological grid layout of active personal posts.
-* **`css/style.css`** — The unified responsive dark design matrix. Utilizes specific CSS Media Queries to transition between wide centered layouts for laptops and sticky bottom nav bars for phones.
+- **Frontend Core**: Semantic HTML5, CSS3 Custom Properties (Dual-Theme Interface Architecture Variables), Native Vanilla ECMAScript Modules (`ES6`).
+- **Database & Identity Management Layer**: Google Firebase JS SDK v10.8.0 (Firestore Database / Authentication via Google Identity Provider Service).
+- **Typography Layout Elements**: Apple Native Font Stacks (`SF Pro Display`, `SF Pro Text`, `Inter`).
 
-### ⚡ Logic Controllers (`js/`)
-* **`js/auth-google.js`** — Manages identity routing. Hooks into Firebase Authentication for single-click entry, triggers onboarding states for new registrations, and drops cookie sessions upon logging out.
-* **`js/wall.js`** — Drives the core feed pipeline. Pulls non-expired moments from Firestore using query filters, injects vector heart SVGs, and runs security checks to block self-liking.
-* **`js/upload.js`** — Listens to file selections, serializes asset streams into lightweight Base64 strings, and adds the data payload to Firestore with matching expiration timestamps.
-* **`js/profile.js`** — Tracks personal metrics. Queries user documents, calculates engagement rates, and hooks up the absolute deletion sequence to purge records permanently.
+## 📁 Repository Directory Structure
 
----
-
-## ⚙️ Core Technical Logic Systems
-
-### 1. The 24-Hour Ephemerality Sweeper Matrix
-Instead of expensive server-side cron daemons, LIK uses programmatic client-side query masking. When the wall loads, a Firestore filter discards any records where the creation timestamp is older than the current Unix window.
-
-```javascript
-const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
-const q = query(
-    collection(db, "moments"), 
-    where("uploadTimestamp", ">", dayAgo), 
-    orderBy("uploadTimestamp", "desc")
-);
+```text
+D:\LIK\
+│
+├── css/
+│   └── main.css                     # Premium responsive standard social UI rules
+│
+├── js/
+│   ├── firebase-config.deploy.js    # Firebase initialization configuration credentials
+│   ├── auth-google.js               # Local persistence identity gateway engine
+│   ├── wall.js                      # Denormalized single-pass feed timeline controller
+│   ├── upload.js                    # Post creator with inline user meta-injection
+│   ├── profile.js                   # Dynamic statistics analyzer & relationship controller
+│   └── swaps.js                     # Batch promise mutual network connection grid
+│
+├── index.html                       # Chronological standard home wall stream panel
+├── upload.html                      # Moment creator viewport frame
+├── swaps.html                       # Connections dashboard panel mapping manager
+├── profile.html                     # Account metadata metrics dashboard
+├── settings.html                    # Decoupled theme, session, and danger zone controls
+└── logo.png                         # Standalone square branding layout graphic asset
