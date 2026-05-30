@@ -1,5 +1,5 @@
 import { db, auth } from './firebase-config.deploy.js';
-import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const uploadForm = document.getElementById('upload-form');
@@ -52,8 +52,16 @@ if (uploadForm) {
         }
 
         try {
+            // Fetch current user details instantly to embed them into the post document
+            const userSnap = await getDoc(doc(db, "users", user.uid));
+            const userData = userSnap.exists() ? userSnap.data() : {};
+
+            // Save the document with embedded profile metadata
             await addDoc(collection(db, "moments"), {
                 userId: user.uid,
+                authorName: userData.name || "User",
+                authorUsername: userData.username || "/user",
+                authorProfilePic: userData.profilePic || "",
                 text: textContent,
                 imageUrl: base64Image,
                 uploadTimestamp: Date.now(),
