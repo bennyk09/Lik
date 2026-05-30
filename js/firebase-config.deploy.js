@@ -2,7 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Paste your actual production keys straight from your Firebase Project Overview Console Settings
+// 🪐 COMPLETE DEPLOYMENT CONFIGURATION MATRIX
+// Replace these placeholder strings with your actual plaintext keys from the Firebase Console!
 const firebaseConfig = {
     apiKey: "AIzaSyYourActualValidKeyHereFromFirebaseConsole",
     authDomain: "your-project-id.firebaseapp.com",
@@ -12,7 +13,7 @@ const firebaseConfig = {
     appId: "1:123456789012:web:abcdef1234567890"
 };
 
-// Initialize active instance contexts
+// Initialize individual service contexts safely for global export
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
