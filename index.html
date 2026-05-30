@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK</title>
-    <link rel="stylesheet" href="/Lik/css/style.css?v=11.0.2">
+    <link rel="stylesheet" href="/Lik/css/style.css?v=11.0.3">
 </head>
 <body>
     <div class="app-container">
@@ -70,6 +70,20 @@
                 </div>
                 <button type="submit" class="btn-primary" style="margin-top: 8px; width: 100%;">Create Profile</button>
             </form>
+        </div>
+    </div>
+
+    <div id="view-user-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 420px; text-align: center; padding: 28px;">
+            <div class="profile-avatar" id="view-user-avatar" style="width: 90px; height: 90px; font-size: 2rem; margin: 0 auto 16px auto; overflow: hidden; border: 1px solid var(--card-border);">--</div>
+            <h2 id="view-user-name" style="font-size: 1.35rem; font-weight: 700; margin-bottom: 2px; color: var(--text-main);">User</h2>
+            <p id="view-user-handle" style="color: var(--accent-color); font-weight: 600; font-size: 0.95rem; margin-bottom: 14px;">/handle</p>
+            <div id="view-user-bio" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 28px; background: rgba(255,255,255,0.01); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.02); text-align: left; min-height: 50px; word-break: break-word;">No biography set.</div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button type="button" id="close-user-modal-btn" class="btn-secondary" style="flex: 1; padding: 10px 0;">Close</button>
+                <button type="button" id="swap-action-btn" class="btn-primary" style="flex: 1; padding: 10px 0; font-weight: 700;">Swap</button>
+            </div>
         </div>
     </div>
 

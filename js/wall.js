@@ -1,13 +1,21 @@
 import { db, auth } from './firebase-config.deploy.js';
-import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc, arrayUnion, arrayRemove, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc, arrayUnion, arrayRemove, limit, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const feed = document.getElementById('wall-feed');
 const storiesTray = document.getElementById('stories-tray');
 
-// Handle Search Element Targets Registry
+// Handle Search and Overlay Modal Node Registries
 const searchInput = document.getElementById('user-search-input');
 const searchResultsTray = document.getElementById('search-results-tray');
+
+const viewUserModal = document.getElementById('view-user-modal');
+const closeUserModalBtn = document.getElementById('close-user-modal-btn');
+const swapActionBtn = document.getElementById('swap-action-btn');
+const viewUserAvatar = document.getElementById('view-user-avatar');
+const viewUserName = document.getElementById('view-user-name');
+const viewUserHandle = document.getElementById('view-user-handle');
+const viewUserBio = document.getElementById('view-user-bio');
 
 async function renderAppFeed() {
     if (!feed) return;
@@ -49,10 +57,10 @@ async function renderAppFeed() {
             card.id = `moment-card-${momentId}`;
             card.innerHTML = `
                 <div class="post-header" style="display: flex; align-items: center; gap: 12px;">
-                    <div class="post-avatar">
+                    <div class="post-avatar" style="cursor: pointer;" data-profile-click-uid="${moment.userId}">
                         ${authorData.profilePic ? `<img src="${authorData.profilePic}">` : (authorData.name || "U").charAt(0).toUpperCase()}
                     </div>
-                    <div style="display: flex; flex-direction: column;">
+                    <div style="display: flex; flex-direction: column; cursor: pointer;" data-profile-click-uid="${moment.userId}">
                         <span class="post-username" style="font-weight: 600; font-size: 0.9rem; color: var(--text-main); line-height: 1.2;">${authorData.name || "Anonymous"}</span>
                         <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 500; margin-top: 2px;">${authorData.username || "/user"}</span>
                     </div>
@@ -73,6 +81,12 @@ async function renderAppFeed() {
                     </div>
                 </div>
             `;
+            
+            // Map timeline card post headers elements to execute modal lookups 
+            card.querySelectorAll('[data-profile-click-uid]').forEach(el => {
+                el.onclick = () => openUserProfileCard(el.getAttribute('data-profile-click-uid'));
+            });
+            
             feed.appendChild(card);
         }
 
@@ -81,7 +95,98 @@ async function renderAppFeed() {
     } catch(err) { console.error("Feed pipeline error: ", err); }
 }
 
-// 🪐 Real-Time Username Search Event Loop Execution Block
+// 🪐 Look up user profiles dynamically and synchronize Swap connection actions
+async function openUserProfileCard(targetUid) {
+    if (!auth.currentUser) return;
+    const currentUserId = auth.currentUser.uid;
+    
+    try {
+        const targetUserSnap = await getDoc(doc(db, "users", targetUid));
+        if (!targetUserSnap.exists()) return;
+        const targetUserData = targetUserSnap.data();
+
+        // Populate popup overlay layout variables components
+        if (viewUserAvatar) {
+            viewUserAvatar.innerHTML = targetUserData.profilePic ? `<img src="${targetUserData.profilePic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : (targetUserData.name || "U").charAt(0).toUpperCase();
+        }
+        if (viewUserName) viewUserName.textContent = targetUserData.name || "User";
+        if (viewUserHandle) viewUserHandle.textContent = targetUserData.username || "/user";
+        if (viewUserBio) viewUserBio.textContent = targetUserData.bio || "No biography added yet.";
+
+        // Resets the open text fields tracking layouts
+        if (searchResultsTray) searchResultsTray.style.display = "none";
+        if (searchInput) searchInput.value = "";
+
+        // Verify relational array mapping configurations metrics
+        const myProfileSnap = await getDoc(doc(db, "users", currentUserId));
+        const myProfileData = myProfileSnap.data();
+        const swappedArray = myProfileData.swappedWith || [];
+        const isSwapped = swappedArray.includes(targetUid);
+
+        if (currentUserId === targetUid) {
+            // Hide action button entirely if clicking onto your own account popup details card
+            swapActionBtn.style.display = "none";
+        } else {
+            swapActionBtn.style.display = "block";
+            updateSwapButtonUI(isSwapped);
+            
+            // Bind operational execution listeners loop directly to target handlers
+            swapActionBtn.onclick = () => handleSwapToggle(targetUid, isSwapped);
+        }
+
+        viewUserModal.style.display = "flex";
+
+    } catch(err) { console.error("Failed loading profile metadata views card: ", err); }
+}
+
+function updateSwapButtonUI(isSwapped) {
+    if (isSwapped) {
+        swapActionBtn.textContent = "Unswap";
+        swapActionBtn.style.background = "transparent";
+        swapActionBtn.style.color = "var(--text-main)";
+        swapActionBtn.style.border = "1px solid var(--card-border)";
+    } else {
+        swapActionBtn.textContent = "Swap";
+        swapActionBtn.style.background = "var(--accent-color)";
+        swapActionBtn.style.color = "#fff";
+        swapActionBtn.style.border = "1px solid transparent";
+    }
+}
+
+async function handleSwapToggle(targetUid, initiallySwapped) {
+    if (!auth.currentUser) return;
+    const currentUserId = auth.currentUser.uid;
+    swapActionBtn.disabled = true;
+
+    try {
+        if (!initiallySwapped) {
+            // Write relationship links atomically into both distinct user metrics sheets
+            await Promise.all([
+                updateDoc(doc(db, "users", currentUserId), { swappedWith: arrayUnion(targetUid) }),
+                updateDoc(doc(db, "users", targetUid), { swappedWith: arrayUnion(currentUserId) })
+            ]);
+            updateSwapButtonUI(true);
+            swapActionBtn.onclick = () => handleSwapToggle(targetUid, true);
+        } else {
+            // Purge relationship connections atomically from records documents mapping variables
+            await Promise.all([
+                updateDoc(doc(db, "users", currentUserId), { swappedWith: arrayRemove(targetUid) }),
+                updateDoc(doc(db, "users", targetUid), { swappedWith: arrayRemove(currentUserId) })
+            ]);
+            updateSwapButtonUI(false);
+            swapActionBtn.onclick = () => handleSwapToggle(targetUid, false);
+        }
+    } catch(err) {
+        console.error("Connection swap routine tracking breakdown: ", err);
+    } finally {
+        swapActionBtn.disabled = false;
+    }
+}
+
+// Bind modal closure button listener
+if (closeUserModalBtn) closeUserModalBtn.onclick = () => viewUserModal.style.display = "none";
+
+// Real-Time Username Search Event Input Parsing Engine
 if (searchInput) {
     searchInput.oninput = async (e) => {
         let keyword = e.target.value.trim().toLowerCase();
@@ -92,21 +197,13 @@ if (searchInput) {
             return;
         }
 
-        // Standardize leading slash format query automatically
         if (!keyword.startsWith("/")) {
             keyword = "/" + keyword;
         }
 
         try {
-            // High-unicode bound marker enforces clean index range match prefix operations
             const endThreshold = keyword + "\uf8ff";
-            const q = query(
-                collection(db, "users"),
-                where("username", ">=", keyword),
-                where("username", "<=", endThreshold),
-                limit(5)
-            );
-
+            const q = query(collection(db, "users"), where("username", ">=", keyword), where("username", "<=", endThreshold), limit(5));
             const snapshot = await getDocs(q);
             
             if (snapshot.empty) {
@@ -131,26 +228,18 @@ if (searchInput) {
                     </div>
                 `;
                 
-                // Clicking a targeted lookup card redirects browser session to profile view parameters
-                row.onclick = () => {
-                    alert(`Username Selected: ${userProfile.name} (${userProfile.username})`);
-                };
+                // Clicking custom matching result elements pulls up the modal context card instantly!
+                row.onclick = () => openUserProfileCard(userProfile.uid);
 
-                // Add simple hover effect dynamically via JS hooks definitions
                 row.onmouseenter = () => row.style.background = "rgba(255,255,255,0.03)";
                 row.onmouseleave = () => row.style.background = "transparent";
-
                 searchResultsTray.appendChild(row);
             });
             
             searchResultsTray.style.display = "block";
-
-        } catch (err) {
-            console.error("Search index failed: ", err);
-        }
+        } catch (err) { console.error(err); }
     };
 
-    // Close dropdown dynamically when clicking outside input area boundary frames
     document.addEventListener('click', (e) => {
         if (e.target !== searchInput && e.target !== searchResultsTray) {
             if (searchResultsTray) searchResultsTray.style.display = "none";
