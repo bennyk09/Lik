@@ -37,18 +37,12 @@ onAuthStateChanged(auth, async (user) => {
 if (loginBtn) {
     loginBtn.onclick = async () => {
         try {
-            // Give visual feedback that auth is processing
             loginBtn.disabled = true;
             loginBtn.textContent = "Connecting to Google...";
-            
             await signInWithPopup(auth, provider);
         } catch (err) {
             console.error("Auth System Failure:", err);
-            
-            // Pop an alert so you can see exactly why Firebase rejected it
             alert(`Auth Error: ${err.message}\n\nCode: ${err.code}`);
-            
-            // Reset the button if it fails
             loginBtn.disabled = false;
             loginBtn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16" alt="Google"> Continue with Google';
         }
@@ -65,7 +59,6 @@ if (onboardingForm) {
             const emailPrefix = user.email.split('@')[0];
             const generatedHandle = `/${emailPrefix}`;
 
-            // 🪐 INITIALIZE ALL ARRAYS TO ENSURE SWAPS AND COUPLE SECTIONS OPERATE FLAWLESSLY
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
                 name: document.getElementById('user-name').value.trim(),

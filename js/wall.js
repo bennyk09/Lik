@@ -3,8 +3,6 @@ import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, 
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const feed = document.getElementById('wall-feed');
-const storiesTray = document.getElementById('stories-tray');
-
 const searchInput = document.getElementById('user-search-input');
 const searchResultsTray = document.getElementById('search-results-tray');
 
@@ -71,7 +69,6 @@ async function renderAppFeed() {
                         </svg>
                         <span class="like-count-num">${likedByArray.length}</span>
                     </button>
-                    
                     <div style="display: flex; align-items: center; gap: 12px;">
                         ${isMyMoment ? `<button class="btn-delete-moment" data-id="${momentId}">Delete</button>` : ''}
                         <small style="color:var(--text-muted); font-size:0.75rem;">${calcTime(moment.uploadTimestamp)}</small>
@@ -82,13 +79,11 @@ async function renderAppFeed() {
             card.querySelectorAll('[data-profile-click-uid]').forEach(el => {
                 el.onclick = () => openUserProfileCard(el.getAttribute('data-profile-click-uid'));
             });
-            
             feed.appendChild(card);
         }
-
         bindLikes();
         bindDeletions();
-    } catch(err) { console.error("Feed pipeline error: ", err); }
+    } catch(err) { console.error(err); }
 }
 
 async function openUserProfileCard(targetUid) {
@@ -114,7 +109,6 @@ async function openUserProfileCard(targetUid) {
             swapActionBtn.style.display = "none";
         } else {
             swapActionBtn.style.display = "block";
-            
             const myProfileSnap = await getDoc(doc(db, "users", currentUserId));
             const myData = myProfileSnap.data();
             
@@ -124,31 +118,17 @@ async function openUserProfileCard(targetUid) {
 
             if (mutualIds.includes(targetUid)) {
                 swapActionBtn.textContent = "Unswap";
-                swapActionBtn.style.background = "transparent";
-                swapActionBtn.style.color = "var(--text-main)";
-                swapActionBtn.style.border = "1px solid var(--card-border)";
             } else if (sentIds.includes(targetUid)) {
                 swapActionBtn.textContent = "Requested";
-                swapActionBtn.style.background = "rgba(255,255,255,0.05)";
-                swapActionBtn.style.color = "var(--text-muted)";
-                swapActionBtn.style.border = "1px solid var(--card-border)";
             } else if (incomingIds.includes(targetUid)) {
                 swapActionBtn.textContent = "Accept Swap";
-                swapActionBtn.style.background = "var(--accent-color)";
-                swapActionBtn.style.color = "#fff";
-                swapActionBtn.style.border = "1px solid transparent";
             } else {
                 swapActionBtn.textContent = "Swap";
-                swapActionBtn.style.background = "var(--accent-color)";
-                swapActionBtn.style.color = "#fff";
-                swapActionBtn.style.border = "1px solid transparent";
             }
             
             swapActionBtn.onclick = () => handleModalSwapOperation(targetUid, swapActionBtn.textContent, currentUserId);
         }
-
         viewUserModal.style.display = "flex";
-
     } catch(err) { console.error(err); }
 }
 
@@ -204,33 +184,25 @@ if (searchInput) {
             snapshot.forEach(docData => {
                 const userProfile = docData.data();
                 const row = document.createElement('div');
-                row.style = "display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; border-radius:4px;";
+                row.style = "display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer;";
                 row.innerHTML = `
                     <div class="post-avatar" style="width:34px; height:34px; font-size:0.8rem;">
                         ${userProfile.profilePic ? `<img src="${userProfile.profilePic}">` : (userProfile.name || "U").charAt(0).toUpperCase()}
                     </div>
                     <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); line-height:1.2;">${userProfile.name || "User"}</span>
-                        <span style="font-size: 0.75rem; color: var(--accent-color); font-weight: 500; margin-top:1px;">${userProfile.username}</span>
+                        <span style="font-size: 0.85rem; font-weight: 600;">${userProfile.name || "User"}</span>
+                        <span style="font-size: 0.75rem; color: var(--accent-color);">${userProfile.username}</span>
                     </div>`;
                 
                 row.onclick = () => {
                     viewUserModal.style.display = "none";
                     window.location.href = `profile.html?uid=${userProfile.uid}`;
                 };
-                row.onmouseenter = () => row.style.background = "rgba(255,255,255,0.03)";
-                row.onmouseleave = () => row.style.background = "transparent";
                 searchResultsTray.appendChild(row);
             });
             searchResultsTray.style.display = "block";
         } catch (err) { console.error(err); }
     };
-
-    document.addEventListener('click', (e) => {
-        if (e.target !== searchInput && e.target !== searchResultsTray) {
-            if (searchResultsTray) searchResultsTray.style.display = "none";
-        }
-    });
 }
 
 function bindLikes() {
@@ -250,43 +222,29 @@ function bindLikes() {
             const isLiked = btnEl.getAttribute('data-liked') === 'true';
             const countLabel = btnEl.querySelector('.like-count-num');
             const currentLikes = parseInt(countLabel.textContent) || 0;
-            
             btnEl.disabled = true;
 
             if (!isLiked) {
                 countLabel.textContent = currentLikes + 1;
                 btnEl.setAttribute('data-liked', 'true');
-                btnEl.style.background = "#ff3b30";
-                btnEl.style.color = "#fff";
-                btnEl.style.borderColor = "#ff3b30";
-
+                btnEl.style.background = "#ff3b30"; btnEl.style.color = "#fff"; btnEl.style.borderColor = "#ff3b30";
                 try {
                     await Promise.all([
                         updateDoc(doc(db, "moments", momentId), { likedBy: arrayUnion(currentUserId) }),
                         updateDoc(doc(db, "users", authorId), { totalLikes: increment(1) })
                     ]);
-                } catch(err) {
-                    countLabel.textContent = currentLikes;
-                    btnEl.setAttribute('data-liked', 'false');
-                    btnEl.style = "";
-                } finally { btnEl.disabled = false; }
+                } catch(err) { countLabel.textContent = currentLikes; btnEl.setAttribute('data-liked', 'false'); btnEl.style = ""; }
+                finally { btnEl.disabled = false; }
             } else {
                 countLabel.textContent = Math.max(0, currentLikes - 1);
-                btnEl.setAttribute('data-liked', 'false');
-                btnEl.style = "";
-
+                btnEl.setAttribute('data-liked', 'false'); btnEl.style = "";
                 try {
                     await Promise.all([
                         updateDoc(doc(db, "moments", momentId), { likedBy: arrayRemove(currentUserId) }),
                         updateDoc(doc(db, "users", authorId), { totalLikes: increment(-1) })
                     ]);
-                } catch(err) {
-                    countLabel.textContent = currentLikes;
-                    btnEl.setAttribute('data-liked', 'true');
-                    btnEl.style.background = "#ff3b30";
-                    btnEl.style.color = "#fff";
-                    btnEl.style.borderColor = "#ff3b30";
-                } finally { btnEl.disabled = false; }
+                } catch(err) { countLabel.textContent = currentLikes; btnEl.setAttribute('data-liked', 'true'); btnEl.style.background = "#ff3b30"; }
+                finally { btnEl.disabled = false; }
             }
         };
     });
@@ -296,22 +254,11 @@ function bindDeletions() {
     document.querySelectorAll('.btn-delete-moment').forEach(btn => {
         btn.onclick = async (e) => {
             const momentId = e.currentTarget.getAttribute('data-id');
-            const userConfirmed = confirm("Are you sure you want to permanently delete this moment from the feed?");
-            if (!userConfirmed) return;
-            e.currentTarget.disabled = true;
-            e.currentTarget.textContent = "Removing...";
+            if (!confirm("Are you sure you want to permanently delete this moment?")) return;
             try {
                 await deleteDoc(doc(db, "moments", momentId));
-                const postCardTarget = document.getElementById(`moment-card-${momentId}`);
-                if (postCardTarget) {
-                    postCardTarget.style.opacity = '0';
-                    setTimeout(() => postCardTarget.remove(), 250);
-                }
-            } catch (err) {
-                console.error(err);
-                e.currentTarget.disabled = false;
-                e.currentTarget.textContent = "Delete";
-            }
+                document.getElementById(`moment-card-${momentId}`)?.remove();
+            } catch (err) { console.error(err); }
         };
     });
 }

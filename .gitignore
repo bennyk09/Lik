@@ -1,19 +1,9 @@
-# Local environment variables
 .env
 .env.local
 .env.*.local
-
-# Database or logging dumps
 *.json
 !moments.json
-
-# Local development Firebase config configuration script mapping
 js/firebase-config.js
-
-# Ensure your deployment credentials target file is explicitly NEVER ignored by Git tracking mechanics
 !js/firebase-config.deploy.js
-
-# IDE configs and systems files
-.DS_Store
 .vscode/
 node_modules/
