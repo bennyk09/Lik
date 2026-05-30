@@ -84,41 +84,39 @@ async function loadProfileData(uid, isViewingSelf) {
         const scoreLikes = userData.totalLikes || 0;
 
         // 🪐 LEADERBOARD RANK GENERATOR PIPELINE: Computes real positional index based on overall Score
-// 🪐 FIXED LEADERBOARD RANK GENERATOR: Handles zero scores and ties cleanly
-let computedRankPosition = "Unranked"; 
-try {
-    if (scoreLikes > 0) {
-        const rankQuery = query(collection(db, "users"), orderBy("totalLikes", "desc"));
-        const rankSnapshot = await getDocs(rankQuery);
-        let indexPosition = 1;
-        let trueRank = 1;
-        let previousLikes = -1;
+        let computedRankPosition = "#0"; 
+        try {
+            if (scoreLikes > 0) {
+                const rankQuery = query(collection(db, "users"), orderBy("totalLikes", "desc"));
+                const rankSnapshot = await getDocs(rankQuery);
+                let indexPosition = 1;
+                let trueRank = 1;
+                let previousLikes = -1;
 
-        for (const docData of rankSnapshot.docs) {
-            const currentDocLikes = docData.data().totalLikes || 0;
-            
-            // If the score drops, push the rank down to the current loop index
-            if (currentDocLikes < previousLikes) {
-                trueRank = indexPosition;
+                for (const docData of rankSnapshot.docs) {
+                    const currentDocLikes = docData.data().totalLikes || 0;
+                    
+                    if (currentDocLikes < previousLikes) {
+                        trueRank = indexPosition;
+                    }
+                    
+                    if (docData.id === uid) {
+                        computedRankPosition = `#${trueRank}`;
+                        break;
+                    }
+                    
+                    previousLikes = currentDocLikes;
+                    indexPosition++;
+                }
+            } else {
+                // 🪐 CHANGED: If score is 0, rank explicitly shows #0
+                computedRankPosition = "#0";
             }
-            
-            if (docData.id === uid) {
-                computedRankPosition = `#${trueRank}`;
-                break;
-            }
-            
-            previousLikes = currentDocLikes;
-            indexPosition++;
+        } catch (rankErr) {
+            console.warn("Rank computation index delay fallback initialized.", rankErr);
         }
-    } else {
-        // 🪐 If your score is 0, you remain unranked until you get your first like!
-        computedRankPosition = "None";
-    }
-} catch (rankErr) {
-    console.warn("Rank computation index delay fallback initialized.", rankErr);
-}
 
-        // 🪐 RENDER PARAMETERS METRICS GRID AS REQUESTED: Swaps | Moments | Score(likes) | Rank(most likes)
+        // RENDER PARAMETERS METRICS GRID: Swaps | Moments | Score | Rank
         if (statsTray) {
             statsTray.innerHTML = `
                 <div class="stat-node"><span class="stat-node-val">${swappedArray.length}</span><span class="stat-node-lbl">Swaps</span></div>

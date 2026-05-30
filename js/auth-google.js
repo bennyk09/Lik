@@ -47,20 +47,25 @@ if (onboardingForm) {
         if (!user || !user.email) return;
 
         try {
-            // 🪐 STEP 1: Extract email prefix and format as an unchangeable handle (/prefix)
             const emailPrefix = user.email.split('@')[0];
             const generatedHandle = `/${emailPrefix}`;
 
+            // 🪐 INITIALIZE ALL ARRAYS TO ENSURE SWAPS AND COUPLE SECTIONS OPERATE FLAWLESSLY
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
-                name: document.getElementById('user-name').value.trim(), // Editable Display Name
-                username: generatedHandle, // 🛑 STOPS MODIFICATION: Saved permanently as /handle
+                name: document.getElementById('user-name').value.trim(),
+                username: generatedHandle,
                 age: parseInt(document.getElementById('user-age').value),
                 bio: "",
                 profilePic: "",
                 totalLikes: 0,
-                averageLikScore: 0,
-                rank: "Unranked"
+                relationshipStatus: "single",
+                partnerUid: "",
+                swappedWith: [],          // 🔍 Fixed: explicit initialization
+                swapRequestsIn: [],       // 🔍 Fixed: explicit initialization
+                swapRequestsOut: [],      // 🔍 Fixed: explicit initialization
+                coupleRequestIn: "",
+                coupleRequestOut: ""
             });
             modal.style.display = 'none';
             showAppInterface();
