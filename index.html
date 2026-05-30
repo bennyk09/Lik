@@ -5,14 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK - Wall</title>
     <link rel="icon" type="image/png" href="logo.png">
-    <script>
-        document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'light');
-    </script>
-    <link rel="stylesheet" href="css/styles.css?v=1.0.0">
+    
+    <!-- EMBEDDED RESISTANT STYLESHEET MATRIX -->
+    <style>
+        :root {
+            --bg-main: #ffffff;
+            --bg-outside: #fafafa;
+            --card-color: #ffffff;
+            --card-border: #e2e2e6;
+            --text-main: #000000;
+            --text-muted: #64748b;
+            --input-bg: #f1f5f9;
+            --pill-dark-bg: #1e293b;
+            --sidebar-line: #e2e2e6;
+            --radius-md: 12px;
+            --radius-card: 20px;
+            --radius-img: 16px;
+            --radius-pill: 50px;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 90px; height: 100vh;
+            border-right: 1px solid var(--sidebar-line);
+            padding: 40px 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            background-color: var(--bg-main);
+            z-index: 1000;
+        }
+
+        .brand-wrapper {
+            display: flex; justify-content: center; align-items: center; cursor: pointer; width: 100%; margin-bottom: 32px;
+        }
+
+        .brand-logo-img { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; }
+
+        .desktop-nav { display: flex; flex-direction: column; align-items: center; gap: 32px; width: 100%; }
+
+        .desktop-nav a {
+            color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-decoration: none;
+            text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 0; border-bottom: 2px solid transparent;
+        }
+
+        .desktop-nav a:hover, .desktop-nav a.active { color: var(--text-main); border-bottom-color: var(--text-main); }
+
+        .sidebar-bottom-pill-btn {
+            background-color: var(--pill-dark-bg); color: #ffffff; border: none;
+            width: 44px; height: 44px; border-radius: 50%; font-size: 0.75rem; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+
+        main { margin-left: 90px; padding: 40px 24px; width: 100%; background-color: var(--bg-outside); display: flex; justify-content: center; }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--bg-main);
+            border-top: 1px solid var(--card-border); height: 64px; display: none; justify-content: space-around; align-items: center; z-index: 1000;
+        }
+        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; }
+        .bottom-nav a.active { color: var(--text-main); }
+
+        @media (max-width: 768px) {
+            header { display: none !important; }
+            main { margin-left: 0; padding: 24px 16px 88px 16px; }
+            .bottom-nav { display: flex; }
+        }
+
+        #wall-feed-container { width: 100%; max-width: 480px; }
+
+        .feed-master-card-shell { background-color: #ffffff; border: 1px solid var(--card-border); border-radius: var(--radius-card); width: 100%; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+
+        .search-wrapper-block { width: 100%; }
+
+        .search-input-field { width: 100%; background-color: var(--input-bg); color: var(--text-main); border: none; border-radius: var(--radius-md); padding: 14px 20px; font-size: 0.95rem; font-weight: 500; outline: none; }
+
+        .timeline-post-node { width: 100%; display: flex; flex-direction: column; margin-bottom: 12px; }
+
+        .post-media-box-wrapper { width: 100%; aspect-ratio: 1 / 1; border-radius: var(--radius-img); overflow: hidden; background-color: #e2e2e6; margin-bottom: 16px; border: 1px solid var(--card-border); }
+
+        .post-media-box-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+        .post-metadata-tray { display: flex; align-items: center; gap: 12px; padding: 0 4px; }
+
+        .post-avatar-circle { width: 46px; height: 46px; border-radius: 50%; border: 1px solid #1c1c1e; background-color: #ffffff; overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; }
+
+        .post-avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+        .post-identity-block { display: flex; flex-direction: column; }
+
+        .post-author-title-label { font-size: 1.15rem; font-weight: 700; color: var(--text-main); line-height: 1.2; }
+
+        .post-timestamp-caption-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+        .post-actions-overlay-strip { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+
+        .action-icon-trigger { background: transparent; border: none; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; }
+
+        .floating-right-account-pill {
+            position: fixed; bottom: 40px; right: 48px; background-color: var(--pill-dark-bg); color: #ffffff !important; border-radius: var(--radius-pill); padding: 10px 24px 10px 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; z-index: 2000; text-decoration: none;
+        }
+
+        .floating-pill-avatar { width: 32px; height: 32px; border-radius: 50%; background-color: #ffffff; overflow: hidden; }
+        .floating-pill-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .floating-pill-label-text { font-size: 0.92rem; font-weight: 600; }
+
+        @media (max-width: 1200px) { .floating-right-account-pill { position: static; margin: 24px auto 0 auto; width: max-content; } }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 16px; }
+        .modal-content { background: #ffffff; border: 1px solid var(--card-border); border-radius: var(--radius-card); width: 100%; max-width: 440px; padding: 32px; }
+    </style>
 </head>
 <body>
     <div class="app-container">
         
+        <!-- SIDEBAR - ONLY THE CLEAN SQUARE LOGO ICON -->
         <header>
             <div style="width: 100%;">
                 <div class="brand-wrapper" onclick="window.location.href='index.html'">
@@ -27,6 +150,7 @@
             <button class="sidebar-bottom-pill-btn" onclick="window.location.href='settings.html'">Set</button>
         </header>
 
+        <!-- CENTER TIMELINE FEED CARD -->
         <main>
             <div id="auth-gateway-view" style="display: none; width: 100%; max-width: 400px; text-align: center; padding-top: 100px;">
                 <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">A temporary space for real-time moments.</p>
@@ -78,7 +202,7 @@
                     <label for="user-age">Age</label>
                     <input type="number" id="user-age" required min="13" placeholder="Your age">
                 </div>
-                <button type="submit" class="btn-primary" style="margin-top: 8px; width: 100%; border-radius: 8px; padding: 12px; background: #000; color: #fff;">Create Profile</button>
+                <button type="submit" style="margin-top: 12px; width: 100%; background:#1e293b; color:#fff; padding:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Create Profile</button>
             </form>
         </div>
     </div>
