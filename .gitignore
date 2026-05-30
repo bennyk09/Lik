@@ -1,1 +1,7 @@
-js/firebase-config.js
+# Ignore local environment config modules containing private keys
+js/config/firebase-config.js
+
+# Ignore system local logs and editor configurations
+.DS_Store
+.vscode/
+node_modules/

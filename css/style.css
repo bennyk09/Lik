@@ -10,7 +10,7 @@
     --text-main: #f3f4f6;
     --text-muted: #8e8e93;
     
-    /* Theme Transparencies */
+    /* Theme Transparencies & Overlays */
     --header-bg: rgba(10, 10, 12, 0.8);
     --nav-bg: rgba(26, 26, 31, 0.85);
     --modal-bg: rgba(5, 5, 6, 0.85);
@@ -91,6 +91,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 header h1 {
@@ -103,13 +104,16 @@ header h1 {
     transition: var(--transition-smooth);
 }
 
-header h1:hover { opacity: 0.8; }
+header h1:hover {
+    opacity: 0.8;
+}
 
 main {
     padding: 24px 16px;
     width: 100%;
 }
 
+/* Navigation System Layout Structures */
 .desktop-nav {
     display: flex;
     gap: 24px;
@@ -143,6 +147,7 @@ main {
     align-items: center;
     z-index: 1000;
     padding: 0 12px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .bottom-nav a {
@@ -158,8 +163,12 @@ main {
     color: var(--accent-color);
 }
 
-@media (max-width: 768px) { .desktop-nav { display: none !important; } }
-@media (min-width: 769px) { .bottom-nav { display: none !important; } }
+@media (max-width: 768px) {
+    .desktop-nav { display: none !important; }
+}
+@media (min-width: 769px) {
+    .bottom-nav { display: none !important; }
+}
 
 /* ==========================================================================
    🖼️ SOCIAL POST CARDS & TIMELINE COMPONENTS
@@ -172,10 +181,12 @@ main {
     padding: 20px;
     margin-bottom: 24px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    transition: var(--transition-smooth);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.post-card:hover { border-color: var(--hover-border); }
+.post-card:hover {
+    border-color: var(--hover-border);
+}
 
 .post-header {
     display: flex;
@@ -199,7 +210,11 @@ main {
     overflow: hidden;
 }
 
-.post-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.post-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
 .post-media-container {
     width: 100%;
@@ -226,7 +241,10 @@ main {
     word-break: break-word;
 }
 
-.post-caption strong { font-weight: 700; margin-right: 6px; }
+.post-caption strong {
+    font-weight: 700;
+    margin-right: 6px;
+}
 
 .moment-footer {
     display: flex;
@@ -240,6 +258,7 @@ main {
    🔘 BUTTON SYSTEM COMPONENTS & INTERACTIONS
    ========================================================================== */
 
+/* Like Button Interface Configs */
 .like-btn {
     background: var(--hover-bg);
     border: 1px solid var(--card-border);
@@ -268,8 +287,11 @@ main {
     border-color: var(--hover-border);
 }
 
-.like-btn:hover svg { transform: scale(1.15); }
+.like-btn:hover svg {
+    transform: scale(1.15);
+}
 
+/* Master Primary Buttons Configuration */
 .btn-primary {
     background-color: var(--text-main);
     color: var(--bg-main);
@@ -286,8 +308,12 @@ main {
     transition: var(--transition-smooth);
 }
 
-.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
 
+/* Secondary Button Frames */
 .btn-secondary {
     background: transparent;
     color: var(--text-main);
@@ -308,6 +334,7 @@ main {
     border-color: var(--hover-border);
 }
 
+/* Platform Delete/Unswap Buttons */
 .btn-delete-moment {
     background: transparent;
     border: none;
@@ -318,7 +345,9 @@ main {
     transition: var(--transition-smooth);
 }
 
-.btn-delete-moment:hover { color: var(--accent-red); }
+.btn-delete-moment:hover {
+    color: var(--accent-red);
+}
 
 /* ==========================================================================
    📝 INPUT FORMS & SEARCH ARCHITECTURE COMPONENTS
@@ -351,7 +380,7 @@ textarea {
     font-family: inherit;
     font-size: 0.92rem;
     outline: none;
-    transition: var(--transition-smooth);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 input[type="text"]:focus,
@@ -361,7 +390,9 @@ textarea:focus {
     background-color: var(--input-focus);
 }
 
-textarea { resize: none; }
+textarea {
+    resize: none;
+}
 
 /* ==========================================================================
    👤 PROFILE DASHBOARD NETWORKS & LOOKUPS
@@ -399,7 +430,11 @@ textarea { resize: none; }
     box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
 
-.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
 .remove-pic-btn {
     background: none;
@@ -419,6 +454,7 @@ textarea { resize: none; }
     flex: 1;
 }
 
+/* Metric Nodes Grid Dashboard Parameters Mapping styles */
 .stats-row {
     display: flex;
     gap: 20px;
@@ -450,6 +486,7 @@ textarea { resize: none; }
     word-break: break-word;
 }
 
+/* 3-Column Image Layout Timeline Grid Configuration */
 #user-moments {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -472,7 +509,9 @@ textarea { resize: none; }
     transition: transform 0.3s ease;
 }
 
-.user-moment-card:hover img { transform: scale(1.04); }
+.user-moment-card:hover img {
+    transform: scale(1.04);
+}
 
 /* ==========================================================================
    🪐 OVERLAY MODAL DISPLAY LAYERS
@@ -492,6 +531,7 @@ textarea { resize: none; }
     justify-content: center;
     z-index: 3000;
     padding: 16px;
+    transition: background-color 0.3s ease;
 }
 
 .modal-content {
@@ -506,10 +546,17 @@ textarea { resize: none; }
 }
 
 @keyframes modalSlideUp {
-    from { transform: translateY(12px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(12px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
+/* Upload Page Picture Container Layout rules */
 .upload-preview-frame {
     width: 100%;
     max-height: 380px;
