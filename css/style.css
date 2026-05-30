@@ -3,28 +3,26 @@
    ========================================================================== */
 
 :root {
-    /* DEFAULT: DARK MODE */
+    /* DEFAULT: PREMIUM DARK MODE */
     --bg-main: #0a0a0c;
-    --card-color: #1a1a1f;
+    --card-color: #16161a;
     --card-border: #26262b;
     --text-main: #f3f4f6;
     --text-muted: #8e8e93;
     
     /* Theme Transparencies & Overlays */
     --header-bg: rgba(10, 10, 12, 0.8);
-    --nav-bg: rgba(26, 26, 31, 0.85);
-    --modal-bg: rgba(5, 5, 6, 0.85);
-    --input-bg: rgba(0, 0, 0, 0.2);
-    --input-focus: rgba(0, 0, 0, 0.3);
-    --hover-bg: rgba(255, 255, 255, 0.03);
-    --hover-border: rgba(255, 255, 255, 0.08);
+    --nav-bg: rgba(22, 22, 26, 0.85);
+    --modal-bg: rgba(0, 0, 0, 0.75);
+    --input-bg: rgba(255, 255, 255, 0.04);
+    --input-focus: rgba(255, 255, 255, 0.08);
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --hover-border: rgba(255, 255, 255, 0.12);
     --avatar-border: rgba(255, 255, 255, 0.1);
     
-    /* Premium High-Contrast Color Variables */
+    /* Premium High-Contrast Colors */
     --accent-color: #2f80ed;
-    --accent-glow: rgba(47, 128, 237, 0.15);
     --accent-red: #ff3b30;
-    --accent-red-glow: rgba(255, 59, 48, 0.12);
     
     /* Layout Constants */
     --radius-sm: 8px;
@@ -36,23 +34,26 @@
 
 /* LIGHT MODE OVERRIDES */
 [data-theme="light"] {
-    --bg-main: #f3f4f6;
+    --bg-main: #f2f2f7;
     --card-color: #ffffff;
-    --card-border: #e5e7eb;
-    --text-main: #111827;
-    --text-muted: #6b7280;
+    --card-border: #e5e5ea;
+    --text-main: #1c1c1e;
+    --text-muted: #8e8e93;
     
-    --header-bg: rgba(243, 244, 246, 0.8);
-    --nav-bg: rgba(255, 255, 255, 0.85);
-    --modal-bg: rgba(255, 255, 255, 0.85);
-    --input-bg: #f9fafb;
-    --input-focus: #ffffff;
-    --hover-bg: rgba(0, 0, 0, 0.03);
-    --hover-border: rgba(0, 0, 0, 0.08);
-    --avatar-border: rgba(0, 0, 0, 0.1);
+    /* Theme Transparencies & Overlays */
+    --header-bg: rgba(242, 242, 247, 0.85);
+    --nav-bg: rgba(255, 255, 255, 0.9);
+    --modal-bg: rgba(255, 255, 255, 0.6);
+    --input-bg: rgba(0, 0, 0, 0.03);
+    --input-focus: rgba(0, 0, 0, 0.06);
+    --hover-bg: rgba(0, 0, 0, 0.04);
+    --hover-border: rgba(0, 0, 0, 0.1);
+    --avatar-border: rgba(0, 0, 0, 0.08);
+    
+    --accent-color: #007aff;
 }
 
-/* Base Document Reset Layer */
+/* Base Document Reset */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -104,16 +105,13 @@ header h1 {
     transition: var(--transition-smooth);
 }
 
-header h1:hover {
-    opacity: 0.8;
-}
+header h1:hover { opacity: 0.8; }
 
 main {
     padding: 24px 16px;
     width: 100%;
 }
 
-/* Navigation System Layout Structures */
 .desktop-nav {
     display: flex;
     gap: 24px;
@@ -159,16 +157,10 @@ main {
     gap: 4px;
 }
 
-.bottom-nav a.active {
-    color: var(--accent-color);
-}
+.bottom-nav a.active { color: var(--accent-color); }
 
-@media (max-width: 768px) {
-    .desktop-nav { display: none !important; }
-}
-@media (min-width: 769px) {
-    .bottom-nav { display: none !important; }
-}
+@media (max-width: 768px) { .desktop-nav { display: none !important; } }
+@media (min-width: 769px) { .bottom-nav { display: none !important; } }
 
 /* ==========================================================================
    🖼️ SOCIAL POST CARDS & TIMELINE COMPONENTS
@@ -180,13 +172,11 @@ main {
     border-radius: var(--radius-md);
     padding: 20px;
     margin-bottom: 24px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.post-card:hover {
-    border-color: var(--hover-border);
-}
+.post-card:hover { border-color: var(--hover-border); }
 
 .post-header {
     display: flex;
@@ -210,11 +200,7 @@ main {
     overflow: hidden;
 }
 
-.post-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+.post-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .post-media-container {
     width: 100%;
@@ -241,10 +227,7 @@ main {
     word-break: break-word;
 }
 
-.post-caption strong {
-    font-weight: 700;
-    margin-right: 6px;
-}
+.post-caption strong { font-weight: 700; margin-right: 6px; }
 
 .moment-footer {
     display: flex;
@@ -258,7 +241,7 @@ main {
    🔘 BUTTON SYSTEM COMPONENTS & INTERACTIONS
    ========================================================================== */
 
-/* Like Button Interface Configs */
+/* Like Button Interface */
 .like-btn {
     background: var(--hover-bg);
     border: 1px solid var(--card-border);
@@ -286,15 +269,12 @@ main {
     color: var(--text-main);
     border-color: var(--hover-border);
 }
+.like-btn:hover svg { transform: scale(1.15); }
 
-.like-btn:hover svg {
-    transform: scale(1.15);
-}
-
-/* Master Primary Buttons Configuration */
+/* Master Primary Buttons - Restored to gorgeous Accent Blue! */
 .btn-primary {
-    background-color: var(--text-main);
-    color: var(--bg-main);
+    background-color: var(--accent-color);
+    color: #ffffff !important;
     border: none;
     padding: 12px 24px;
     border-radius: var(--radius-sm);
@@ -309,8 +289,18 @@ main {
 }
 
 .btn-primary:hover {
-    opacity: 0.9;
+    opacity: 0.85;
     transform: translateY(-1px);
+}
+
+/* Dedicated Google Login Button Fix */
+#google-login-btn {
+    background-color: var(--card-color);
+    color: var(--text-main) !important;
+    border: 1px solid var(--card-border);
+}
+#google-login-btn:hover {
+    background-color: var(--hover-bg);
 }
 
 /* Secondary Button Frames */
@@ -334,7 +324,6 @@ main {
     border-color: var(--hover-border);
 }
 
-/* Platform Delete/Unswap Buttons */
 .btn-delete-moment {
     background: transparent;
     border: none;
@@ -344,10 +333,7 @@ main {
     cursor: pointer;
     transition: var(--transition-smooth);
 }
-
-.btn-delete-moment:hover {
-    color: var(--accent-red);
-}
+.btn-delete-moment:hover { color: var(--accent-red); }
 
 /* ==========================================================================
    📝 INPUT FORMS & SEARCH ARCHITECTURE COMPONENTS
@@ -390,9 +376,7 @@ textarea:focus {
     background-color: var(--input-focus);
 }
 
-textarea {
-    resize: none;
-}
+textarea { resize: none; }
 
 /* ==========================================================================
    👤 PROFILE DASHBOARD NETWORKS & LOOKUPS
@@ -430,11 +414,7 @@ textarea {
     box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
 
-.profile-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .remove-pic-btn {
     background: none;
@@ -454,7 +434,6 @@ textarea {
     flex: 1;
 }
 
-/* Metric Nodes Grid Dashboard Parameters Mapping styles */
 .stats-row {
     display: flex;
     gap: 20px;
@@ -486,7 +465,6 @@ textarea {
     word-break: break-word;
 }
 
-/* 3-Column Image Layout Timeline Grid Configuration */
 #user-moments {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -509,12 +487,10 @@ textarea {
     transition: transform 0.3s ease;
 }
 
-.user-moment-card:hover img {
-    transform: scale(1.04);
-}
+.user-moment-card:hover img { transform: scale(1.04); }
 
 /* ==========================================================================
-   🪐 OVERLAY MODAL DISPLAY LAYERS
+   🪐 OVERLAY MODAL DISPLAY LAYERS (Fixed layout for image_5a8122.png)
    ========================================================================== */
 
 .modal-overlay {
@@ -540,23 +516,28 @@ textarea {
     border-radius: var(--radius-md);
     width: 100%;
     max-width: 440px;
-    padding: 28px;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    padding: 32px 28px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
     animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes modalSlideUp {
-    from {
-        transform: translateY(12px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+/* OVERRIDE: Strip the ugly input-style borders off the Modal Bio Text */
+#view-user-bio {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    text-align: center !important;
+    min-height: auto !important;
+    margin-bottom: 28px !important;
+    color: var(--text-muted) !important;
+    font-size: 0.95rem;
 }
 
-/* Upload Page Picture Container Layout rules */
+@keyframes modalSlideUp {
+    from { transform: translateY(12px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
 .upload-preview-frame {
     width: 100%;
     max-height: 380px;
