@@ -110,7 +110,7 @@ async function renderPartnerDetailsCard(partnerUid, isViewingSelf) {
             </div>`;
         if (isViewingSelf) {
             partnerStatusDisplayFrame.querySelector('#btn-break-up-direct').onclick = async () => {
-                if (!confirm("Confirm dissolution parameters?")) return;
+                if (!confirm("Confirm breakup relationship dissolving parameters?")) return;
                 const me = auth.currentUser.uid;
                 await Promise.all([
                     updateDoc(doc(db, "users", me), { relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" }),
@@ -146,7 +146,8 @@ async function injectForeignProfileButtons(targetUid) {
         }
         await loadProfileData(targetUid, false);
     };
-    holder.appendChild(b); photosMatrixGrid.parentNode.insertBefore(holder, photosMatrixGrid.parentNode.querySelector('.lik-feed-master-card-shell'));
+    holder.appendChild(b);
+    photosMatrixGrid.parentNode.insertBefore(holder, photosMatrixGrid.parentNode.querySelector('.lik-feed-master-card-shell'));
 }
 
 if (openEditBtn) openEditBtn.onclick = () => editModal.style.display = 'flex';

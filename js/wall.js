@@ -38,7 +38,7 @@ async function renderAppFeed() {
             const cardElement = document.createElement('div');
             cardElement.className = "lik-stream-post-card";
             
-            // RENDERS CORE SPECIFICATION CLASSIFICATIONS MAPS - MEDIA CONSTANTLY SECURED ON TOP
+            // RENDERS SECURED HIERARCHY STRUCTURE CONSTRAINTS — PICTURE CANVAS SECURED CONSTANTLY ON TOP
             cardElement.innerHTML = `
                 <div class="lik-stream-card-media-box" style="cursor: pointer;" data-uid="${moment.userId}">
                     ${moment.imageUrl ? `<img src="${moment.imageUrl}" loading="lazy">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:var(--lik-bg-outside); color:var(--lik-text-gray); font-weight:bold; padding:20px; text-align:center;">${textCaption}</div>`}
@@ -112,7 +112,7 @@ function bindDeletionActionTriggers() {
     document.querySelectorAll('.delete-moment-trigger').forEach(btn => {
         btn.onclick = async (e) => {
             const momentId = e.currentTarget.getAttribute('data-id');
-            if (!confirm("Delete this moment permanently?")) return;
+            if (!confirm("Delete this moment?")) return;
             try {
                 await deleteDoc(doc(db, "moments", momentId));
                 await renderAppFeed();

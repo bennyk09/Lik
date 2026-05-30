@@ -8,7 +8,79 @@
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'light');
     </script>
-    <link rel="stylesheet" href="css/style.css?v=3.0.0">
+    
+    <style>
+        :root {
+            --lik-bg-canvas: #ffffff;
+            --lik-bg-outside: #fafafa;
+            --lik-border-clean: #e2e2e6;
+            --lik-text-dark: #000000;
+            --lik-text-gray: #64748b;
+            --lik-brand-dark: #1e293b;
+            --lik-danger-red: #ef4444;
+            --lik-radius-sm: 8px;
+            --lik-radius-md: 12px;
+            --lik-radius-card: 20px;
+            --lik-radius-pill: 50px;
+            --lik-font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --lik-transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { background-color: var(--lik-bg-canvas); color: var(--lik-text-dark); font-family: var(--lik-font-stack); }
+
+        .lik-app-grid-wrapper { display: grid; grid-template-columns: 90px 1fr; width: 100%; min-height: 100vh; }
+
+        header {
+            position: fixed; top: 0; left: 0; width: 90px; height: 100vh; border-right: 1px solid var(--lik-border-clean); padding: 40px 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between; background-color: var(--lik-bg-canvas); z-index: 1000;
+        }
+
+        .lik-brand-logo-container { display: flex; justify-content: center; align-items: center; cursor: pointer; width: 100%; margin-bottom: 32px; }
+        .lik-brand-logo-graphic { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; }
+        .lik-desktop-sidebar-nav { display: flex; flex-direction: column; align-items: center; gap: 32px; width: 100%; }
+        .lik-desktop-sidebar-nav a { color: var(--lik-text-gray); font-size: 0.85rem; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 0; transition: var(--lik-transition); border-bottom: 2px solid transparent; }
+        .lik-desktop-sidebar-nav a:hover, .lik-desktop-sidebar-nav a.lik-active-route { color: var(--lik-text-dark); border-bottom-color: var(--lik-text-dark); }
+        .lik-sidebar-action-pill-btn { background-color: var(--lik-brand-dark); color: #ffffff !important; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--lik-transition); }
+        
+        main { margin-left: 90px; padding: 40px 24px; width: 100%; background-color: var(--lik-bg-outside); display: flex; justify-content: center; }
+        .lik-feed-column-container { width: 100%; max-width: 480px; }
+
+        .lik-profile-card-panel { display: flex; flex-direction: column; align-items: flex-start; width: 100%; background-color: #ffffff; border: 1px solid var(--lik-border-clean); border-radius: var(--lik-radius-card); padding: 28px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .lik-profile-panel-top-split { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 12px; }
+        .lik-profile-panel-avatar-frame { width: 76px; height: 76px; border-radius: 50%; border: 1px solid var(--lik-border-clean); overflow: hidden; }
+        .lik-profile-panel-avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .lik-profile-remove-photo-link { background: none; border: none; color: var(--lik-danger-red); font-size: 0.72rem; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: 6px; display: block; }
+
+        #relationship-status-badge { background-color: #f1f5f9; color: var(--lik-text-gray); font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: var(--lik-radius-pill); display: inline-block; margin-top: 2px; }
+        .lik-profile-counters-row { display: flex; gap: 20px; margin: 12px 0 4px 0; }
+        .lik-profile-counter-node { display: flex; gap: 4px; font-size: 0.88rem; }
+        .lik-profile-counter-value { font-weight: 700; }
+        .lik-profile-counter-label { color: var(--lik-text-gray); }
+        .lik-profile-bio-description { font-size: 0.95rem; line-height: 1.5; color: #334155; margin-top: 4px; }
+
+        .lik-feed-master-card-shell { background-color: #ffffff; border: 1px solid var(--lik-border-clean); border-radius: var(--lik-radius-card); width: 100%; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+        .lik-profile-photo-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; }
+        .lik-profile-matrix-square { aspect-ratio: 1/1; border-radius: var(--lik-radius-sm); overflow: hidden; border: 1px solid var(--lik-border-clean); }
+        .lik-profile-matrix-square img { width: 100%; height: 100%; object-fit: cover; }
+
+        .lik-portable-bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--lik-bg-canvas); border-top: 1px solid var(--lik-border-clean); height: 64px; display: none; justify-content: space-around; align-items: center; z-index: 1000; }
+        .lik-portable-bottom-bar a { color: var(--lik-text-gray); text-decoration: none; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; }
+        .lik-portable-bottom-bar a.lik-active-route { color: var(--lik-text-dark); }
+
+        @media (max-width: 768px) {
+            header { display: none !important; }
+            main { margin-left: 0; padding: 24px 16px 88px 16px; }
+            .lik-portable-bottom-bar { display: flex; }
+        }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 16px; }
+        .modal-content { background: #ffffff; border: 1px solid var(--lik-border-clean); border-radius: var(--lik-radius-card); width: 100%; max-width: 440px; padding: 32px; }
+        .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.8rem; font-weight: 700; color: var(--lik-text-gray); }
+        .lik-search-native-input { width: 100%; background-color: var(--lik-bg-outside); color: var(--lik-text-dark); border: 1px solid var(--lik-border-clean); border-radius: var(--lik-radius-md); padding: 14px 20px; font-size: 0.95rem; font-weight: 500; outline: none; }
+    </style>
 </head>
 <body>
     <div class="lik-app-grid-wrapper">
@@ -34,7 +106,7 @@
                 <div class="lik-profile-card-panel">
                     <div class="lik-profile-panel-top-split">
                         <div class="lik-profile-identity-details">
-                            <h2 id="lbl-username-display">User</h2>
+                            <h2 id="lbl-username-display" style="font-size:1.5rem; font-weight:800; color:var(--lik-text-dark);">User</h2>
                         </div>
                         <div style="text-align: center;">
                             <div id="avatar-preview" class="lik-profile-panel-avatar-frame">-</div>
@@ -84,9 +156,9 @@
                 </div>
                 <div class="form-group">
                     <label for="edit-user-bio">Biography</label>
-                    <textarea id="edit-user-bio" rows="3"></textarea>
+                    <textarea id="edit-user-bio" class="lik-search-native-input" rows="3" style="resize:none; height:auto;"></textarea>
                 </div>
-                <div style="display: flex; gap: 12px;">
+                <div style="display: flex; gap: 12px; margin-top:24px;">
                     <button type="button" id="close-edit-modal-btn" class="lik-sidebar-action-pill-btn" style="flex: 1; width:auto; border-radius:8px; background:#fff; color:#000!important; border:1px solid var(--lik-border-clean);">Cancel</button>
                     <button type="submit" class="lik-sidebar-action-pill-btn" style="flex: 1; width:auto; border-radius:8px;">Save</button>
                 </div>

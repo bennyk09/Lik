@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.deploy.js';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const provider = new GoogleAuthProvider();
@@ -18,10 +18,7 @@ onAuthStateChanged(auth, async (user) => {
             const userSnap = await getDoc(userDocRef);
 
             if (!userSnap.exists()) {
-                if (!modal) {
-                    window.location.href = "index.html";
-                    return;
-                }
+                if (!modal) { window.location.href = "index.html"; return; }
                 modal.style.display = 'flex';
             } else {
                 showAppInterface();
@@ -36,14 +33,13 @@ if (loginBtn) {
     loginBtn.onclick = async () => {
         try {
             loginBtn.disabled = true;
-            loginBtn.textContent = "Connecting to Google...";
+            loginBtn.textContent = "Connecting...";
             await setPersistence(auth, browserLocalPersistence);
             await signInWithPopup(auth, provider);
         } catch (err) {
-            console.error("Auth Failure:", err);
-            alert(`Auth Error: ${err.message}`);
+            console.error(err);
             loginBtn.disabled = false;
-            loginBtn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16" alt="Google"> Continue with Google';
+            loginBtn.textContent = "Continue with Google";
         }
     };
 }
@@ -73,18 +69,13 @@ if (onboardingForm) {
 }
 
 function showAppInterface() {
-    const desktopNav = document.getElementById('app-nav-desktop');
     if (authView) authView.style.display = 'none';
-    if (feedView) feedView.style.display = 'block';
+    if (feedView) feedView.style.display = 'flex';
     if (appNav) appNav.style.display = 'flex';
-    if (desktopNav) desktopNav.style.display = 'flex';
 }
 
 function showAuthInterface() {
-    const desktopNav = document.getElementById('app-nav-desktop');
-    if (!authView) { window.location.href = "index.html"; return; }
-    if (authView) authView.style.display = 'flex';
+    if (authView) authView.style.display = 'block';
     if (feedView) feedView.style.display = 'none';
     if (appNav) appNav.style.display = 'none';
-    if (desktopNav) desktopNav.style.display = 'none';
 }

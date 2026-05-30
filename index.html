@@ -8,7 +8,133 @@
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'light');
     </script>
-    <link rel="stylesheet" href="css/style.css?v=3.0.0">
+    
+    <style>
+        :root {
+            --lik-bg-canvas: #ffffff;
+            --lik-bg-outside: #fafafa;
+            --lik-panel-surface: #ffffff;
+            --lik-border-clean: #e2e2e6;
+            --lik-text-dark: #000000;
+            --lik-text-gray: #64748b;
+            --lik-brand-dark: #1e293b;
+            --lik-danger-red: #ef4444;
+            
+            --lik-radius-sm: 8px;
+            --lik-radius-md: 12px;
+            --lik-radius-card: 20px;
+            --lik-radius-pill: 50px;
+            --lik-font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --lik-transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--lik-bg-canvas);
+            color: var(--lik-text-dark);
+            font-family: var(--lik-font-stack);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .lik-app-grid-wrapper {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 90px; height: 100vh;
+            border-right: 1px solid var(--lik-border-clean);
+            padding: 40px 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            background-color: var(--lik-bg-canvas);
+            z-index: 1000;
+        }
+
+        .lik-brand-logo-container {
+            display: flex; justify-content: center; align-items: center; cursor: pointer; width: 100%; margin-bottom: 32px;
+        }
+
+        .lik-brand-logo-graphic { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; }
+
+        .lik-desktop-sidebar-nav { display: flex; flex-direction: column; align-items: center; gap: 32px; width: 100%; }
+
+        .lik-desktop-sidebar-nav a {
+            color: var(--lik-text-gray); font-size: 0.85rem; font-weight: 700; text-decoration: none;
+            text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 0; transition: var(--lik-transition); border-bottom: 2px solid transparent;
+        }
+
+        .lik-desktop-sidebar-nav a:hover, 
+        .lik-desktop-sidebar-nav a.lik-active-route { color: var(--lik-text-dark); border-bottom-color: var(--lik-text-dark); }
+
+        .lik-sidebar-action-pill-btn {
+            background-color: var(--lik-brand-dark); color: #ffffff !important; border: none;
+            width: 44px; height: 44px; border-radius: 50%; font-size: 0.75rem; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--lik-transition);
+        }
+        .lik-sidebar-action-pill-btn:hover { transform: scale(1.05); }
+
+        main { margin-left: 90px; padding: 40px 24px; width: 100%; background-color: var(--lik-bg-outside); display: flex; justify-content: center; }
+
+        .lik-portable-bottom-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--lik-bg-canvas);
+            border-top: 1px solid var(--lik-border-clean); height: 64px; display: none; justify-content: space-around; align-items: center; z-index: 1000;
+        }
+        .lik-portable-bottom-bar a { color: var(--lik-text-gray); text-decoration: none; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; }
+        .lik-portable-bottom-bar a.lik-active-route { color: var(--lik-text-dark); }
+
+        @media (max-width: 768px) {
+            header { display: none !important; }
+            main { margin-left: 0; padding: 24px 16px 88px 16px; }
+            .lik-portable-bottom-bar { display: flex; }
+        }
+
+        .lik-feed-column-container, #wall-feed-container { width: 100%; max-width: 480px; }
+
+        .lik-feed-master-card-shell { background-color: #ffffff; border: 1px solid var(--lik-border-clean); border-radius: var(--lik-radius-card); width: 100%; padding: 24px; display: flex; flex-direction: column; gap: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.01); }
+
+        .lik-search-block-wrapper { width: 100%; }
+
+        .lik-search-native-input { width: 100%; background-color: var(--lik-bg-outside); color: var(--lik-text-dark); border: 1px solid var(--lik-border-clean); border-radius: var(--lik-radius-md); padding: 14px 20px; font-size: 0.95rem; font-weight: 500; outline: none; }
+
+        .lik-stream-post-card { width: 100%; display: flex; flex-direction: column; margin-bottom: 24px; }
+
+        .lik-stream-card-media-box { width: 100%; aspect-ratio: 1 / 1; border-radius: var(--lik-radius-md); overflow: hidden; background-color: var(--lik-bg-outside); margin-bottom: 14px; border: 1px solid var(--lik-border-clean); }
+
+        .lik-stream-card-media-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .lik-stream-card-meta-row { display: flex; align-items: center; gap: 12px; padding: 0 4px; }
+
+        .lik-stream-card-avatar-circle { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--lik-brand-dark); background-color: #ffffff; overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; }
+
+        .lik-stream-card-avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+        .lik-stream-card-profile-text { display: flex; flex-direction: column; }
+
+        .lik-stream-card-author-name { font-size: 1.15rem; font-weight: 700; color: var(--lik-text-dark); line-height: 1.2; }
+
+        .lik-stream-card-sub-label { font-size: 0.85rem; color: var(--lik-text-gray); font-weight: 500; margin-top: 2px; }
+
+        .lik-stream-card-actions-tray { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+
+        .lik-stream-action-trigger { background: transparent; border: none; cursor: pointer; color: var(--lik-text-dark); display: flex; align-items: center; justify-content: center; transition: var(--lik-transition); }
+        .lik-stream-action-trigger:hover { opacity: 0.7; }
+        .lik-stream-action-trigger.lik-delete-intent:hover { color: var(--lik-danger-red); }
+
+        .lik-sticky-right-profile-pill {
+            position: fixed; bottom: 40px; right: 48px; background-color: var(--lik-brand-dark); color: #ffffff !important; border-radius: var(--lik-radius-pill); padding: 10px 24px 10px 12px; display: flex; align-items: center; gap: 12px; text-decoration: none; z-index: 2000; transition: var(--lik-transition);
+        }
+        .lik-sticky-right-profile-pill:hover { transform: translateY(-1px); opacity: 0.95; }
+        .lik-sticky-pill-avatar-box { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #ffffff; }
+        .lik-sticky-pill-avatar-box img { width: 100%; height: 100%; object-fit: cover; }
+        .lik-sticky-pill-title { font-size: 0.92rem; font-weight: 600; }
+
+        @media (max-width: 1200px) { .lik-sticky-right-profile-pill { position: static; margin: 24px auto 0 auto; width: max-content; } }
+    </style>
 </head>
 <body>
     <div class="lik-app-grid-wrapper">
