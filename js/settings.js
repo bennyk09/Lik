@@ -13,20 +13,18 @@ onAuthStateChanged(auth, (user) => {
     if (!user) window.location.href = "index.html";
 });
 
-// Dynamic Theme Toggle Settings Engine Layout
 if (themeBtn) {
     const savedTheme = localStorage.getItem('lik-theme') || 'dark';
-    themeBtn.innerHTML = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    themeBtn.innerHTML = savedTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
     themeBtn.onclick = () => {
         const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('lik-theme', newTheme);
-        themeBtn.innerHTML = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+        themeBtn.innerHTML = newTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
     };
 }
 
-// Session Signout Logic Action Bind
 if (logoutBtn) {
     logoutBtn.onclick = async () => {
         const { signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
@@ -34,7 +32,6 @@ if (logoutBtn) {
     };
 }
 
-// Modal Visibility State Handlers Matrix Rules
 if (openDeleteBtn) openDeleteBtn.onclick = () => deleteModal.style.display = 'flex';
 if (closeDeleteBtn) closeDeleteBtn.onclick = () => deleteModal.style.display = 'none';
 

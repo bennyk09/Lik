@@ -37,9 +37,7 @@ async function loadProfileData(uid, isViewingSelf) {
 
         let statusBadgeHtml = "";
         if (userData.relationshipStatus === "couple") {
-            statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 59, 48, 0.12); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700;">❤️ Committed</span>`;
-            
-            // Fetch and render the partner's info sub-card layout dynamically
+            statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 59, 48, 0.12); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700;">Committed</span>`;
             if (partnerStatusDisplayFrame && userData.partnerUid) {
                 renderPartnerDetailsCard(userData.partnerUid, isViewingSelf);
             }
@@ -137,7 +135,6 @@ async function loadProfileData(uid, isViewingSelf) {
     } catch (err) { console.error(err); }
 }
 
-// 🪐 DYNAMIC COMPONENT: Renders committed partner data records box card link context frame
 async function renderPartnerDetailsCard(partnerUid, isViewingSelf) {
     try {
         const partnerSnap = await getDoc(doc(db, "users", partnerUid));
@@ -160,12 +157,12 @@ async function renderPartnerDetailsCard(partnerUid, isViewingSelf) {
         if (isViewingSelf) {
             partnerStatusDisplayFrame.querySelector('#btn-break-up-direct').onclick = async (e) => {
                 e.stopPropagation();
-                if (!confirm("Are you sure you want to break up and dissolve relationship profiles link tracking data records?")) return;
+                if (!confirm("Are you sure you want to break up?")) return;
                 const currentUserId = auth.currentUser.uid;
                 try {
                     await Promise.all([
-                        updateDoc(doc(doc(db, "users", currentUserId)), { relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" }),
-                        updateDoc(doc(doc(db, "users", partnerUid)), { relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" })
+                        updateDoc(doc(db, "users", currentUserId), { relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" }),
+                        updateDoc(doc(db, "users", partnerUid), { relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" })
                     ]);
                     await loadProfileData(currentUserId, true);
                 } catch(err) { console.error(err); }
@@ -262,7 +259,7 @@ async function injectForeignProfileButtons(targetUid) {
             const rowWrapper = document.createElement('div');
             rowWrapper.style = "display: flex; gap: 12px; width: 100%;";
             rowWrapper.innerHTML = `
-                <button id="btn-accept-couple" class="btn-primary" style="flex: 1; background: #ff3b30;">Accept ❤️</button>
+                <button id="btn-accept-couple" class="btn-primary" style="flex: 1; background: #ff453a;">Accept</button>
                 <button id="btn-reject-couple" class="btn-secondary" style="flex: 1;">Reject</button>
             `;
             rowWrapper.querySelector('#btn-accept-couple').onclick = async () => {
@@ -279,7 +276,7 @@ async function injectForeignProfileButtons(targetUid) {
         } else if (myCoupleStatus === "single") {
             const proposeBtn = document.createElement('button');
             proposeBtn.className = "btn-secondary"; proposeBtn.style.width = "100%";
-            proposeBtn.textContent = "Add Couple ➕";
+            proposeBtn.textContent = "Add Couple";
             proposeBtn.onclick = async () => {
                 await updateDoc(doc(db, "users", currentUserId), { coupleRequestOut: targetUid });
                 await updateDoc(doc(db, "users", targetUid), { coupleRequestIn: currentUserId });

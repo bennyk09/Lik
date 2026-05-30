@@ -1,38 +1,38 @@
 /* ==========================================================================
-   🪐 LIK CORE SYSTEM STYLE MATRIX - DUAL THEME (DARK / LIGHT)
+   🪐 LIK PREMIUM DUAL-THEME MASTER UI ARCHITECTURE
    ========================================================================== */
 
 :root {
-    /* DEFAULT: PREMIUM DARK MODE */
-    --bg-main: #0a0a0c;
-    --card-color: #16161a;
-    --card-border: #26262b;
+    /* DEFAULT: DARK APPEARANCE SCHEMA */
+    --bg-main: #0d0d11;
+    --card-color: #1a1a22;
+    --card-border: #2a2a35;
     --text-main: #f3f4f6;
     --text-muted: #8e8e93;
     
-    /* Theme Transparencies & Overlays */
-    --header-bg: rgba(10, 10, 12, 0.8);
-    --nav-bg: rgba(22, 22, 26, 0.85);
-    --modal-bg: rgba(0, 0, 0, 0.75);
+    /* Layout Layer Overlays */
+    --header-bg: rgba(13, 13, 17, 0.85);
+    --nav-bg: rgba(26, 26, 34, 0.9);
+    --modal-bg: rgba(0, 0, 0, 0.8);
     --input-bg: rgba(255, 255, 255, 0.04);
     --input-focus: rgba(255, 255, 255, 0.08);
-    --hover-bg: rgba(255, 255, 255, 0.05);
-    --hover-border: rgba(255, 255, 255, 0.12);
-    --avatar-border: rgba(255, 255, 255, 0.1);
+    --hover-bg: rgba(255, 255, 255, 0.06);
+    --hover-border: rgba(255, 255, 255, 0.15);
+    --avatar-border: rgba(255, 255, 255, 0.12);
     
-    /* Premium High-Contrast Colors */
-    --accent-color: #2f80ed;
-    --accent-red: #ff3b30;
+    /* Semantic Colors */
+    --accent-color: #388af6;
+    --accent-red: #ff453a;
     
     /* Layout Constants */
     --radius-sm: 8px;
     --radius-md: 16px;
-    --radius-lg: 28px;
-    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --radius-lg: 24px;
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* LIGHT MODE OVERRIDES */
+/* LIGHT THEME OVERRIDES */
 [data-theme="light"] {
     --bg-main: #f2f2f7;
     --card-color: #ffffff;
@@ -52,7 +52,7 @@
     --accent-color: #007aff;
 }
 
-/* Base Document Reset */
+/* Document Reset */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -69,10 +69,7 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ==========================================================================
-   🧱 GLOBAL SYSTEM CONTAINER FRAME LAYOUTS
-   ========================================================================== */
-
+/* Container Structure */
 .app-container {
     max-width: 100%;
     min-height: 100vh;
@@ -91,20 +88,16 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 header h1 {
     font-size: 1.5rem;
     font-weight: 900;
-    letter-spacing: -1.5px;
+    letter-spacing: -1px;
     color: var(--text-main);
     cursor: pointer;
     text-transform: uppercase;
-    transition: var(--transition-smooth);
 }
-
-header h1:hover { opacity: 0.8; }
 
 main {
     padding: 24px 16px;
@@ -144,7 +137,6 @@ main {
     align-items: center;
     z-index: 1000;
     padding: 0 12px;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .bottom-nav a {
@@ -161,11 +153,8 @@ main {
 @media (max-width: 768px) { .desktop-nav { display: none !important; } }
 @media (min-width: 769px) { .bottom-nav { display: none !important; } }
 
-/* ==========================================================================
-   🖼️ SOCIAL POST CARDS & TIMELINE COMPONENTS
-   ========================================================================== */
-
-#wall-feed-container {
+/* Wall Timeline Architecture */
+#wall-feed-container, .search-wrapper {
     max-width: 600px;
     margin: 0 auto;
 }
@@ -176,8 +165,7 @@ main {
     border-radius: var(--radius-md);
     padding: 20px;
     margin-bottom: 24px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .post-card:hover { border-color: var(--hover-border); }
@@ -206,7 +194,6 @@ main {
 
 .post-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-/* 🪐 PREVENTS IMAGE DISTORTION STRETCHING */
 .post-media-container {
     width: 100%;
     border-radius: var(--radius-sm);
@@ -223,7 +210,7 @@ main {
     width: 100%;
     height: auto;
     max-height: 520px;
-    object-fit: contain; /* Correctly displays wide shots natively without squishing */
+    object-fit: contain;
     display: block;
 }
 
@@ -232,10 +219,7 @@ main {
     line-height: 1.5;
     color: var(--text-main);
     margin-bottom: 16px;
-    word-break: break-word;
 }
-
-.post-caption strong { font-weight: 700; margin-right: 6px; }
 
 .moment-footer {
     display: flex;
@@ -245,10 +229,7 @@ main {
     border-top: 1px solid var(--hover-bg);
 }
 
-/* ==========================================================================
-   🔘 BUTTON SYSTEM COMPONENTS & INTERACTIONS
-   ========================================================================== */
-
+/* Interactive Components Button Framework */
 .like-btn {
     background: var(--hover-bg);
     border: 1px solid var(--card-border);
@@ -265,10 +246,9 @@ main {
 }
 
 .like-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     fill: currentColor;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .like-btn:hover {
@@ -276,7 +256,6 @@ main {
     color: var(--text-main);
     border-color: var(--hover-border);
 }
-.like-btn:hover svg { transform: scale(1.15); }
 
 .btn-primary {
     background-color: var(--accent-color);
@@ -290,21 +269,10 @@ main {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
     transition: var(--transition-smooth);
 }
 
-.btn-primary:hover {
-    opacity: 0.85;
-    transform: translateY(-1px);
-}
-
-#google-login-btn {
-    background-color: var(--card-color);
-    color: var(--text-main) !important;
-    border: 1px solid var(--card-border);
-}
-#google-login-btn:hover { background-color: var(--hover-bg); }
+.btn-primary:hover { opacity: 0.85; }
 
 .btn-secondary {
     background: transparent;
@@ -333,14 +301,10 @@ main {
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
-    transition: var(--transition-smooth);
 }
 .btn-delete-moment:hover { color: var(--accent-red); }
 
-/* ==========================================================================
-   📝 INPUT FORMS & SEARCH ARCHITECTURE COMPONENTS
-   ========================================================================= */
-
+/* Input Elements */
 .form-group {
     margin-bottom: 20px;
     display: flex;
@@ -356,9 +320,7 @@ main {
     color: var(--text-muted);
 }
 
-input[type="text"],
-input[type="number"],
-textarea {
+input[type="text"], input[type="number"], textarea {
     width: 100%;
     background-color: var(--input-bg);
     border: 1px solid var(--card-border);
@@ -368,28 +330,19 @@ textarea {
     font-family: inherit;
     font-size: 0.92rem;
     outline: none;
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-textarea:focus {
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
     border-color: var(--hover-border);
     background-color: var(--input-focus);
 }
 
-textarea { resize: none; }
-
-/* ==========================================================================
-   👤 PROFILE DASHBOARD NETWORKS & LOOKUPS
-   ========================================================================== */
-
+/* Profiles Architecture Matrix Mapping Configuration */
 .profile-meta-block {
     display: flex;
     align-items: center;
     gap: 24px;
     margin-bottom: 32px;
-    padding: 4px;
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
@@ -400,7 +353,6 @@ textarea { resize: none; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
 }
 
 .profile-avatar {
@@ -416,7 +368,6 @@ textarea { resize: none; }
     font-size: 2.2rem;
     color: var(--text-main);
     overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
 
 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -429,8 +380,7 @@ textarea { resize: none; }
     font-weight: 700;
     cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-top: 4px;
+    margin-top: 6px;
 }
 
 .profile-identity-details {
@@ -448,7 +398,6 @@ textarea { resize: none; }
 .stat-node {
     display: flex;
     flex-direction: column;
-    gap: 2px;
 }
 
 .stat-node-val {
@@ -467,15 +416,12 @@ textarea { resize: none; }
     font-size: 0.88rem;
     line-height: 1.5;
     color: var(--text-muted);
-    word-break: break-word;
 }
 
 #user-moments {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
     max-width: 600px;
     margin: 0 auto;
 }
@@ -484,7 +430,7 @@ textarea { resize: none; }
     aspect-ratio: 1 / 1;
     overflow: hidden;
     background: var(--bg-main);
-    border: 1px solid var(--hover-bg);
+    border: 1px solid var(--card-border);
     border-radius: var(--radius-sm);
 }
 
@@ -492,14 +438,9 @@ textarea { resize: none; }
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
 }
-.user-moment-card:hover img { transform: scale(1.04); }
 
-/* ==========================================================================
-   🪐 OVERLAY MODAL DISPLAY LAYERS
-   ========================================================================== */
-
+/* Modals Overlay Configurations */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -514,7 +455,6 @@ textarea { resize: none; }
     justify-content: center;
     z-index: 3000;
     padding: 16px;
-    transition: background-color 0.3s ease;
 }
 
 .modal-content {
@@ -525,7 +465,7 @@ textarea { resize: none; }
     max-width: 440px;
     padding: 32px 28px;
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
-    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: modalSlideUp 0.2s ease-out;
 }
 
 #view-user-bio {
@@ -533,30 +473,11 @@ textarea { resize: none; }
     border: none !important;
     padding: 0 !important;
     text-align: center !important;
-    min-height: auto !important;
     margin-bottom: 28px !important;
     color: var(--text-muted) !important;
-    font-size: 0.95rem;
 }
 
 @keyframes modalSlideUp {
-    from { transform: translateY(12px); opacity: 0; }
+    from { transform: translateY(8px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
-}
-
-.upload-preview-frame {
-    width: 100%;
-    max-height: 380px;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    border: 1px solid var(--card-border);
-    margin-bottom: 24px;
-    background: var(--bg-main);
-}
-
-.upload-preview-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
 }

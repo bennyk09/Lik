@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK - Wall</title>
     <script>
-        // Load theme instantly to prevent white flash
         document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'dark');
     </script>
     <link rel="stylesheet" href="css/style.css?v=2.0.0">
@@ -36,12 +35,12 @@
             <div id="app-feed-view" style="display: none;">
                 <div id="wall-feed-container">
                     
+                    <!-- Updated search placeholder constraint -->
                     <div class="search-wrapper" style="margin-bottom: 24px;">
                         <div class="form-group" style="margin-bottom: 0; position: relative;">
-                            <input type="text" id="user-search-input" placeholder="Search profiles by handle... (e.g. benny)" style="padding-left: 38px;">
-                            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.6; font-size: 0.85rem;">🔍</span>
+                            <input type="text" id="user-search-input" placeholder="search people" style="padding-left: 14px;">
                         </div>
-                        <div id="search-results-tray" class="post-card" style="display: none; position: absolute; width: 100%; z-index: 2000; padding: 6px; margin-top: 6px; border-color: var(--card-border);"></div>
+                        <div id="search-results-tray" class="post-card" style="display: none; position: absolute; width: 100%; z-index: 2000; padding: 6px; margin-top: 6px;"></div>
                     </div>
                     
                     <div id="wall-feed">
@@ -82,7 +81,7 @@
             <div class="profile-avatar" id="view-user-avatar" style="width: 90px; height: 90px; font-size: 2rem; margin: 0 auto 16px auto;">--</div>
             <h2 id="view-user-name" style="font-size: 1.35rem; font-weight: 700; margin-bottom: 2px;">User</h2>
             <p id="view-user-handle" style="color: var(--accent-color); font-weight: 600; font-size: 0.95rem; margin-bottom: 14px;">/handle</p>
-            <div id="view-user-bio" class="profile-bio-text" style="margin-bottom: 28px; background: var(--hover-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--hover-border); text-align: left; min-height: 50px;">No biography set.</div>
+            <div id="view-user-bio" class="profile-bio-text">No biography set.</div>
             
             <div style="display: flex; gap: 12px;">
                 <button type="button" id="close-user-modal-btn" class="btn-secondary" style="flex: 1;">Close</button>

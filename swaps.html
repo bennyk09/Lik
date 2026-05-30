@@ -24,22 +24,22 @@
         <main>
             <div style="max-width: 600px; margin: 0 auto; position: relative;">
                 
+                <!-- Updated search placeholder constraint -->
                 <div class="search-wrapper" style="margin-bottom: 32px;">
                     <div class="form-group" style="margin-bottom: 0; position: relative;">
-                        <input type="text" id="swaps-search-input" placeholder="Search profiles by handle... (e.g. benny)" style="padding-left: 38px;">
-                        <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.6; font-size: 0.85rem;">🔍</span>
+                        <input type="text" id="swaps-search-input" placeholder="search people" style="padding-left: 14px;">
                     </div>
                     <div id="swaps-search-results" class="post-card" style="display: none; position: absolute; width: 100%; z-index: 2000; padding: 6px; margin-top: 6px;"></div>
                 </div>
 
-                <div style="margin-bottom: 32px;">
+                <div>
                     <h4 style="margin: 0 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--accent-color); letter-spacing:0.5px;">Swap Requests (Incoming)</h4>
                     <div id="incoming-requests-list" style="display: flex; flex-direction: column; gap: 10px;">
                         <p style="color: var(--text-muted); font-size: 0.85rem; padding: 12px 4px;">Checking incoming requests...</p>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 32px;">
+                <div style="margin-top: 32px; margin-bottom: 32px;">
                     <h4 style="margin: 0 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Pending Invitations (Sent)</h4>
                     <div id="sent-requests-list" style="display: flex; flex-direction: column; gap: 10px;">
                         <p style="color: var(--text-muted); font-size: 0.85rem; padding: 12px 4px;">No active pending sent requests.</p>
