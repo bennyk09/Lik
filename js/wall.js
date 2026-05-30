@@ -1,5 +1,5 @@
 import { db, auth } from './firebase-config.deploy.js';
-import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const feed = document.getElementById('wall-feed');
@@ -21,6 +21,7 @@ async function renderAppFeed() {
         }
 
         const userCacheMap = new Map();
+        const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
         
         for (const docData of snap.docs) {
             const moment = docData.data();
@@ -34,7 +35,11 @@ async function renderAppFeed() {
             }
             
             const authorData = userCacheMap.get(moment.userId) || { name: "User", username: "/user", profilePic: "" };
-            const isMyMoment = auth.currentUser && auth.currentUser.uid === moment.userId;
+            const isMyMoment = currentUserId === moment.userId;
+
+            // 🪐 CHECK IF CURRENT USER ALREADY LIKED THIS POST
+            const likedByArray = moment.likedBy || [];
+            const hasLiked = currentUserId && likedByArray.includes(currentUserId);
 
             const card = document.createElement('div');
             card.className = "post-card";
@@ -52,11 +57,11 @@ async function renderAppFeed() {
                 ${moment.imageUrl ? `<div class="post-media-container"><img src="${moment.imageUrl}" class="post-img"></div>` : ''}
                 ${moment.text ? `<p class="post-caption"><strong>${authorData.name || "User"}</strong> ${moment.text}</p>` : ''}
                 <div class="moment-footer">
-                    <button class="like-btn" data-id="${momentId}" data-author="${moment.userId}">
+                    <button class="like-btn" data-id="${momentId}" data-author="${moment.userId}" data-liked="${hasLiked}" style="${hasLiked ? 'background: #ff3b30; color: #fff; border-color: #ff3b30;' : ''}">
                         <svg viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
-                        <span class="like-count-num">${moment.likesCount || 0}</span>
+                        <span class="like-count-num">${likedByArray.length}</span>
                     </button>
                     
                     <div style="display: flex; align-items: center; gap: 12px;">
@@ -80,28 +85,62 @@ function bindLikes() {
             
             const btnEl = e.currentTarget;
             const authorId = btnEl.getAttribute('data-author');
+            const momentId = btnEl.getAttribute('data-id');
+            const currentUserId = auth.currentUser.uid;
             
-            if (auth.currentUser.uid === authorId) {
+            if (currentUserId === authorId) {
                 alert("You cannot like your own moments!");
                 return;
             }
             
+            const isLiked = btnEl.getAttribute('data-liked') === 'true';
             const countLabel = btnEl.querySelector('.like-count-num');
             const currentLikes = parseInt(countLabel.textContent) || 0;
-            const momentId = btnEl.getAttribute('data-id');
             
-            countLabel.textContent = currentLikes + 1;
             btnEl.disabled = true;
 
-            try {
-                await Promise.all([
-                    updateDoc(doc(db, "moments", momentId), { likesCount: increment(1) }),
-                    updateDoc(doc(db, "users", authorId), { totalLikes: increment(1) })
-                ]);
-            } catch(err) { 
-                countLabel.textContent = currentLikes; 
-            } finally { 
-                btnEl.disabled = false; 
+            if (!isLiked) {
+                // 🪐 ACTION A: LIKE THE POST
+                countLabel.textContent = currentLikes + 1;
+                btnEl.setAttribute('data-liked', 'true');
+                btnEl.style.background = "#ff3b30";
+                btnEl.style.color = "#fff";
+                btnEl.style.borderColor = "#ff3b30";
+
+                try {
+                    await Promise.all([
+                        updateDoc(doc(db, "moments", momentId), { 
+                            likedBy: arrayUnion(currentUserId) 
+                        }),
+                        updateDoc(doc(db, "users", authorId), { totalLikes: increment(1) })
+                    ]);
+                } catch(err) {
+                    // Rollback on network failure
+                    countLabel.textContent = currentLikes;
+                    btnEl.setAttribute('data-liked', 'false');
+                    btnEl.style = "";
+                } finally { btnEl.disabled = false; }
+            } else {
+                // 🪐 ACTION B: UNLIKE THE POST
+                countLabel.textContent = Math.max(0, currentLikes - 1);
+                btnEl.setAttribute('data-liked', 'false');
+                btnEl.style = "";
+
+                try {
+                    await Promise.all([
+                        updateDoc(doc(db, "moments", momentId), { 
+                            likedBy: arrayRemove(currentUserId) 
+                        }),
+                        updateDoc(doc(db, "users", authorId), { totalLikes: increment(-1) })
+                    ]);
+                } catch(err) {
+                    // Rollback on network failure
+                    countLabel.textContent = currentLikes;
+                    btnEl.setAttribute('data-liked', 'true');
+                    btnEl.style.background = "#ff3b30";
+                    btnEl.style.color = "#fff";
+                    btnEl.style.borderColor = "#ff3b30";
+                } finally { btnEl.disabled = false; }
             }
         };
     });

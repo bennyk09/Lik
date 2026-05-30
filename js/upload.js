@@ -32,13 +32,13 @@ if(uploadForm) {
         try {
             const now = Date.now();
             await addDoc(collection(db, "moments"), {
-                userId: auth.currentUser.uid,
-                text: text || "",
-                imageUrl: imageUrl,
-                uploadTimestamp: now,
-                expirationTimestamp: now + (24*60*60*1000),
-                likesCount: 0
-            });
+            userId: user.uid,
+            text: document.getElementById('moment-text').value.trim(),
+            imageUrl: imgStagingUrl, // contains base64 string or empty string
+            uploadTimestamp: Date.now(),
+            likedBy: [], // 🪐 INITIALIZE AS EMPTY ARRAY FOR TRACKING UNIQUE LIKES
+            likesCount: 0 // Keep for legacy aggregation parameters if needed
+});
             window.location.href = "index.html";
         } catch(err) { alert(err.message); }
     };
