@@ -5,7 +5,6 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 const feed = document.getElementById('wall-feed');
 const storiesTray = document.getElementById('stories-tray');
 
-// Handle Search and Overlay Modal Node Registries
 const searchInput = document.getElementById('user-search-input');
 const searchResultsTray = document.getElementById('search-results-tray');
 
@@ -25,7 +24,6 @@ async function renderAppFeed() {
     try {
         const snap = await getDocs(q);
         feed.innerHTML = "";
-        if (storiesTray) storiesTray.innerHTML = "";
         
         if(snap.empty) {
             feed.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size:0.9rem;">No moments active right now.</p>`;
@@ -48,7 +46,6 @@ async function renderAppFeed() {
             
             const authorData = userCacheMap.get(moment.userId) || { name: "User", username: "/user", profilePic: "" };
             const isMyMoment = currentUserId === moment.userId;
-            
             const likedByArray = moment.likedBy || [];
             const hasLiked = currentUserId && likedByArray.includes(currentUserId);
 
@@ -82,7 +79,6 @@ async function renderAppFeed() {
                 </div>
             `;
             
-            // Map timeline card post headers elements to execute modal lookups 
             card.querySelectorAll('[data-profile-click-uid]').forEach(el => {
                 el.onclick = () => openUserProfileCard(el.getAttribute('data-profile-click-uid'));
             });
@@ -95,7 +91,6 @@ async function renderAppFeed() {
     } catch(err) { console.error("Feed pipeline error: ", err); }
 }
 
-// 🪐 Look up user profiles dynamically and synchronize Swap connection actions
 async function openUserProfileCard(targetUid) {
     if (!auth.currentUser) return;
     const currentUserId = auth.currentUser.uid;
@@ -105,7 +100,6 @@ async function openUserProfileCard(targetUid) {
         if (!targetUserSnap.exists()) return;
         const targetUserData = targetUserSnap.data();
 
-        // Populate popup overlay layout variables components
         if (viewUserAvatar) {
             viewUserAvatar.innerHTML = targetUserData.profilePic ? `<img src="${targetUserData.profilePic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : (targetUserData.name || "U").charAt(0).toUpperCase();
         }
@@ -113,93 +107,87 @@ async function openUserProfileCard(targetUid) {
         if (viewUserHandle) viewUserHandle.textContent = targetUserData.username || "/user";
         if (viewUserBio) viewUserBio.textContent = targetUserData.bio || "No biography added yet.";
 
-        // Resets the open text fields tracking layouts
         if (searchResultsTray) searchResultsTray.style.display = "none";
         if (searchInput) searchInput.value = "";
 
-        // Verify relational array mapping configurations metrics
-        const myProfileSnap = await getDoc(doc(db, "users", currentUserId));
-        const myProfileData = myProfileSnap.data();
-        const swappedArray = myProfileData.swappedWith || [];
-        const isSwapped = swappedArray.includes(targetUid);
-
         if (currentUserId === targetUid) {
-            // Hide action button entirely if clicking onto your own account popup details card
             swapActionBtn.style.display = "none";
         } else {
             swapActionBtn.style.display = "block";
-            updateSwapButtonUI(isSwapped);
             
-            // Bind operational execution listeners loop directly to target handlers
-            swapActionBtn.onclick = () => handleSwapToggle(targetUid, isSwapped);
+            const myProfileSnap = await getDoc(doc(db, "users", currentUserId));
+            const myData = myProfileSnap.data();
+            
+            const incomingIds = myData.swapRequestsIn || [];
+            const sentIds = myData.swapRequestsOut || [];
+            const mutualIds = myData.swappedWith || [];
+
+            if (mutualIds.includes(targetUid)) {
+                swapActionBtn.textContent = "Unswap";
+                swapActionBtn.style.background = "transparent";
+                swapActionBtn.style.color = "var(--text-main)";
+                swapActionBtn.style.border = "1px solid var(--card-border)";
+            } else if (sentIds.includes(targetUid)) {
+                swapActionBtn.textContent = "Requested";
+                swapActionBtn.style.background = "rgba(255,255,255,0.05)";
+                swapActionBtn.style.color = "var(--text-muted)";
+                swapActionBtn.style.border = "1px solid var(--card-border)";
+            } else if (incomingIds.includes(targetUid)) {
+                swapActionBtn.textContent = "Accept Swap";
+                swapActionBtn.style.background = "var(--accent-color)";
+                swapActionBtn.style.color = "#fff";
+                swapActionBtn.style.border = "1px solid transparent";
+            } else {
+                swapActionBtn.textContent = "Swap";
+                swapActionBtn.style.background = "var(--accent-color)";
+                swapActionBtn.style.color = "#fff";
+                swapActionBtn.style.border = "1px solid transparent";
+            }
+            
+            swapActionBtn.onclick = () => handleModalSwapOperation(targetUid, swapActionBtn.textContent, currentUserId);
         }
 
         viewUserModal.style.display = "flex";
 
-    } catch(err) { console.error("Failed loading profile metadata views card: ", err); }
+    } catch(err) { console.error(err); }
 }
 
-function updateSwapButtonUI(isSwapped) {
-    if (isSwapped) {
-        swapActionBtn.textContent = "Unswap";
-        swapActionBtn.style.background = "transparent";
-        swapActionBtn.style.color = "var(--text-main)";
-        swapActionBtn.style.border = "1px solid var(--card-border)";
-    } else {
-        swapActionBtn.textContent = "Swap";
-        swapActionBtn.style.background = "var(--accent-color)";
-        swapActionBtn.style.color = "#fff";
-        swapActionBtn.style.border = "1px solid transparent";
-    }
-}
-
-async function handleSwapToggle(targetUid, initiallySwapped) {
-    if (!auth.currentUser) return;
-    const currentUserId = auth.currentUser.uid;
+async function handleModalSwapOperation(targetUid, currentLabel, myUid) {
     swapActionBtn.disabled = true;
-
     try {
-        if (!initiallySwapped) {
-            // Write relationship links atomically into both distinct user metrics sheets
+        if (currentLabel === "Swap") {
             await Promise.all([
-                updateDoc(doc(db, "users", currentUserId), { swappedWith: arrayUnion(targetUid) }),
-                updateDoc(doc(db, "users", targetUid), { swappedWith: arrayUnion(currentUserId) })
+                updateDoc(doc(db, "users", myUid), { swapRequestsOut: arrayUnion(targetUid) }),
+                updateDoc(doc(db, "users", targetUid), { swapRequestsIn: arrayUnion(myUid) })
             ]);
-            updateSwapButtonUI(true);
-            swapActionBtn.onclick = () => handleSwapToggle(targetUid, true);
-        } else {
-            // Purge relationship connections atomically from records documents mapping variables
+        } else if (currentLabel === "Unswap") {
+            if (!confirm("Unswap with this user?")) return;
             await Promise.all([
-                updateDoc(doc(db, "users", currentUserId), { swappedWith: arrayRemove(targetUid) }),
-                updateDoc(doc(db, "users", targetUid), { swappedWith: arrayRemove(currentUserId) })
+                updateDoc(doc(db, "users", myUid), { swappedWith: arrayRemove(targetUid) }),
+                updateDoc(doc(db, "users", targetUid), { swappedWith: arrayRemove(myUid) })
             ]);
-            updateSwapButtonUI(false);
-            swapActionBtn.onclick = () => handleSwapToggle(targetUid, false);
+        } else if (currentLabel === "Accept Swap") {
+            await Promise.all([
+                updateDoc(doc(db, "users", myUid), { swapRequestsIn: arrayRemove(targetUid), swappedWith: arrayUnion(targetUid) }),
+                updateDoc(doc(db, "users", targetUid), { swapRequestsOut: arrayRemove(myUid), swappedWith: arrayUnion(myUid) })
+            ]);
         }
-    } catch(err) {
-        console.error("Connection swap routine tracking breakdown: ", err);
-    } finally {
-        swapActionBtn.disabled = false;
-    }
+        viewUserModal.style.display = "none";
+    } catch(err) { console.error(err); }
+    finally { swapActionBtn.disabled = false; }
 }
 
-// Bind modal closure button listener
 if (closeUserModalBtn) closeUserModalBtn.onclick = () => viewUserModal.style.display = "none";
 
-// Real-Time Username Search Event Input Parsing Engine
 if (searchInput) {
     searchInput.oninput = async (e) => {
         let keyword = e.target.value.trim().toLowerCase();
-        
         if (!keyword) {
             searchResultsTray.innerHTML = "";
             searchResultsTray.style.display = "none";
             return;
         }
-
-        if (!keyword.startsWith("/")) {
-            keyword = "/" + keyword;
-        }
+        if (!keyword.startsWith("/")) keyword = "/" + keyword;
 
         try {
             const endThreshold = keyword + "\uf8ff";
@@ -216,7 +204,6 @@ if (searchInput) {
             snapshot.forEach(docData => {
                 const userProfile = docData.data();
                 const row = document.createElement('div');
-                
                 row.style = "display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; border-radius:4px;";
                 row.innerHTML = `
                     <div class="post-avatar" style="width:34px; height:34px; font-size:0.8rem;">
@@ -225,17 +212,16 @@ if (searchInput) {
                     <div style="display: flex; flex-direction: column;">
                         <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); line-height:1.2;">${userProfile.name || "User"}</span>
                         <span style="font-size: 0.75rem; color: var(--accent-color); font-weight: 500; margin-top:1px;">${userProfile.username}</span>
-                    </div>
-                `;
+                    </div>`;
                 
-                // Clicking custom matching result elements pulls up the modal context card instantly!
-                row.onclick = () => openUserProfileCard(userProfile.uid);
-
+                row.onclick = () => {
+                    viewUserModal.style.display = "none";
+                    window.location.href = `profile.html?uid=${userProfile.uid}`;
+                };
                 row.onmouseenter = () => row.style.background = "rgba(255,255,255,0.03)";
                 row.onmouseleave = () => row.style.background = "transparent";
                 searchResultsTray.appendChild(row);
             });
-            
             searchResultsTray.style.display = "block";
         } catch (err) { console.error(err); }
     };
@@ -251,7 +237,6 @@ function bindLikes() {
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async (e) => {
             if(!auth.currentUser) return;
-            
             const btnEl = e.currentTarget;
             const authorId = btnEl.getAttribute('data-author');
             const momentId = btnEl.getAttribute('data-id');
@@ -312,12 +297,9 @@ function bindDeletions() {
         btn.onclick = async (e) => {
             const momentId = e.currentTarget.getAttribute('data-id');
             const userConfirmed = confirm("Are you sure you want to permanently delete this moment from the feed?");
-            
             if (!userConfirmed) return;
-            
             e.currentTarget.disabled = true;
             e.currentTarget.textContent = "Removing...";
-
             try {
                 await deleteDoc(doc(db, "moments", momentId));
                 const postCardTarget = document.getElementById(`moment-card-${momentId}`);

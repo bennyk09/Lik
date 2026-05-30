@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LIK - Swaps Manager</title>
+    <link rel="stylesheet" href="css/style.css?v=11.0.5">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1 onclick="window.location.href='index.html'">LIK</h1>
+            <nav class="desktop-nav">
+                <a href="index.html">Wall</a>
+                <a href="upload.html">Upload</a>
+                <a href="swaps.html" class="active">Swaps</a>
+                <a href="profile.html">Profile</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div style="max-width: 600px; margin: 0 auto;">
+                
+                <div style="margin-bottom: 32px;">
+                    <h4 style="margin: 0 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--accent-color); letter-spacing:0.5px;">Swap Requests (Incoming)</h4>
+                    <div id="incoming-requests-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <p style="color: var(--text-muted); font-size: 0.85rem; padding: 12px 4px;">Checking incoming requests...</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 32px;">
+                    <h4 style="margin: 0 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Pending Invitations (Sent)</h4>
+                    <div id="sent-requests-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <p style="color: var(--text-muted); font-size: 0.85rem; padding: 12px 4px;">No active pending sent requests.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 style="margin: 0 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Swapped Networks (Mutual Connections)</h4>
+                    <div id="mutual-swaps-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <p style="color: var(--text-muted); font-size: 0.85rem; padding: 12px 4px;">No mutual connections formed yet.</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="index.html">Wall</a>
+            <a href="upload.html">Upload</a>
+            <a href="swaps.html" class="active">Swaps</a>
+            <a href="profile.html">Profile</a>
+        </nav>
+    </div>
+
+    <script type="module" src="js/auth-google.js"></script>
+    <script type="module" src="js/swaps.js"></script>
+</body>
+</html>

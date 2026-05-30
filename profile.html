@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK - Profile</title>
-    <link rel="stylesheet" href="/Lik/css/style.css?v=11.0.4">
+    <link rel="stylesheet" href="css/style.css?v=11.0.5">
 </head>
 <body>
     <div class="app-container">
@@ -13,8 +13,8 @@
             <nav class="desktop-nav">
                 <a href="index.html">Wall</a>
                 <a href="upload.html">Upload</a>
+                <a href="swaps.html">Swaps</a>
                 <a href="profile.html" class="active">Profile</a>
-                <a href="#" id="logout-btn-desktop">Logout</a>
             </nav>
         </header>
         
@@ -30,19 +30,14 @@
                     <div class="profile-identity-details">
                         <h2 id="lbl-username-display">User</h2>
                         <div class="stats-row" id="stats-numbers-tray"></div>
-                        <div id="profile-bio-container" class="profile-bio-text">Loading profile metadata parameters...</div>
+                        <div id="profile-bio-container" class="profile-bio-text">Syncing profile metadata parameters...</div>
                     </div>
                 </div>
                 
-                <div style="display: flex; gap: 12px; margin-bottom: 32px;">
+                <div style="display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;">
                     <button id="open-edit-modal-btn" class="btn-secondary" style="flex: 1; display:none;">Edit Profile</button>
-                    <button id="open-about-modal-btn" class="btn-secondary" style="flex: 1;">Platform Info (About)</button>
-                    <button id="open-delete-modal-btn" class="btn-secondary" style="color: var(--accent-red); border-color: rgba(255,59,48,0.2); display:none;">Delete</button>
-                </div>
-
-                <div id="swaps-connections-section" style="margin-bottom: 40px; display: none;">
-                    <h4 style="margin: 0 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--accent-color); letter-spacing:0.5px;">My Swapped Networks</h4>
-                    <div id="swapped-users-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                    <button id="logout-btn-profile" class="btn-primary" style="background: var(--accent-red); color: #fff; flex: 1; font-weight:700;">Logout</button>
+                    <button id="open-delete-modal-btn" class="btn-secondary" style="color: var(--accent-red); border-color: rgba(255,59,48,0.2); display:none;">Delete Account</button>
                 </div>
 
                 <h4 style="margin: 24px 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Live Timeline</h4>
@@ -54,8 +49,8 @@
         <nav class="bottom-nav">
             <a href="index.html">Wall</a>
             <a href="upload.html">Upload</a>
+            <a href="swaps.html">Swaps</a>
             <a href="profile.html" class="active">Profile</a>
-            <a href="#" id="logout-btn-mobile">Logout</a>
         </nav>
     </div>
 
@@ -73,34 +68,13 @@
                 </div>
                 <div class="form-group">
                     <label for="edit-user-bio">Biography</label>
-                    <textarea id="edit-user-bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                    <textarea id="edit-user-bio" rows="3"></textarea>
                 </div>
                 <div style="display: flex; gap: 12px; margin-top:24px;">
                     <button type="button" id="close-edit-modal-btn" class="btn-secondary" style="flex: 1;">Cancel</button>
                     <button type="submit" class="btn-primary" style="flex: 1;">Save</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <div id="about-info-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
-            <h3 style="margin-top: 0; font-weight:700; margin-bottom: 12px;">The Ephemeral Space</h3>
-            <p style="line-height:1.5; font-size:0.9rem; color:var(--text-muted); margin-bottom: 20px;">
-                LIK is an open-source temporary social media space centered around real-time interactive presence. All text thoughts and shared image metrics automatically disappear post-creation.
-            </p>
-            <button type="button" id="close-about-modal-btn" class="btn-primary" style="width: 100%;">Close</button>
-        </div>
-    </div>
-
-    <div id="delete-profile-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <h3 style="margin-top: 0; color: var(--accent-red); font-weight:700; margin-bottom: 12px;">Purge Account Data?</h3>
-            <p style="font-size: 0.9rem; line-height: 1.4; color: var(--text-muted);">Warning: This action cannot be reversed. Your profile parameters, scores, and active posts will be deleted permanently.</p>
-            <div style="display: flex; gap: 12px; margin-top: 24px;">
-                <button type="button" id="close-delete-modal-btn" class="btn-secondary" style="flex: 1;">Cancel</button>
-                <button type="button" id="confirm-delete-btn" class="btn-primary" style="background: var(--accent-red); color: #ffffff; flex: 1;">Delete</button>
-            </div>
         </div>
     </div>
 
