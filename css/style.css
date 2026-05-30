@@ -1,9 +1,9 @@
 /* ==========================================================================
-   🪐 LIK CORE RE-DESIGN CANVAS - MINIMALIST HIGH-CONTRAST PITCH-BLACK & WHITE
+   🪐 LIK MASTER UI CANVAS - MINIMALIST HIGH-CONTRAST PITCH-BLACK & WHITE
    ========================================================================== */
 
 :root {
-    /* 🪐 Completely inverted colors to match wall.jpg white-space aesthetic */
+    /* Completely inverted colors to match the white-space aesthetic */
     --bg-main: #ffffff;
     --card-color: #333333;       /* Deep dark gray post frame */
     --card-border: #222222;
@@ -22,7 +22,7 @@
     --font-stack: "Arial Black", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Base Canvas Setup */
+/* Base Canvas Reset */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -34,10 +34,12 @@ body {
     color: var(--text-main);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    min-height: 100vh;
 }
 
 /* ==========================================================================
-   🧱 HEADER & PLATFORM LOGO BRANDING
+   🧱 GLOBAL HEADER, NAVIGATION, & BRANDING
    ========================================================================== */
 
 header {
@@ -51,7 +53,7 @@ header {
     border-bottom: none;
 }
 
-/* Matches the heavy geometric branding style of LIKIN in your photo */
+/* Heavy geometric branding style of LIKIN */
 header h1 {
     font-family: var(--font-stack);
     font-size: 2rem;
@@ -60,6 +62,16 @@ header h1 {
     color: var(--text-main);
     text-transform: uppercase;
     cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+header h1:hover {
+    opacity: 0.8;
+}
+
+main {
+    padding: 24px 16px;
+    width: 100%;
 }
 
 /* Center Search Container Element Layout */
@@ -67,22 +79,108 @@ header h1 {
     max-width: 400px;
     width: 100%;
     margin: 0 auto;
+    position: relative;
 }
 
-#user-search-input, #swaps-search-input {
+#user-search-input, 
+#swaps-search-input {
     background: #e5e5ea !important;
     border: none !important;
     border-radius: 6px !important;
     color: #000000 !important;
     height: 36px !important;
-    font-size: 0.85rem !important;
+    font-size: 0.9rem !important;
+    outline: none;
+}
+
+/* Search Dropdown Windows Overlay */
+#search-results-tray,
+#swaps-search-results {
+    border-color: var(--card-border) !important;
+    background: #16161a !important;
+    color: #ffffff !important;
+}
+
+/* Dynamic Floating Right Corner Profile Menu Indicator Capsule */
+.desktop-nav {
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
+    background: #222222;
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    z-index: 2500;
+}
+
+.desktop-nav a {
+    color: #ffffff !important;
+    font-family: var(--font-stack);
+    text-transform: uppercase;
+    font-size: 0.75rem !important;
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+}
+
+.desktop-nav a:hover, 
+.desktop-nav a.active {
+    opacity: 0.7;
+}
+
+/* Mobile Navigation Bar Bar Strip */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(26, 26, 31, 0.9);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid var(--card-border);
+    height: 68px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 2500;
+    padding: 0 12px;
+}
+
+.bottom-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 500;
+    gap: 4px;
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.bottom-nav a.active {
+    color: var(--bg-main);
+    background: var(--text-main);
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+@media (max-width: 880px) {
+    .desktop-nav { display: none !important; }
+}
+@media (min-width: 881px) {
+    .bottom-nav { display: none !important; }
 }
 
 /* ==========================================================================
-   🖼️ REFERENCE CARD POST STRUCTURES (As seen in wall.jpg)
+   🖼️ SOCIAL POST CARDS & TIMELINE FEED (Ref: wall.jpg Layout)
    ========================================================================== */
 
-#wall-feed-container, #wall-feed {
+#wall-feed-container, 
+#wall-feed {
     max-width: 580px;
     margin: 40px auto 0 auto;
 }
@@ -94,9 +192,10 @@ header h1 {
     padding: 28px !important;
     margin-bottom: 20px !important;
     color: var(--text-light) !important;
+    position: relative;
 }
 
-/* Left-shifted detached floating profile header block style */
+/* Left-shifted detached floating profile header block style matching wall.jpg */
 .post-header {
     position: absolute;
     transform: translateX(-130px);
@@ -125,6 +224,17 @@ header h1 {
     height: 64px !important;
     border: 1px solid #111111 !important;
     background: #e5e5ea !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.post-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .post-username {
@@ -134,19 +244,26 @@ header h1 {
 }
 
 .post-media-container {
+    width: 100%;
     border-radius: var(--radius-sm) !important;
     overflow: hidden;
+    background: #111115;
+}
+
+.post-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 520px;
+    object-fit: cover;
 }
 
 .post-caption {
     color: var(--text-light) !important;
     font-size: 0.95rem !important;
     margin-top: 16px;
+    line-height: 1.5;
 }
-
-/* ==========================================================================
-   🔘 CUSTOM ACTION CONTROLS (Bolds, Hearts, Bottom Account Button)
-   ========================================================================== */
 
 .moment-footer {
     display: flex;
@@ -164,12 +281,23 @@ header h1 {
     background: #222222 !important;
     border: none !important;
     color: #ffffff !important;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    padding: 0 !important;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.like-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
 }
 
 /* Custom black graphic UNFOLLOW style format from reference image */
-.btn-unswap, [id*="swap-action-btn"], [id*="-swap-btn"] button {
+.btn-unswap, 
+[id*="swap-action-btn"], 
+[id*="-swap-btn"] button {
     font-family: var(--font-stack) !important;
     text-transform: uppercase !important;
     background: #222222 !important;
@@ -179,34 +307,210 @@ header h1 {
     font-size: 0.8rem !important;
     letter-spacing: -0.5px;
     border: none !important;
+    cursor: pointer;
+    transition: var(--transition-smooth);
 }
 
-/* Dynamic Floating Right Corner Profile Menu Indicator */
-.desktop-nav {
-    position: fixed;
-    bottom: 30px;
-    right: 40px;
-    background: #222222;
-    padding: 10px 20px;
-    border-radius: 30px;
-    border: 1px solid #333;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+.btn-unswap:hover, 
+[id*="-swap-btn"] button:hover {
+    opacity: 0.9;
 }
 
-.desktop-nav a {
-    color: #ffffff !important;
-    font-family: var(--font-stack);
-    text-transform: uppercase;
-    font-size: 0.75rem !important;
-}
+/* ==========================================================================
+   👤 PROFILE DASHBOARD SYSTEM CLEANUP PATCH (Ref: image_58bf61.jpg Fixes)
+   ========================================================================== */
 
-/* Profile Identity Panels Refactor */
+/* Spreads elements out gracefully on large widths */
 .profile-meta-block {
-    max-width: 600px;
-    margin: 40px auto;
+    max-width: 700px !important;
+    margin: 40px auto 24px auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 0 20px !important;
+}
+
+/* Scales the landscape layout banner image responsively */
+.avatar-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-avatar {
+    width: 100% !important;
+    max-width: 600px !important;
+    height: auto !important;
+    aspect-ratio: 16 / 10 !important;
+    border-radius: var(--radius-sm) !important;
+    margin-bottom: 16px !important;
+    border: 1px solid #e5e5ea !important;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-pic-btn {
+    background: none;
+    border: none;
+    color: var(--accent-red);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.profile-identity-details {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* Layout parameters grid metrics dashboard row formatting style rule */
+.stats-row {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 32px !important;
+    margin: 20px 0 !important;
+    width: 100% !important;
+}
+
+.stat-node {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
 }
 
 .stat-node-val {
     font-family: var(--font-stack);
     font-size: 1.4rem !important;
+    color: var(--text-main);
+}
+
+.stat-node-lbl {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.profile-bio-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    max-width: 500px;
+    line-height: 1.5;
+}
+
+/* Alignment rules for the Action Control buttons row under stats metrics */
+div[style*="display: flex; gap: 12px; margin-bottom: 32px;"] {
+    max-width: 600px !important;
+    margin: 16px auto 40px auto !important;
+    width: 100% !important;
+}
+
+/* Live Gallery Timeline Grid Frame Formatting */
+#user-moments {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    max-width: 600px !important;
+    margin: 16px auto 0 auto !important;
+    gap: 12px !important;
+    width: 100%;
+}
+
+.user-moment-card {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background: #f3f4f6;
+}
+
+.user-moment-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ==========================================================================
+   🪐 OVERLAY MODALS & INTERACTIVE FORMS
+   ========================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    padding: 16px;
+}
+
+.modal-content {
+    background: #ffffff;
+    border: 2px solid #111111;
+    border-radius: var(--radius-md);
+    width: 100%;
+    max-width: 440px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-main);
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+    width: 100%;
+    background: #f3f4f6;
+    border: 1px solid #e5e5ea;
+    border-radius: 8px;
+    padding: 12px;
+    color: #000000;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+/* Dynamic upload page configuration asset staging layout box view */
+.upload-preview-frame {
+    width: 100%;
+    max-height: 380px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.upload-preview-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
