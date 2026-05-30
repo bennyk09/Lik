@@ -3,63 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LIK - Wall</title>
+    <title>LIK - Home</title>
     <link rel="icon" type="image/png" href="logo.png">
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'light');
     </script>
-    <link rel="stylesheet" href="css/style.css?v=2.0.0">
+    <link rel="stylesheet" href="css/style.css?v=3.0.0">
 </head>
 <body>
-    <div class="app-container">
+    <div class="lik-app-grid-wrapper">
         
         <header>
             <div style="width: 100%;">
-                <div class="brand-wrapper" onclick="window.location.href='index.html'">
-                    <img src="logo.png" alt="LIK" class="brand-logo-img">
+                <div class="lik-brand-logo-container" onclick="window.location.href='index.html'">
+                    <img src="logo.png" alt="LIK" class="lik-brand-logo-graphic">
                 </div>
-                <nav class="desktop-nav">
-                    <a href="index.html" class="active">Home</a>
+                <nav class="lik-desktop-sidebar-nav">
+                    <a href="index.html" class="lik-active-route">Home</a>
                     <a href="upload.html">Create</a>
                     <a href="swaps.html">Swaps</a>
                 </nav>
             </div>
-            <button class="sidebar-bottom-pill-btn" onclick="window.location.href='settings.html'">Set</button>
+            <button class="lik-sidebar-action-pill-btn" onclick="window.location.href='settings.html'">Set</button>
         </header>
 
         <main>
             <div id="auth-gateway-view" style="display: none; width: 100%; max-width: 400px; text-align: center; padding-top: 100px;">
-                <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">A temporary space for real-time moments.</p>
-                <button id="google-login-btn" class="sidebar-bottom-pill-btn" style="max-width: 100%; width: 100%; border-radius:12px;">Continue with Google</button>
+                <p style="color: var(--lik-text-gray); margin-bottom: 24px; font-size: 0.95rem;">A temporary space for real-time moments.</p>
+                <button id="google-login-btn" class="lik-sidebar-action-pill-btn" style="max-width: 100%; width: 100%; border-radius:12px;">Continue with Google</button>
             </div>
 
             <div id="app-feed-view" style="display: none; width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div id="wall-feed-container">
                     
-                    <div class="feed-master-card-shell">
-                        <div class="search-wrapper-block">
-                            <input type="text" id="user-search-input" class="search-input-field" placeholder="Search people">
-                            <div id="search-results-tray" style="display: none; background: white; border: 1px solid var(--card-border); border-radius: 12px; margin-top: 8px; padding: 6px;"></div>
+                    <div class="lik-feed-master-card-shell">
+                        <div class="lik-search-block-wrapper">
+                            <input type="text" id="user-search-input" class="lik-search-native-input" placeholder="Search people">
+                            <div id="search-results-tray" style="display: none; background: white; border: 1px solid var(--lik-border-clean); border-radius: 12px; margin-top: 8px; padding: 6px; width:100%;"></div>
                         </div>
 
                         <div id="wall-feed">
-                            <p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size:0.9rem;">Syncing feed streams...</p>
+                            <p style="text-align:center; color:var(--lik-text-gray); padding: 40px 0; font-size:0.9rem;">Syncing feed streams...</p>
                         </div>
                     </div>
 
                 </div>
 
-                <a href="profile.html" class="floating-right-account-pill">
-                    <div class="floating-pill-avatar" id="floating-pill-avatar-target">
+                <a href="profile.html" class="lik-sticky-right-profile-pill">
+                    <div class="lik-sticky-pill-avatar-box" id="floating-pill-avatar-target">
                         <div style="width:100%; height:100%; background: #eee;"></div>
                     </div>
-                    <span class="floating-pill-label-text">My account</span>
+                    <span class="lik-sticky-pill-title">My account</span>
                 </a>
             </div>
         </main>
 
-        <nav class="bottom-nav" id="app-nav">
-            <a href="index.html" class="active">Home</a>
+        <nav class="lik-portable-bottom-bar" id="app-nav">
+            <a href="index.html" class="lik-active-route">Home</a>
             <a href="upload.html">Create</a>
             <a href="swaps.html">Swaps</a>
             <a href="profile.html">Account</a>
@@ -72,13 +72,13 @@
             <form id="onboarding-form">
                 <div class="form-group">
                     <label for="user-name">Display Name</label>
-                    <input type="text" id="user-name" required placeholder="Username">
+                    <input type="text" id="user-name" class="lik-search-native-input" required placeholder="Username">
                 </div>
                 <div class="form-group">
                     <label for="user-age">Age</label>
-                    <input type="number" id="user-age" required min="13" placeholder="Your age">
+                    <input type="number" id="user-age" class="lik-search-native-input" required min="13" placeholder="Your age">
                 </div>
-                <button type="submit" style="margin-top: 12px; width: 100%; background:#1e293b; color:#fff; padding:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Create Profile</button>
+                <button type="submit" style="margin-top: 12px; width: 100%; background:var(--lik-text-dark); color:#fff; padding:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Create Profile</button>
             </form>
         </div>
     </div>

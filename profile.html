@@ -8,65 +8,65 @@
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'light');
     </script>
-    <link rel="stylesheet" href="css/style.css?v=2.0.0">
+    <link rel="stylesheet" href="css/style.css?v=3.0.0">
 </head>
 <body>
-    <div class="app-container">
+    <div class="lik-app-grid-wrapper">
         
         <header>
             <div style="width: 100%;">
-                <div class="brand-wrapper" onclick="window.location.href='index.html'">
-                    <img src="logo.png" alt="LIK" class="brand-logo-img">
+                <div class="lik-brand-logo-container" onclick="window.location.href='index.html'">
+                    <img src="logo.png" alt="LIK" class="lik-brand-logo-graphic">
                 </div>
-                <nav class="desktop-nav">
+                <nav class="lik-desktop-sidebar-nav">
                     <a href="index.html">Home</a>
                     <a href="upload.html">Create</a>
                     <a href="swaps.html">Swaps</a>
-                    <a href="profile.html" class="active">Profile</a>
+                    <a href="profile.html" class="lik-active-route">Profile</a>
                 </nav>
             </div>
-            <button class="sidebar-bottom-pill-btn" onclick="window.location.href='settings.html'">Set</button>
+            <button class="lik-sidebar-action-pill-btn" onclick="window.location.href='settings.html'">Set</button>
         </header>
         
         <main>
-            <div class="feed-column-wrapper">
+            <div class="lik-feed-column-container">
                 
-                <div class="profile-meta-block">
-                    <div class="profile-meta-top-row">
-                        <div class="profile-identity-details">
+                <div class="lik-profile-card-panel">
+                    <div class="lik-profile-panel-top-split">
+                        <div class="lik-profile-identity-details">
                             <h2 id="lbl-username-display">User</h2>
                         </div>
-                        <div class="avatar-container" style="text-align: center;">
-                            <div id="avatar-preview" class="profile-avatar">-</div>
+                        <div style="text-align: center;">
+                            <div id="avatar-preview" class="lik-profile-panel-avatar-frame">-</div>
                             <input type="file" id="avatar-input" accept="image/*" style="display: none;">
-                            <button id="remove-pic-btn" class="remove-pic-btn">Remove Photo</button>
+                            <button id="remove-pic-btn" class="lik-profile-remove-photo-link">Remove Photo</button>
                         </div>
                     </div>
                     
-                    <div class="stats-row" id="stats-numbers-tray"></div>
-                    <div id="profile-bio-container" class="profile-bio-text">Syncing profile parameters...</div>
+                    <div class="lik-profile-counters-row" id="stats-numbers-tray"></div>
+                    <div id="profile-bio-container" class="lik-profile-bio-description">Syncing profile parameters...</div>
                 </div>
 
                 <div id="partner-status-display-frame" style="width: 100%;"></div>
                 
                 <div style="display: flex; gap: 12px; width: 100%; margin-bottom: 24px;">
-                    <button id="open-edit-modal-btn" class="sidebar-bottom-pill-btn" style="flex: 1; width: auto; border-radius: 12px; background:#ffffff; color:#000000!important; border:1px solid var(--card-border);">Edit Profile</button>
-                    <button id="open-settings-page-btn" class="sidebar-bottom-pill-btn" style="flex: 1; width: auto; border-radius: 12px;">Settings</button>
+                    <button id="open-edit-modal-btn" class="lik-sidebar-action-pill-btn" style="flex: 1; width: auto; border-radius: 12px; background:#ffffff; color:#000000!important; border:1px solid var(--lik-border-clean);">Edit Profile</button>
+                    <button id="open-settings-page-btn" class="lik-sidebar-action-pill-btn" style="flex: 1; width: auto; border-radius: 12px;">Settings</button>
                 </div>
 
-                <div class="feed-master-card-shell" style="padding: 20px;">
-                    <h4 style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 14px;">Timeline Photos</h4>
-                    <div id="user-moments"></div>
+                <div class="lik-feed-master-card-shell" style="padding: 20px;">
+                    <h4 style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--lik-text-gray); letter-spacing: 0.5px; margin-bottom: 14px;">Timeline Photos</h4>
+                    <div id="lik-profile-photos-target-matrix" class="lik-profile-photo-matrix"></div>
                 </div>
 
             </div>
         </main>
 
-        <nav class="bottom-nav">
+        <nav class="lik-portable-bottom-bar">
             <a href="index.html">Home</a>
             <a href="upload.html">Create</a>
             <a href="swaps.html">Swaps</a>
-            <a href="profile.html" class="active">Account</a>
+            <a href="profile.html" class="lik-active-route">Account</a>
         </nav>
     </div>
 
@@ -76,19 +76,19 @@
             <form id="edit-profile-form">
                 <div class="form-group">
                     <label for="edit-user-name">Display Name</label>
-                    <input type="text" id="edit-user-name" required>
+                    <input type="text" id="edit-user-name" class="lik-search-native-input" required>
                 </div>
                 <div class="form-group">
                     <label for="edit-user-age">Age</label>
-                    <input type="number" id="edit-user-age" required min="13">
+                    <input type="number" id="edit-user-age" class="lik-search-native-input" required min="13">
                 </div>
                 <div class="form-group">
                     <label for="edit-user-bio">Biography</label>
                     <textarea id="edit-user-bio" rows="3"></textarea>
                 </div>
-                <div style="display: flex; gap: 12px; margin-top:24px;">
-                    <button type="button" id="close-edit-modal-btn" class="btn-secondary" style="flex: 1;">Cancel</button>
-                    <button type="submit" class="btn-primary" style="flex: 1; border-radius: 8px; background: #000; color: #fff; font-weight:bold;">Save</button>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" id="close-edit-modal-btn" class="lik-sidebar-action-pill-btn" style="flex: 1; width:auto; border-radius:8px; background:#fff; color:#000!important; border:1px solid var(--lik-border-clean);">Cancel</button>
+                    <button type="submit" class="lik-sidebar-action-pill-btn" style="flex: 1; width:auto; border-radius:8px;">Save</button>
                 </div>
             </form>
         </div>
