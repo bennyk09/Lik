@@ -9,9 +9,7 @@ const openDeleteBtn = document.getElementById('open-delete-modal-btn');
 const closeDeleteBtn = document.getElementById('close-delete-modal-btn');
 const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 
-onAuthStateChanged(auth, (user) => {
-    if (!user) window.location.href = "index.html";
-});
+onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "index.html"; });
 
 if (themeBtn) {
     const savedTheme = localStorage.getItem('lik-theme') || 'dark';
@@ -26,11 +24,7 @@ if (themeBtn) {
 }
 
 if (logoutBtn) {
-    logoutBtn.onclick = async () => {
-        signOut(auth).then(() => { 
-            window.location.href = "index.html"; 
-        }).catch(err => console.error(err));
-    };
+    logoutBtn.onclick = async () => { signOut(auth).then(() => { window.location.href = "index.html"; }); };
 }
 
 if (openDeleteBtn) openDeleteBtn.onclick = () => deleteModal.style.display = 'flex';
@@ -38,17 +32,13 @@ if (closeDeleteBtn) closeDeleteBtn.onclick = () => deleteModal.style.display = '
 
 if (confirmDeleteBtn) {
     confirmDeleteBtn.onclick = async () => {
-        const user = auth.currentUser;
-        if (!user) return;
-        confirmDeleteBtn.disabled = true;
-        confirmDeleteBtn.textContent = "Deleting Account...";
+        const user = auth.currentUser; if (!user) return;
+        confirmDeleteBtn.disabled = true; confirmDeleteBtn.textContent = "Deleting Account...";
         try {
             await deleteDoc(doc(db, "users", user.uid));
             signOut(auth).then(() => { window.location.href = "index.html"; });
         } catch (err) { 
-            alert(err.message); 
-            confirmDeleteBtn.disabled = false;
-            confirmDeleteBtn.textContent = "Confirm Delete";
+            alert(err.message); confirmDeleteBtn.disabled = false; confirmDeleteBtn.textContent = "Confirm Delete";
         }
     };
 }

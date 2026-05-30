@@ -11,7 +11,6 @@ const loginBtn = document.getElementById('google-login-btn');
 const modal = document.getElementById('onboarding-modal');
 const onboardingForm = document.getElementById('onboarding-form');
 
-// State Monitor automatically catches cached persistent user records
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
@@ -27,9 +26,7 @@ onAuthStateChanged(auth, async (user) => {
             } else {
                 showAppInterface();
             }
-        } catch (err) {
-            console.error(err);
-        }
+        } catch (err) { console.error(err); }
     } else {
         showAuthInterface();
     }
@@ -40,15 +37,11 @@ if (loginBtn) {
         try {
             loginBtn.disabled = true;
             loginBtn.textContent = "Connecting to Google...";
-            
-            // Explicitly force Firebase to save credentials permanently inside the browser's storage
             await setPersistence(auth, browserLocalPersistence);
-            
-            // Trigger authentication
             await signInWithPopup(auth, provider);
         } catch (err) {
-            console.error("Auth System Failure:", err);
-            alert(`Auth Error: ${err.message}\n\nCode: ${err.code}`);
+            console.error("Auth Failure:", err);
+            alert(`Auth Error: ${err.message}`);
             loginBtn.disabled = false;
             loginBtn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16" alt="Google"> Continue with Google';
         }
@@ -70,35 +63,14 @@ if (onboardingForm) {
                 name: document.getElementById('user-name').value.trim(),
                 username: generatedHandle,
                 age: parseInt(document.getElementById('user-age').value),
-                bio: "",
-                profilePic: "",
-                totalLikes: 0,
-                relationshipStatus: "single",
-                partnerUid: "",
-                swappedWith: [],          
-                swapRequestsIn: [],       
-                swapRequestsOut: [],      
-                coupleRequestIn: "",
-                coupleRequestOut: ""
+                bio: "", profilePic: "", totalLikes: 0, relationshipStatus: "single", partnerUid: "",
+                swappedWith: [], swapRequestsIn: [], swapRequestsOut: [], coupleRequestIn: "", coupleRequestOut: ""
             });
             modal.style.display = 'none';
             showAppInterface();
         } catch (err) { alert(err.message); }
     };
 }
-
-const executeLogout = (e) => {
-    e.preventDefault();
-    signOut(auth).then(() => {
-        window.location.href = "index.html";
-    }).catch(err => console.error("Logout failed:", err));
-};
-
-const logoutDesktop = document.getElementById('logout-btn-desktop');
-const logoutMobile = document.getElementById('logout-btn-mobile');
-
-if (logoutDesktop) logoutDesktop.onclick = executeLogout;
-if (logoutMobile) logoutMobile.onclick = executeLogout;
 
 function showAppInterface() {
     const desktopNav = document.getElementById('app-nav-desktop');
@@ -110,10 +82,7 @@ function showAppInterface() {
 
 function showAuthInterface() {
     const desktopNav = document.getElementById('app-nav-desktop');
-    if (!authView) {
-        window.location.href = "index.html";
-        return;
-    }
+    if (!authView) { window.location.href = "index.html"; return; }
     if (authView) authView.style.display = 'flex';
     if (feedView) feedView.style.display = 'none';
     if (appNav) appNav.style.display = 'none';

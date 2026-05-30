@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK - Swaps Manager</title>
+    <link rel="icon" type="image/png" href="logo.png">
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'dark');
     </script>
@@ -12,7 +13,10 @@
 <body>
     <div class="app-container">
         <header>
-            <h1 onclick="window.location.href='index.html'">LIK</h1>
+            <div onclick="window.location.href='index.html'" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <img src="logo.png" alt="LIK Logo" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover;">
+                <h1 style="margin: 0; line-height: 1;">LIK</h1>
+            </div>
             <nav class="desktop-nav">
                 <a href="index.html">Wall</a>
                 <a href="upload.html">Upload</a>
@@ -24,7 +28,6 @@
         <main>
             <div style="max-width: 600px; margin: 0 auto; position: relative;">
                 
-                <!-- Updated search placeholder constraint -->
                 <div class="search-wrapper" style="margin-bottom: 32px;">
                     <div class="form-group" style="margin-bottom: 0; position: relative;">
                         <input type="text" id="swaps-search-input" placeholder="search people" style="padding-left: 14px;">

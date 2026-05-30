@@ -14,34 +14,25 @@ onAuthStateChanged(auth, async (user) => {
 
 async function renderSwapsDashboard(myUid) {
     try {
-        const mySnap = await getDoc(doc(db, "users", myUid));
-        if (!mySnap.exists()) return;
+        const mySnap = await getDoc(doc(db, "users", myUid)); if (!mySnap.exists()) return;
         const myData = mySnap.data();
 
         const incomingIds = myData.swapRequestsIn || [];
         const sentIds = myData.swapRequestsOut || [];
         const mutualIds = myData.swappedWith || [];
 
-        // Execute all user documentation profiling loads simultaneously in parallel batch channels
         const allTargetUids = [...new Set([...incomingIds, ...sentIds, ...mutualIds])];
         const profileFetchPromises = allTargetUids.map(uid => getDoc(doc(db, "users", uid)));
         const profileSnapshots = await Promise.all(profileFetchPromises);
         
         const profileCacheMap = new Map();
-        profileSnapshots.forEach(snap => {
-            if (snap.exists()) {
-                const data = snap.data();
-                profileCacheMap.set(data.uid, data);
-            }
-        });
+        profileSnapshots.forEach(snap => { if (snap.exists()) { const data = snap.data(); profileCacheMap.set(data.uid, data); } });
 
-        // 1. POPULATE INCOMING REQUESTS
         incomingContainer.innerHTML = incomingIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No new swap requests.</p>` : "";
         incomingIds.forEach(targetUid => {
             const profile = profileCacheMap.get(targetUid);
             if (profile) {
-                const item = document.createElement('div');
-                item.className = "post-card";
+                const item = document.createElement('div'); item.className = "post-card";
                 item.style = "display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px;";
                 item.innerHTML = `
                     <div class="post-avatar" style="width:36px; height:36px; font-size:0.85rem; cursor:pointer;" onclick="window.location.href='profile.html?uid=${targetUid}'">
@@ -59,13 +50,11 @@ async function renderSwapsDashboard(myUid) {
             }
         });
 
-        // 2. POPULATE PENDING SENT INVITATIONS
         sentContainer.innerHTML = sentIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No pending sent invitations.</p>` : "";
         sentIds.forEach(targetUid => {
             const profile = profileCacheMap.get(targetUid);
             if (profile) {
-                const item = document.createElement('div');
-                item.className = "post-card";
+                const item = document.createElement('div'); item.className = "post-card";
                 item.style = "display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px; opacity: 0.75;";
                 item.innerHTML = `
                     <div class="post-avatar" style="width:36px; height:36px; font-size:0.85rem; cursor:pointer;" onclick="window.location.href='profile.html?uid=${targetUid}'">
@@ -80,13 +69,11 @@ async function renderSwapsDashboard(myUid) {
             }
         });
 
-        // 3. POPULATE MUTUAL SWAPPED FRIENDS
         mutualContainer.innerHTML = mutualIds.length === 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 8px 4px;">No mutual connections formed yet.</p>` : "";
         mutualIds.forEach(targetUid => {
             const profile = profileCacheMap.get(targetUid);
             if (profile) {
-                const item = document.createElement('div');
-                item.className = "post-card";
+                const item = document.createElement('div'); item.className = "post-card";
                 item.style = "display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px;";
                 item.innerHTML = `
                     <div class="post-avatar" style="width:36px; height:36px; font-size:0.85rem; cursor:pointer;" onclick="window.location.href='profile.html?uid=${targetUid}'">
@@ -100,7 +87,6 @@ async function renderSwapsDashboard(myUid) {
                 mutualContainer.appendChild(item);
             }
         });
-        
         bindActionButtons(myUid);
     } catch (err) { console.error(err); }
 }
@@ -108,8 +94,7 @@ async function renderSwapsDashboard(myUid) {
 function bindActionButtons(myUid) {
     document.querySelectorAll('.btn-accept').forEach(btn => {
         btn.onclick = async (e) => {
-            const targetUid = e.currentTarget.getAttribute('data-uid');
-            e.currentTarget.disabled = true;
+            const targetUid = e.currentTarget.getAttribute('data-uid'); e.currentTarget.disabled = true;
             try {
                 await Promise.all([
                     updateDoc(doc(db, "users", myUid), { swapRequestsIn: arrayRemove(targetUid), swappedWith: arrayUnion(targetUid) }),
@@ -122,8 +107,7 @@ function bindActionButtons(myUid) {
 
     document.querySelectorAll('.btn-reject').forEach(btn => {
         btn.onclick = async (e) => {
-            const targetUid = e.currentTarget.getAttribute('data-uid');
-            e.currentTarget.disabled = true;
+            const targetUid = e.currentTarget.getAttribute('data-uid'); e.currentTarget.disabled = true;
             try {
                 await Promise.all([
                     updateDoc(doc(db, "users", myUid), { swapRequestsIn: arrayRemove(targetUid) }),
@@ -136,8 +120,7 @@ function bindActionButtons(myUid) {
 
     document.querySelectorAll('.btn-unswap').forEach(btn => {
         btn.onclick = async (e) => {
-            const targetUid = e.currentTarget.getAttribute('data-uid');
-            if (!confirm("Are you sure you want to unswap with this user?")) return;
+            const targetUid = e.currentTarget.getAttribute('data-uid'); if (!confirm("Are you sure you want to unswap with this user?")) return;
             e.currentTarget.disabled = true;
             try {
                 await Promise.all([
@@ -163,17 +146,11 @@ if (searchInput) {
                 const endThreshold = keyword + "\uf8ff";
                 const q = query(collection(db, "users"), where("username", ">=", keyword), where("username", "<=", endThreshold), limit(5));
                 const snapshot = await getDocs(q);
-                
-                if (snapshot.empty) {
-                    searchResultsTray.innerHTML = `<p style="padding: 12px; font-size: 0.85rem; color: var(--text-muted); text-align: center; margin:0;">No users matched</p>`;
-                    searchResultsTray.style.display = "block";
-                    return;
-                }
+                if (snapshot.empty) { searchResultsTray.innerHTML = `<p style="padding:12px; font-size:0.85rem; color:var(--text-muted); text-align:center; margin:0;">No users matched</p>`; searchResultsTray.style.display = "block"; return; }
 
                 searchResultsTray.innerHTML = "";
                 snapshot.forEach(docData => {
-                    const userProfile = docData.data();
-                    const row = document.createElement('div');
+                    const userProfile = docData.data(); const row = document.createElement('div');
                     row.style = "display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid var(--card-border); cursor: pointer;";
                     row.innerHTML = `
                         <div class="post-avatar" style="width:34px; height:34px; font-size:0.8rem;">
@@ -183,9 +160,7 @@ if (searchInput) {
                             <span style="font-size: 0.85rem; font-weight: 600;">${userProfile.name || "User"}</span>
                             <span style="font-size: 0.75rem; color: var(--accent-color);">${userProfile.username}</span>
                         </div>`;
-                    
-                    row.onclick = () => { window.location.href = `profile.html?uid=${userProfile.uid}`; };
-                    searchResultsTray.appendChild(row);
+                    row.onclick = () => { window.location.href = `profile.html?uid=${userProfile.uid}`; }; searchResultsTray.appendChild(row);
                 });
                 searchResultsTray.style.display = "block";
             } catch (err) { console.error(err); }

@@ -24,9 +24,7 @@ onAuthStateChanged(auth, async (user) => {
         const uidToLoad = (targetProfileUid && targetProfileUid !== user.uid) ? targetProfileUid : user.uid;
         const isViewingSelf = (uidToLoad === user.uid);
         await loadProfileData(uidToLoad, isViewingSelf);
-    } else {
-        window.location.href = "index.html";
-    }
+    } else { window.location.href = "index.html"; }
 });
 
 async function loadProfileData(uid, isViewingSelf) {
@@ -54,8 +52,7 @@ async function loadProfileData(uid, isViewingSelf) {
                 <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px; width: 100%;">
                     <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: 400;">${userData.username || '/user'}</span>
                     ${statusBadgeHtml}
-                </div>
-            `;
+                </div>`;
         }
         
         if (bioContainer) bioContainer.textContent = userData.bio || "No biography set yet.";
@@ -99,8 +96,7 @@ async function loadProfileData(uid, isViewingSelf) {
                 <div class="stat-node"><span class="stat-node-val">${swappedArray.length}</span><span class="stat-node-lbl">Swaps</span></div>
                 <div class="stat-node"><span class="stat-node-val">${activeMomentsCount}</span><span class="stat-node-lbl">Moments</span></div>
                 <div class="stat-node"><span class="stat-node-val">${scoreLikes}</span><span class="stat-node-lbl">Score</span></div>
-                <div class="stat-node"><span class="stat-node-val">${computedRankPosition}</span><span class="stat-node-lbl">Rank</span></div>
-            `;
+                <div class="stat-node"><span class="stat-node-val">${computedRankPosition}</span><span class="stat-node-lbl">Rank</span></div>`;
         }
 
         if (isViewingSelf) {
@@ -137,8 +133,7 @@ async function loadProfileData(uid, isViewingSelf) {
 
 async function renderPartnerDetailsCard(partnerUid, isViewingSelf) {
     try {
-        const partnerSnap = await getDoc(doc(db, "users", partnerUid));
-        if (!partnerSnap.exists()) return;
+        const partnerSnap = await getDoc(doc(db, "users", partnerUid)); if (!partnerSnap.exists()) return;
         const partnerData = partnerSnap.data();
 
         partnerStatusDisplayFrame.innerHTML = `
@@ -151,13 +146,11 @@ async function renderPartnerDetailsCard(partnerUid, isViewingSelf) {
                     <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-main);">${partnerData.name}</span>
                 </div>
                 ${isViewingSelf ? `<button id="btn-break-up-direct" class="btn-secondary" style="padding: 6px 14px; font-size: 0.78rem; font-weight: 700; color: var(--accent-red); border-color: rgba(255,59,48,0.2); border-radius: 20px;">Break Up</button>` : ''}
-            </div>
-        `;
+            </div>`;
 
         if (isViewingSelf) {
             partnerStatusDisplayFrame.querySelector('#btn-break-up-direct').onclick = async (e) => {
-                e.stopPropagation();
-                if (!confirm("Are you sure you want to break up?")) return;
+                e.stopPropagation(); if (!confirm("Are you sure you want to break up?")) return;
                 const currentUserId = auth.currentUser.uid;
                 try {
                     await Promise.all([
@@ -177,11 +170,8 @@ function removeDynamicProfileButtons() {
 }
 
 async function injectForeignProfileButtons(targetUid) {
-    const currentUserId = auth.currentUser.uid;
-    removeDynamicProfileButtons();
-
-    const myProfileSnap = await getDoc(doc(db, "users", currentUserId));
-    const myData = myProfileSnap.data();
+    const currentUserId = auth.currentUser.uid; removeDynamicProfileButtons();
+    const myProfileSnap = await getDoc(doc(db, "users", currentUserId)); const myData = myProfileSnap.data();
     
     const mutualIds = myData.swappedWith || [];
     const incomingIds = myData.swapRequestsIn || [];
@@ -192,13 +182,8 @@ async function injectForeignProfileButtons(targetUid) {
     const myCoupleReqOut = myData.coupleRequestOut || "";
     const myCoupleReqIn = myData.coupleRequestIn || "";
 
-    const swapContainer = document.createElement('div');
-    swapContainer.id = "profile-dynamic-swap-btn";
-    swapContainer.style = "margin-bottom: 12px;";
-
-    const swapBtn = document.createElement('button');
-    swapBtn.className = "btn-primary";
-    swapBtn.style.width = "100%";
+    const swapContainer = document.createElement('div'); swapContainer.id = "profile-dynamic-swap-btn"; swapContainer.style = "margin-bottom: 12px;";
+    const swapBtn = document.createElement('button'); swapBtn.className = "btn-primary"; swapBtn.style.width = "100%";
     
     if (mutualIds.includes(targetUid)) {
         swapBtn.textContent = "Unswap Connection"; swapBtn.className = "btn-secondary";
@@ -206,13 +191,10 @@ async function injectForeignProfileButtons(targetUid) {
         swapBtn.textContent = "Requested"; swapBtn.className = "btn-secondary";
     } else if (incomingIds.includes(targetUid)) {
         swapBtn.textContent = "Accept Swap Request";
-    } else {
-        swapBtn.textContent = "Swap Profile";
-    }
+    } else { swapBtn.textContent = "Swap Profile"; }
 
     swapBtn.onclick = async () => {
-        swapBtn.disabled = true;
-        const currentLabel = swapBtn.textContent;
+        swapBtn.disabled = true; const currentLabel = swapBtn.textContent;
         try {
             if (currentLabel === "Swap Profile") {
                 await updateDoc(doc(db, "users", currentUserId), { swapRequestsOut: arrayUnion(targetUid) });
@@ -229,19 +211,14 @@ async function injectForeignProfileButtons(targetUid) {
         } catch(err) { console.error(err); }
         finally { swapBtn.disabled = false; }
     };
-    swapContainer.appendChild(swapBtn);
-    userMomentsGrid.parentNode.insertBefore(swapContainer, userMomentsGrid);
+    swapContainer.appendChild(swapBtn); userMomentsGrid.parentNode.insertBefore(swapContainer, userMomentsGrid);
 
     if (mutualIds.includes(targetUid)) {
-        const coupleContainer = document.createElement('div');
-        coupleContainer.id = "profile-dynamic-couple-btn";
-        coupleContainer.style = "margin-bottom: 32px;";
-
+        const coupleContainer = document.createElement('div'); coupleContainer.id = "profile-dynamic-couple-btn"; coupleContainer.style = "margin-bottom: 32px;";
         if (myCoupleStatus === "couple" && myPartnerUid !== targetUid) return;
 
         if (myCoupleStatus === "couple" && myPartnerUid === targetUid) {
-            const breakBtn = document.createElement('button');
-            breakBtn.className = "btn-secondary"; breakBtn.style.width = "100%"; breakBtn.style.color = "var(--accent-red)";
+            const breakBtn = document.createElement('button'); breakBtn.className = "btn-secondary"; breakBtn.style.width = "100%"; breakBtn.style.color = "var(--accent-red)";
             breakBtn.textContent = "Break Up (Remove Couple)";
             breakBtn.onclick = async () => {
                 if (!confirm("Are you sure?")) return;
@@ -251,17 +228,13 @@ async function injectForeignProfileButtons(targetUid) {
             };
             coupleContainer.appendChild(breakBtn);
         } else if (myCoupleReqOut === targetUid) {
-            const pendingBtn = document.createElement('button');
-            pendingBtn.className = "btn-secondary"; pendingBtn.style.width = "100%"; pendingBtn.disabled = true;
-            pendingBtn.textContent = "Couple Proposal Sent...";
-            coupleContainer.appendChild(pendingBtn);
+            const pendingBtn = document.createElement('button'); pendingBtn.className = "btn-secondary"; pendingBtn.style.width = "100%"; pendingBtn.disabled = true;
+            pendingBtn.textContent = "Couple Proposal Sent..."; coupleContainer.appendChild(pendingBtn);
         } else if (myCoupleReqIn === targetUid) {
-            const rowWrapper = document.createElement('div');
-            rowWrapper.style = "display: flex; gap: 12px; width: 100%;";
+            const rowWrapper = document.createElement('div'); rowWrapper.style = "display: flex; gap: 12px; width: 100%;";
             rowWrapper.innerHTML = `
                 <button id="btn-accept-couple" class="btn-primary" style="flex: 1; background: #ff453a;">Accept</button>
-                <button id="btn-reject-couple" class="btn-secondary" style="flex: 1;">Reject</button>
-            `;
+                <button id="btn-reject-couple" class="btn-secondary" style="flex: 1;">Reject</button>`;
             rowWrapper.querySelector('#btn-accept-couple').onclick = async () => {
                 await updateDoc(doc(db, "users", currentUserId), { coupleRequestIn: "", relationshipStatus: "couple", partnerUid: targetUid });
                 await updateDoc(doc(db, "users", targetUid), { coupleRequestOut: "", relationshipStatus: "couple", partnerUid: currentUserId });
@@ -274,8 +247,7 @@ async function injectForeignProfileButtons(targetUid) {
             };
             coupleContainer.appendChild(rowWrapper);
         } else if (myCoupleStatus === "single") {
-            const proposeBtn = document.createElement('button');
-            proposeBtn.className = "btn-secondary"; proposeBtn.style.width = "100%";
+            const proposeBtn = document.createElement('button'); proposeBtn.className = "btn-secondary"; proposeBtn.style.width = "100%";
             proposeBtn.textContent = "Add Couple";
             proposeBtn.onclick = async () => {
                 await updateDoc(doc(db, "users", currentUserId), { coupleRequestOut: targetUid });
@@ -300,8 +272,7 @@ if (editForm) {
                 age: parseInt(document.getElementById('edit-user-age').value),
                 bio: document.getElementById('edit-user-bio').value.trim()
             });
-            editModal.style.display = 'none';
-            await loadProfileData(auth.currentUser.uid, true);
+            editModal.style.display = 'none'; await loadProfileData(auth.currentUser.uid, true);
         } catch (err) { alert(err.message); }
     };
 }
@@ -310,9 +281,7 @@ if (avatarPreview && avatarInput) {
     avatarPreview.onclick = () => {
         const urlParamsCheck = new URLSearchParams(window.location.search);
         const currentProfileUid = urlParamsCheck.get('uid');
-        if (!currentProfileUid || currentProfileUid === auth.currentUser.uid) {
-            avatarInput.click();
-        }
+        if (!currentProfileUid || currentProfileUid === auth.currentUser.uid) avatarInput.click();
     };
 }
 
@@ -326,5 +295,18 @@ if (avatarInput) {
                 await loadProfileData(auth.currentUser.uid, true);
             } catch (err) { alert(err.message); }
         };
+    };
+}
+
+const themeBtn = document.getElementById('theme-toggle-btn');
+if (themeBtn) {
+    const savedTheme = localStorage.getItem('lik-theme') || 'dark';
+    themeBtn.innerHTML = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    themeBtn.onclick = () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('lik-theme', newTheme);
+        themeBtn.innerHTML = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
     };
 }

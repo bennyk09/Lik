@@ -7,21 +7,15 @@ const momentFile = document.getElementById('moment-file');
 const framePreviewBox = document.getElementById('frame-preview-box');
 const imgRenderTarget = document.getElementById('img-render-target');
 
-onAuthStateChanged(auth, (user) => {
-    if (!user) window.location.href = "index.html";
-});
+onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "index.html"; });
 
 if (momentFile) {
     momentFile.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader(); reader.readAsDataURL(file);
         reader.onload = () => {
             if (imgRenderTarget && framePreviewBox) {
-                imgRenderTarget.src = reader.result;
-                framePreviewBox.style.display = "block";
+                imgRenderTarget.src = reader.result; framePreviewBox.style.display = "block";
             }
         };
     };
@@ -29,50 +23,32 @@ if (momentFile) {
 
 if (uploadForm) {
     uploadForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const user = auth.currentUser;
-        if (!user) return;
-
+        e.preventDefault(); const user = auth.currentUser; if (!user) return;
         const submitBtn = uploadForm.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Publishing Moment...";
+        submitBtn.disabled = true; submitBtn.textContent = "Publishing Moment...";
 
         const textContent = document.getElementById('moment-text').value.trim();
-        let base64Image = "";
-
-        if (momentFile.files[0]) {
-            base64Image = imgRenderTarget.src;
-        }
+        let base64Image = ""; if (momentFile.files[0]) base64Image = imgRenderTarget.src;
 
         if (!textContent && !base64Image) {
-            alert("Please provide either a caption or an image source file to share a moment!");
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Share Moment";
-            return;
+            alert("Provide content to share a moment!");
+            submitBtn.disabled = false; submitBtn.textContent = "Share Moment"; return;
         }
 
         try {
-            // Fetch current user details instantly to embed them into the post document
             const userSnap = await getDoc(doc(db, "users", user.uid));
             const userData = userSnap.exists() ? userSnap.data() : {};
 
-            // Save the document with embedded profile metadata
             await addDoc(collection(db, "moments"), {
                 userId: user.uid,
                 authorName: userData.name || "User",
                 authorUsername: userData.username || "/user",
                 authorProfilePic: userData.profilePic || "",
-                text: textContent,
-                imageUrl: base64Image,
-                uploadTimestamp: Date.now(),
-                likedBy: []
+                text: textContent, imageUrl: base64Image, uploadTimestamp: Date.now(), likedBy: []
             });
             window.location.href = "index.html";
         } catch (err) {
-            console.error("Moment Creation Failure:", err);
-            alert(err.message);
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Share Moment";
+            alert(err.message); submitBtn.disabled = false; submitBtn.textContent = "Share Moment";
         }
     };
 }

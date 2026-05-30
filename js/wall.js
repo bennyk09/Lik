@@ -1,30 +1,19 @@
 import { db, auth } from './firebase-config.deploy.js';
-import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc, arrayUnion, arrayRemove, limit, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, where, getDocs, orderBy, doc, updateDoc, increment, deleteDoc, arrayUnion, arrayRemove, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const feed = document.getElementById('wall-feed');
 const searchInput = document.getElementById('user-search-input');
 const searchResultsTray = document.getElementById('search-results-tray');
 
-const viewUserModal = document.getElementById('view-user-modal');
-const closeUserModalBtn = document.getElementById('close-user-modal-btn');
-const swapActionBtn = document.getElementById('swap-action-btn');
-const viewUserAvatar = document.getElementById('view-user-avatar');
-const viewUserName = document.getElementById('view-user-name');
-const viewUserHandle = document.getElementById('view-user-handle');
-const viewUserBio = document.getElementById('view-user-bio');
-
 async function renderAppFeed() {
     if (!feed) return;
-    
-    // Limits stream query parameters strictly to the past 24 hours
     const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
     const q = query(collection(db, "moments"), where("uploadTimestamp", ">", dayAgo), orderBy("uploadTimestamp", "desc"));
     
     try {
         const snap = await getDocs(q);
         feed.innerHTML = "";
-        
         if (snap.empty) {
             feed.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size:0.9rem;">No moments active right now.</p>`;
             return;
@@ -37,7 +26,6 @@ async function renderAppFeed() {
             const moment = docSnap.data();
             const momentId = docSnap.id;
             
-            // Read pre-embedded profile parameters instantly with zero lag
             const authorName = moment.authorName || "User";
             const authorUsername = moment.authorUsername || "/user";
             const authorProfilePic = moment.authorProfilePic || "";
@@ -70,10 +58,8 @@ async function renderAppFeed() {
                         ${isMyMoment ? `<button class="btn-delete-moment" data-id="${momentId}">Delete</button>` : ''}
                         <small style="color:var(--text-muted); font-size:0.75rem;">${calcTime(moment.uploadTimestamp)}</small>
                     </div>
-                </div>
-            `;
+                </div>`;
             
-            // Route seamlessly to selected profiles
             card.querySelectorAll('[data-uid]').forEach(el => {
                 el.onclick = () => { window.location.href = `profile.html?uid=${el.getAttribute('data-uid')}`; };
             });
@@ -83,7 +69,7 @@ async function renderAppFeed() {
         feed.appendChild(fragment);
         bindLikes();
         bindDeletions();
-    } catch (err) { console.error("Feed error:", err); }
+    } catch (err) { console.error(err); }
 }
 
 if (searchInput) {
@@ -139,15 +125,13 @@ function bindLikes() {
             const currentUserId = auth.currentUser.uid;
             
             if (currentUserId === authorId) return;
-            
             const isLiked = btnEl.getAttribute('data-liked') === 'true';
             const countLabel = btnEl.querySelector('.like-count-num');
             const currentLikes = parseInt(countLabel.textContent) || 0;
             btnEl.disabled = true;
 
             if (!isLiked) {
-                countLabel.textContent = currentLikes + 1;
-                btnEl.setAttribute('data-liked', 'true');
+                countLabel.textContent = currentLikes + 1; btnEl.setAttribute('data-liked', 'true');
                 btnEl.style.background = "var(--accent-red)"; btnEl.style.color = "#fff"; btnEl.style.borderColor = "var(--accent-red)";
                 try {
                     await Promise.all([
@@ -157,8 +141,7 @@ function bindLikes() {
                 } catch(err) { countLabel.textContent = currentLikes; btnEl.setAttribute('data-liked', 'false'); btnEl.style = ""; }
                 finally { btnEl.disabled = false; }
             } else {
-                countLabel.textContent = Math.max(0, currentLikes - 1);
-                btnEl.setAttribute('data-liked', 'false'); btnEl.style = "";
+                countLabel.textContent = Math.max(0, currentLikes - 1); btnEl.setAttribute('data-liked', 'false'); btnEl.style = "";
                 try {
                     await Promise.all([
                         updateDoc(doc(db, "moments", momentId), { likedBy: arrayRemove(currentUserId) }),
