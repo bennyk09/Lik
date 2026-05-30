@@ -269,7 +269,7 @@ if (editForm) {
 }
 
 if (avatarPreview && avatarInput) {
-    avatarPreview.onclick = () => { if(isViewingSelf) avatarInput.click(); };
+    avatarPreview.onclick = () => { if(auth.currentUser) avatarInput.click(); };
 }
 
 if (avatarInput) {
