@@ -14,7 +14,6 @@ const closeEditBtn = document.getElementById('close-edit-modal-btn');
 const editForm = document.getElementById('edit-profile-form');
 
 const openDeleteBtn = document.getElementById('open-delete-modal-btn');
-const closeDeleteBtn = document.getElementById('close-delete-modal-btn');
 const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 
 const avatarPreview = document.getElementById('avatar-preview');
@@ -43,10 +42,10 @@ async function loadProfileData(uid, isViewingSelf) {
         if (!userSnap.exists()) return;
         const userData = userSnap.data();
 
-        // 🪐 Dynamic Relationship Indicator Tag Engine
+        // 🪐 DYNAMIC RELATIONSHIP BADGE ENGINE: Displays Single vs Committed
         let statusBadgeHtml = "";
         if (userData.relationshipStatus === "couple") {
-            statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 59, 48, 0.12); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; letter-spacing: 0.3px; margin-left: 2px;">❤️ Couple</span>`;
+            statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 59, 48, 0.12); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; letter-spacing: 0.3px; margin-left: 2px;">❤️ Committed</span>`;
         } else {
             statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 255, 255, 0.04); color: var(--text-muted); border: 1px solid var(--card-border); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; vertical-align: middle; margin-left: 2px;">Single</span>`;
         }
@@ -55,9 +54,11 @@ async function loadProfileData(uid, isViewingSelf) {
             usernameLabel.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 8px; width: 100%; flex-wrap: wrap;">
                     <span style="color: var(--text-main); font-weight: 700; font-size: 1.35rem;">${userData.name || "User"}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px; width: 100%;">
+                    <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: 400; letter-spacing: 0px;">${userData.username || '/user'}</span>
                     ${statusBadgeHtml}
                 </div>
-                <span style="display: block; font-size: 0.95rem; color: var(--text-muted); font-weight: 400; margin-top: 6px; width: 100%; letter-spacing: 0px;">${userData.username || '/user'}</span>
             `;
         }
         
@@ -87,7 +88,7 @@ async function loadProfileData(uid, isViewingSelf) {
             `;
         }
 
-        // Configure Layout Control Options
+        // Configure View Boundaries
         if (isViewingSelf) {
             if (openEditBtn) openEditBtn.style.display = "block";
             if (openDeleteBtn) openDeleteBtn.style.display = "block";
@@ -99,6 +100,7 @@ async function loadProfileData(uid, isViewingSelf) {
             if (openDeleteBtn) openDeleteBtn.style.display = "none";
             if (profileLogoutBtn) profileLogoutBtn.style.display = "none";
             
+            // Build the dynamic interaction button rows
             await injectForeignProfileButtons(uid);
         }
 
@@ -143,7 +145,12 @@ async function injectForeignProfileButtons(targetUid) {
     const incomingIds = myData.swapRequestsIn || [];
     const sentIds = myData.swapRequestsOut || [];
 
-    // 🪐 BUTTON CONTAINER A: CORE PROFILE SWAP ACTIONS
+    const myCoupleStatus = myData.relationshipStatus || "single";
+    const myPartnerUid = myData.partnerUid || "";
+    const myCoupleReqOut = myData.coupleRequestOut || "";
+    const myCoupleReqIn = myData.coupleRequestIn || "";
+
+    // 🌐 BUTTON CONTAINER A: SWAP COMPONENT MANAGER
     const swapContainer = document.createElement('div');
     swapContainer.id = "profile-dynamic-swap-btn";
     swapContainer.style = "margin-bottom: 12px;";
@@ -195,71 +202,80 @@ async function injectForeignProfileButtons(targetUid) {
     swapContainer.appendChild(swapBtn);
     userMomentsGrid.parentNode.insertBefore(swapContainer, userMomentsGrid);
 
-    // 🪐 BUTTON CONTAINER B: MUTUAL RELATIONSHIP SUB-ENGINE
+    // 🌐 BUTTON CONTAINER B: RELATIONSHIP SUB-ENGINE (Only activates if users are swapped)
     if (mutualIds.includes(targetUid)) {
         const coupleContainer = document.createElement('div');
         coupleContainer.id = "profile-dynamic-couple-btn";
         coupleContainer.style = "margin-bottom: 32px;";
 
-        const coupleBtn = document.createElement('button');
-        coupleBtn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; transition: 0.2s;";
-        
-        const myCoupleStatus = myData.relationshipStatus || "single";
-        const myPartnerUid = myData.partnerUid || "";
-        const myCoupleReqOut = myData.coupleRequestOut || "";
-        const myCoupleReqIn = myData.coupleRequestIn || "";
-
-        if (myCoupleStatus === "couple" && myPartnerUid === targetUid) {
-            coupleBtn.textContent = "Break Up (Remove Couple)";
-            coupleBtn.style.background = "transparent";
-            coupleBtn.style.color = "var(--accent-red)";
-            coupleBtn.style.border = "1px solid rgba(255,59,48,0.2)";
-        } else if (myCoupleReqOut === targetUid) {
-            coupleBtn.textContent = "Couple Proposal Sent...";
-            coupleBtn.style.background = "rgba(255,255,255,0.03)";
-            coupleBtn.style.color = "var(--text-muted)";
-            coupleBtn.style.border = "1px solid var(--card-border)";
-        } else if (myCoupleReqIn === targetUid) {
-            coupleBtn.textContent = "Accept Couple Request ❤️";
-            coupleBtn.style.background = "#ff3b30";
-            coupleBtn.style.color = "#fff";
-            coupleBtn.style.border = "1px solid transparent";
-        } else if (myCoupleStatus === "single") {
-            coupleBtn.textContent = "Add Couple ➕";
-            coupleBtn.style.background = "rgba(255,255,255,0.04)";
-            coupleBtn.style.color = "var(--text-main)";
-            coupleBtn.style.border = "1px solid var(--card-border)";
-        } else {
-            // Already coupled with someone else, hide choice entirely
-            coupleContainer.style.display = "none";
+        // Enforce block rule: If already coupled with someone else, hide choice completely
+        if (myCoupleStatus === "couple" && myPartnerUid !== targetUid) {
+            return;
         }
 
-        coupleBtn.onclick = async () => {
-            coupleBtn.disabled = true;
-            const actionText = coupleBtn.textContent;
-            try {
-                if (actionText.includes("Add Couple")) {
-                    await updateDoc(doc(db, "users", currentUserId), { coupleRequestOut: targetUid });
-                    await updateDoc(doc(db, "users", targetUid), { coupleRequestIn: currentUserId });
-                } else if (actionText.includes("Accept Couple Request")) {
-                    await updateDoc(doc(db, "users", currentUserId), { coupleRequestIn: "", relationshipStatus: "couple", partnerUid: targetUid });
-                    await updateDoc(doc(db, "users", targetUid), { coupleRequestOut: "", relationshipStatus: "couple", partnerUid: currentUserId });
-                } else if (actionText.includes("Break Up")) {
-                    if (!confirm("Are you sure you want to dissolve couple status records?")) return;
-                    await updateDoc(doc(db, "users", currentUserId), { relationshipStatus: "single", partnerUid: "" });
-                    await updateDoc(doc(db, "users", targetUid), { relationshipStatus: "single", partnerUid: "" });
-                }
+        if (myCoupleStatus === "couple" && myPartnerUid === targetUid) {
+            // State: Already Committed -> Render Break Up
+            const breakBtn = document.createElement('button');
+            breakBtn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; background: transparent; color: var(--accent-red); border: 1px solid rgba(255,59,48,0.2);";
+            breakBtn.textContent = "Break Up (Remove Couple)";
+            breakBtn.onclick = async () => {
+                if (!confirm("Are you sure you want to dissolve committed relationship records?")) return;
+                breakBtn.disabled = true;
+                await updateDoc(doc(db, "users", currentUserId), { relationshipStatus: "single", partnerUid: "" });
+                await updateDoc(doc(db, "users", targetUid), { relationshipStatus: "single", partnerUid: "" });
                 await loadProfileData(targetUid, false);
-            } catch (err) { console.error(err); }
-            finally { coupleBtn.disabled = false; }
-        };
+            };
+            coupleContainer.appendChild(breakBtn);
 
-        coupleContainer.appendChild(coupleBtn);
+        } else if (myCoupleReqOut === targetUid) {
+            // State: Proposal Sent -> Render Pending Label
+            const pendingBtn = document.createElement('button');
+            pendingBtn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); color: var(--text-muted); background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); cursor: default;";
+            pendingBtn.textContent = "Couple Proposal Sent...";
+            coupleContainer.appendChild(pendingBtn);
+
+        } else if (myCoupleReqIn === targetUid) {
+            // State: Incoming Request -> Render Accept & Reject Inline Decision Row
+            const rowWrapper = document.createElement('div');
+            rowWrapper.style = "display: flex; gap: 12px; width: 100%;";
+            rowWrapper.innerHTML = `
+                <button id="btn-accept-couple" class="btn-primary" style="flex: 1; padding: 12px; background: #ff3b30; color: #fff; border: none; border-radius: var(--radius-md); font-weight: 700; cursor: pointer;">Accept Request ❤️</button>
+                <button id="btn-reject-couple" class="btn-secondary" style="flex: 1; padding: 12px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer;">Reject</button>
+            `;
+
+            rowWrapper.querySelector('#btn-accept-couple').onclick = async () => {
+                await updateDoc(doc(db, "users", currentUserId), { coupleRequestIn: "", relationshipStatus: "couple", partnerUid: targetUid });
+                await updateDoc(doc(db, "users", targetUid), { coupleRequestOut: "", relationshipStatus: "couple", partnerUid: currentUserId });
+                await loadProfileData(targetUid, false);
+            };
+
+            rowWrapper.querySelector('#btn-reject-couple').onclick = async () => {
+                await updateDoc(doc(db, "users", currentUserId), { coupleRequestIn: "" });
+                await updateDoc(doc(db, "users", targetUid), { coupleRequestOut: "" });
+                await loadProfileData(targetUid, false);
+            };
+
+            coupleContainer.appendChild(rowWrapper);
+
+        } else if (myCoupleStatus === "single") {
+            // State: Both Single -> Render Propose Button
+            const proposeBtn = document.createElement('button');
+            proposeBtn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; background: rgba(255,255,255,0.04); color: var(--text-main); border: 1px solid var(--card-border);";
+            proposeBtn.textContent = "Add Couple ➕";
+            proposeBtn.onclick = async () => {
+                proposeBtn.disabled = true;
+                await updateDoc(doc(db, "users", currentUserId), { coupleRequestOut: targetUid });
+                await updateDoc(doc(db, "users", targetUid), { coupleRequestIn: currentUserId });
+                await loadProfileData(targetUid, false);
+            };
+            coupleContainer.appendChild(proposeBtn);
+        }
+
         userMomentsGrid.parentNode.insertBefore(coupleContainer, userMomentsGrid);
     }
 }
 
-// Global modal toggle event registers
+// Global modal toggle registrations
 if (openEditBtn) openEditBtn.onclick = () => editModal.style.display = 'flex';
 if (closeEditBtn) closeEditBtn.onclick = () => editModal.style.display = 'none';
 if (openDeleteBtn) openDeleteBtn.onclick = () => deleteModal.style.display = 'flex';
