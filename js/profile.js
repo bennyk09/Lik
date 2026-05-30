@@ -42,7 +42,7 @@ async function loadProfileData(uid, isViewingSelf) {
         if (!userSnap.exists()) return;
         const userData = userSnap.data();
 
-        // Relationship Indicator Tag Configuration
+        // Dynamic Relationship Indicator Tag Engine
         let statusBadgeHtml = "";
         if (userData.relationshipStatus === "couple") {
             statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 59, 48, 0.12); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; letter-spacing: 0.3px; margin-left: 2px;">❤️ Committed</span>`;
@@ -83,7 +83,7 @@ async function loadProfileData(uid, isViewingSelf) {
         const swappedArray = userData.swappedWith || [];
         const scoreLikes = userData.totalLikes || 0;
 
-        // 🪐 LEADERBOARD RANK GENERATOR PIPELINE: Computes real positional index based on overall Score
+        // Leaderboard Rank Generator Pipeline
         let computedRankPosition = "#0"; 
         try {
             if (scoreLikes > 0) {
@@ -109,14 +109,13 @@ async function loadProfileData(uid, isViewingSelf) {
                     indexPosition++;
                 }
             } else {
-                // 🪐 CHANGED: If score is 0, rank explicitly shows #0
                 computedRankPosition = "#0";
             }
         } catch (rankErr) {
-            console.warn("Rank computation index delay fallback initialized.", rankErr);
+            console.warn(rankErr);
         }
 
-        // RENDER PARAMETERS METRICS GRID: Swaps | Moments | Score | Rank
+        // Render Parameters Metrics Grid
         if (statsTray) {
             statsTray.innerHTML = `
                 <div class="stat-node"><span class="stat-node-val">${swappedArray.length}</span><span class="stat-node-lbl">Swaps</span></div>
@@ -178,12 +177,15 @@ async function injectForeignProfileButtons(targetUid) {
     const myProfileSnap = await getDoc(doc(db, "users", currentUserId));
     const myData = myProfileSnap.data();
     
+    // Safety Fallbacks initialization logic
     const mutualIds = myData.swappedWith || [];
     const incomingIds = myData.swapRequestsIn || [];
     const sentIds = myData.swapRequestsOut || [];
 
     const myCoupleStatus = myData.relationshipStatus || "single";
     const myPartnerUid = myData.partnerUid || "";
+    
+    // 🪐 FIXED: Explicit string safety protection fallbacks prevents undefined evaluations
     const myCoupleReqOut = myData.coupleRequestOut || "";
     const myCoupleReqIn = myData.coupleRequestIn || "";
 
@@ -226,8 +228,8 @@ async function injectForeignProfileButtons(targetUid) {
                 await updateDoc(doc(db, "users", targetUid), { swapRequestsIn: arrayUnion(currentUserId) });
             } else if (currentLabel === "Unswap Connection") {
                 if (!confirm("Disconnect swap link?")) return;
-                await updateDoc(doc(db, "users", currentUserId), { swappedWith: arrayRemove(targetUid), relationshipStatus: "single", partnerUid: "" });
-                await updateDoc(doc(db, "users", targetUid), { swappedWith: arrayRemove(currentUserId), relationshipStatus: "single", partnerUid: "" });
+                await updateDoc(doc(db, "users", currentUserId), { swappedWith: arrayRemove(targetUid), relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" });
+                await updateDoc(doc(db, "users", targetUid), { swappedWith: arrayRemove(currentUserId), relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" });
             } else if (currentLabel === "Accept Swap Request") {
                 await updateDoc(doc(db, "users", currentUserId), { swapRequestsIn: arrayRemove(targetUid), swappedWith: arrayUnion(targetUid) });
                 await updateDoc(doc(db, "users", targetUid), { swapRequestsOut: arrayRemove(currentUserId), swappedWith: arrayUnion(currentUserId) });
@@ -254,8 +256,8 @@ async function injectForeignProfileButtons(targetUid) {
             breakBtn.onclick = async () => {
                 if (!confirm("Are you sure you want to dissolve committed relationship records?")) return;
                 breakBtn.disabled = true;
-                await updateDoc(doc(db, "users", currentUserId), { relationshipStatus: "single", partnerUid: "" });
-                await updateDoc(doc(db, "users", targetUid), { relationshipStatus: "single", partnerUid: "" });
+                await updateDoc(doc(db, "users", currentUserId), { relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" });
+                await updateDoc(doc(db, "users", targetUid), { relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" });
                 await loadProfileData(targetUid, false);
             };
             coupleContainer.appendChild(breakBtn);
