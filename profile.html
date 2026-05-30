@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK - Profile</title>
-    <link rel="stylesheet" href="./css/style.css?v=11.0.0">
+    <link rel="stylesheet" href="/Lik/css/style.css?v=11.0.4">
 </head>
 <body>
     <div class="app-container">
@@ -20,6 +20,7 @@
         
         <main>
             <div style="max-width: 600px; margin: 0 auto;">
+                
                 <div class="profile-meta-block">
                     <div class="avatar-container">
                         <div id="avatar-preview" class="profile-avatar">-</div>
@@ -29,24 +30,24 @@
                     <div class="profile-identity-details">
                         <h2 id="lbl-username-display">User</h2>
                         <div class="stats-row" id="stats-numbers-tray"></div>
-                        <div id="profile-bio-container" class="profile-bio-text">No biography set. Click edit profile to add yours!</div>
+                        <div id="profile-bio-container" class="profile-bio-text">Loading profile metadata parameters...</div>
                     </div>
                 </div>
                 
                 <div style="display: flex; gap: 12px; margin-bottom: 32px;">
-                    <button id="open-edit-modal-btn" class="btn-secondary" style="flex: 1; display:none;">
-                        Edit Profile
-                    </button>
-                    <button id="open-about-modal-btn" class="btn-secondary" style="flex: 1;">
-                        Platform Info (About)
-                    </button>
-                    <button id="open-delete-modal-btn" class="btn-secondary" style="color: var(--accent-red); border-color: rgba(255,59,48,0.2); display:none;">
-                        Delete
-                    </button>
+                    <button id="open-edit-modal-btn" class="btn-secondary" style="flex: 1; display:none;">Edit Profile</button>
+                    <button id="open-about-modal-btn" class="btn-secondary" style="flex: 1;">Platform Info (About)</button>
+                    <button id="open-delete-modal-btn" class="btn-secondary" style="color: var(--accent-red); border-color: rgba(255,59,48,0.2); display:none;">Delete</button>
+                </div>
+
+                <div id="swaps-connections-section" style="margin-bottom: 40px; display: none;">
+                    <h4 style="margin: 0 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--accent-color); letter-spacing:0.5px;">My Swapped Networks</h4>
+                    <div id="swapped-users-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
                 </div>
 
                 <h4 style="margin: 24px 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Live Timeline</h4>
                 <div id="user-moments"></div>
+                
             </div>
         </main>
 
@@ -88,12 +89,7 @@
             <p style="line-height:1.5; font-size:0.9rem; color:var(--text-muted); margin-bottom: 20px;">
                 LIK is an open-source temporary social media space centered around real-time interactive presence. All text thoughts and shared image metrics automatically disappear post-creation.
             </p>
-            <h4 style="margin:20px 0 8px 0; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing: 0.5px;">Release History</h4>
-            <div class="version-log">
-                <span class="version-tag">v0.1.0</span>
-                <p style="font-size:0.8rem; color:var(--text-muted); margin:6px 0 0 0; line-height: 1.4;">Dual responsive layout matrix engine fully updated across production streams.</p>
-            </div>
-            <button type="button" id="close-about-modal-btn" class="btn-primary" style="margin-top:24px; width: 100%;">Close</button>
+            <button type="button" id="close-about-modal-btn" class="btn-primary" style="width: 100%;">Close</button>
         </div>
     </div>
 

@@ -7,7 +7,11 @@ const bioContainer = document.getElementById('profile-bio-container');
 const statsTray = document.getElementById('stats-numbers-tray');
 const userMomentsGrid = document.getElementById('user-moments');
 
-// Modal Elements
+// New Connection List Component Hooks Targets
+const swapsSection = document.getElementById('swaps-connections-section');
+const swappedUsersList = document.getElementById('swapped-users-list');
+
+// Modal Elements Target Registry
 const editModal = document.getElementById('edit-profile-modal');
 const openEditBtn = document.getElementById('open-edit-modal-btn');
 const closeEditBtn = document.getElementById('close-edit-modal-btn');
@@ -40,7 +44,7 @@ async function loadProfileData(uid) {
         if (!userSnap.exists()) return;
         const userData = userSnap.data();
 
-        // 🪐 STEP 2: Render display name alongside the permanent handle below it
+        // Render display name alongside the unchangeable handle label
         if (usernameLabel) {
             usernameLabel.innerHTML = `
                 ${userData.name || "User"} 
@@ -49,7 +53,7 @@ async function loadProfileData(uid) {
         }
         if (bioContainer) bioContainer.textContent = userData.bio || "No biography set yet. Click Edit Profile to add one!";
         
-        // Avatar handlers
+        // Avatar asset profile mapping parameters setup
         if (avatarPreview) {
             if (userData.profilePic) {
                 avatarPreview.innerHTML = `<img src="${userData.profilePic}" alt="Avatar">`;
@@ -60,20 +64,52 @@ async function loadProfileData(uid) {
             }
         }
 
-        // Fetch user posts to compute metrics
+        // Fetch user posts to compute timeline variables counts
         const momentsQuery = query(collection(db, "moments"), where("userId", "==", uid));
         const momentsSnap = await getDocs(momentsQuery);
         const activeMomentsCount = momentsSnap.size;
+
+        // Extract connection counts array parameter sizes safely
+        const swappedArray = userData.swappedWith || [];
 
         if (statsTray) {
             statsTray.innerHTML = `
                 <div class="stat-node"><span class="stat-node-val">${userData.totalLikes || 0}</span><span class="stat-node-lbl">Likes</span></div>
                 <div class="stat-node"><span class="stat-node-val">${activeMomentsCount}</span><span class="stat-node-lbl">Moments</span></div>
-                <div class="stat-node"><span class="stat-node-val">#1</span><span class="stat-node-lbl">Rank</span></div>
+                <div class="stat-node"><span class="stat-node-val">${swappedArray.length}</span><span class="stat-node-lbl">Swaps</span></div>
             `;
         }
 
-        // Build grid layout
+        // 🪐 NEW: Loop through each swapped UID parameter and render friend layout blocks
+        if (swappedArray.length > 0 && swappedUsersList && swapsSection) {
+            swappedUsersList.innerHTML = "";
+            swapsSection.style.display = "block";
+
+            for (const targetUid of swappedArray) {
+                const friendSnap = await getDoc(doc(db, "users", targetUid));
+                if (friendSnap.exists()) {
+                    const friendData = friendSnap.data();
+                    const friendRow = document.createElement('div');
+                    
+                    friendRow.style = "display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--card-color); border: 1px solid var(--card-border); border-radius: var(--radius-md);";
+                    friendRow.innerHTML = `
+                        <div class="post-avatar" style="width:38px; height:38px; font-size:0.9rem; border-color:rgba(255,255,255,0.05);">
+                            ${friendData.profilePic ? `<img src="${friendData.profilePic}">` : (friendData.name || "U").charAt(0).toUpperCase()}
+                        </div>
+                        <div style="display: flex; flex-direction: column; flex: 1;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); line-height:1.2;">${friendData.name || "User"}</span>
+                            <span style="font-size: 0.75rem; color: var(--accent-color); font-weight: 500; margin-top:1px;">${friendData.username}</span>
+                        </div>
+                    `;
+                    swappedUsersList.appendChild(friendRow);
+                }
+            }
+        } else if (swapsSection) {
+            // Hide connection row area completely if user hasn't completed any swaps yet
+            swapsSection.style.display = "none";
+        }
+
+        // Build grid layout posts array frames timeline
         if (userMomentsGrid) {
             userMomentsGrid.innerHTML = "";
             momentsSnap.forEach(docData => {
@@ -87,7 +123,7 @@ async function loadProfileData(uid) {
             });
         }
 
-        // Set form inputs (Excluding handle input since it cannot be changed)
+        // Synchronize settings configurations input boxes values variables
         document.getElementById('edit-user-name').value = userData.name || "";
         document.getElementById('edit-user-age').value = userData.age || "";
         document.getElementById('edit-user-bio').value = userData.bio || "";
@@ -95,10 +131,10 @@ async function loadProfileData(uid) {
         if (openEditBtn) openEditBtn.style.display = "block";
         if (openDeleteBtn) openDeleteBtn.style.display = "block";
 
-    } catch (err) { console.error(err); }
+    } catch (err) { console.error("Profile view aggregation error: ", err); }
 }
 
-// Modal Toggle Handlers
+// Dialog overlays setup configurations visibility loops toggle logic handlers
 if (openEditBtn) openEditBtn.onclick = () => editModal.style.display = 'flex';
 if (closeEditBtn) closeEditBtn.onclick = () => editModal.style.display = 'none';
 if (openAboutBtn) openAboutBtn.onclick = () => aboutModal.style.display = 'flex';
