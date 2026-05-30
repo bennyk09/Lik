@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.deploy.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const themeBtn = document.getElementById('theme-toggle-btn');
@@ -27,8 +27,9 @@ if (themeBtn) {
 
 if (logoutBtn) {
     logoutBtn.onclick = async () => {
-        const { signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
-        signOut(auth).then(() => { window.location.href = "index.html"; });
+        signOut(auth).then(() => { 
+            window.location.href = "index.html"; 
+        }).catch(err => console.error(err));
     };
 }
 
@@ -43,7 +44,6 @@ if (confirmDeleteBtn) {
         confirmDeleteBtn.textContent = "Deleting Account...";
         try {
             await deleteDoc(doc(db, "users", user.uid));
-            const { signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
             signOut(auth).then(() => { window.location.href = "index.html"; });
         } catch (err) { 
             alert(err.message); 

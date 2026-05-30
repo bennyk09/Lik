@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.deploy.js';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const provider = new GoogleAuthProvider();
@@ -11,6 +11,7 @@ const loginBtn = document.getElementById('google-login-btn');
 const modal = document.getElementById('onboarding-modal');
 const onboardingForm = document.getElementById('onboarding-form');
 
+// State Monitor automatically catches cached persistent user records
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
@@ -39,6 +40,11 @@ if (loginBtn) {
         try {
             loginBtn.disabled = true;
             loginBtn.textContent = "Connecting to Google...";
+            
+            // Explicitly force Firebase to save credentials permanently inside the browser's storage
+            await setPersistence(auth, browserLocalPersistence);
+            
+            // Trigger authentication
             await signInWithPopup(auth, provider);
         } catch (err) {
             console.error("Auth System Failure:", err);
