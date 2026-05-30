@@ -6,13 +6,14 @@
     <title>LIK - Profile</title>
     <link rel="icon" type="image/png" href="logo.png">
     <script>
-        document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'dark');
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'light');
     </script>
     <link rel="stylesheet" href="css/style.css?v=2.0.0">
 </head>
 <body>
     <div class="app-container">
         
+        <!-- SIDEBAR NAVIGATION COLUMN WITHOUT OVERLAPPING TEXT -->
         <header>
             <div style="width: 100%;">
                 <div class="brand-wrapper" onclick="window.location.href='index.html'">
@@ -25,34 +26,42 @@
                     <a href="profile.html" class="active">Profile</a>
                 </nav>
             </div>
-            <button class="sidebar-bottom-pill-btn" onclick="window.location.href='settings.html'">Settings</button>
+            <button class="sidebar-bottom-pill-btn" onclick="window.location.href='settings.html'">Set</button>
         </header>
         
-        <main>
+        <!-- BALANCED TIMELINE TRACK INTERFACES -->
+        <main style="--main-pad: 0px;">
             <div class="feed-column-wrapper">
                 
+                <!-- PROTECTED ACCOUNT OVERVIEW CARD -->
                 <div class="profile-meta-block">
-                    <div class="profile-identity-details">
-                        <h2 id="lbl-username-display">User</h2>
-                        <div class="stats-row" id="stats-numbers-tray"></div>
-                        <div id="profile-bio-container" class="profile-bio-text">Loading meta metrics...</div>
+                    <div class="profile-meta-top-row">
+                        <div class="profile-identity-details">
+                            <h2 id="lbl-username-display">User</h2>
+                        </div>
+                        <div class="avatar-container" style="text-align: center;">
+                            <div id="avatar-preview" class="profile-avatar">-</div>
+                            <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                            <button id="remove-pic-btn" class="remove-pic-btn">Remove Photo</button>
+                        </div>
                     </div>
-                    <div class="avatar-container">
-                        <div id="avatar-preview" class="profile-avatar">-</div>
-                        <input type="file" id="avatar-input" accept="image/*" style="display: none;">
-                        <button id="remove-pic-btn" class="remove-pic-btn">Remove Photo</button>
-                    </div>
+                    
+                    <div class="stats-row" id="stats-numbers-tray"></div>
+                    <div id="profile-bio-container" class="profile-bio-text">Syncing profile elements...</div>
                 </div>
 
-                <div id="partner-status-display-frame" style="width: 100%; margin-bottom: 24px;"></div>
+                <!-- RELATIONSHIP TRACK SUB-CARDS INNER AREA FRAME -->
+                <div id="partner-status-display-frame" style="width: 100%;"></div>
                 
-                <div style="display: flex; gap: 12px; width: 100%; margin-bottom: 32px;">
-                    <button id="open-edit-modal-btn" class="btn-secondary" style="flex: 1; display: none;">Edit Profile</button>
-                    <button id="open-settings-page-btn" class="btn-primary" style="flex: 1;" onclick="window.location.href='settings.html'">Settings</button>
+                <!-- PROFILE INTERACTION OPTIONS BASE ROW -->
+                <div style="display: flex; gap: 12px; width: 100%; margin-bottom: 24px;">
+                    <button id="open-edit-modal-btn" class="sidebar-bottom-pill-btn" style="flex: 1; width: auto; border-radius: 12px; background:#fff; color:#000!important; border:1px solid var(--card-border);">Edit Profile</button>
+                    <button id="open-settings-page-btn" class="sidebar-bottom-pill-btn" style="flex: 1; width: auto; border-radius: 12px;">Settings</button>
                 </div>
 
-                <div style="border-top: 1px solid var(--card-border); width: 100%; padding-top: 24px;">
-                    <h4 style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 16px;">Live Timeline</h4>
+                <!-- PHOTO MEDIA GRID HOUSING MODULE -->
+                <div class="feed-master-card-shell" style="padding: 20px;">
+                    <h4 style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 14px;">Timeline Photos</h4>
                     <div id="user-moments"></div>
                 </div>
 
@@ -67,9 +76,10 @@
         </nav>
     </div>
 
+    <!-- ONBOARDING FORM MODAL OVERLAYS -->
     <div id="edit-profile-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
-            <h3 style="font-weight:700; margin-bottom: 20px; font-size:1.1rem;">Update Profile</h3>
+            <h3 style="font-weight:700; margin-bottom: 20px;">Update Profile</h3>
             <form id="edit-profile-form">
                 <div class="form-group">
                     <label for="edit-user-name">Display Name</label>
