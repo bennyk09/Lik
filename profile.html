@@ -8,7 +8,7 @@
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'light');
     </script>
-    <link rel="stylesheet" href="css/styles.css?v=2.0.0">
+    <link rel="stylesheet" href="css/style.css?v=2.0.0">
 </head>
 <body>
     <div class="app-container">
@@ -34,7 +34,7 @@
                 <div class="profile-meta-block">
                     <div class="profile-meta-top-row">
                         <div class="profile-identity-details">
-                            <h2 id="lbl-username-display" style="font-size:1.5rem; font-weight:800;">User</h2>
+                            <h2 id="lbl-username-display">User</h2>
                         </div>
                         <div class="avatar-container" style="text-align: center;">
                             <div id="avatar-preview" class="profile-avatar">-</div>
@@ -44,7 +44,7 @@
                     </div>
                     
                     <div class="stats-row" id="stats-numbers-tray"></div>
-                    <div id="profile-bio-container" class="profile-bio-text">Syncing profile elements...</div>
+                    <div id="profile-bio-container" class="profile-bio-text">Syncing profile parameters...</div>
                 </div>
 
                 <div id="partner-status-display-frame" style="width: 100%;"></div>
@@ -88,7 +88,7 @@
                 </div>
                 <div style="display: flex; gap: 12px; margin-top:24px;">
                     <button type="button" id="close-edit-modal-btn" class="btn-secondary" style="flex: 1;">Cancel</button>
-                    <button type="submit" class="btn-primary" style="flex: 1; border-radius:8px; background:#000; color:#fff;">Save</button>
+                    <button type="submit" class="btn-primary" style="flex: 1; border-radius: 8px; background: #000; color: #fff; font-weight:bold;">Save</button>
                 </div>
             </form>
         </div>

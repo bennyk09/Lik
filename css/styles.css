@@ -1,8 +1,9 @@
 /* ==========================================================================
-   🪐 LIK CLEAN RESTARTED STANDARD SOCIAL MEDIA APPARATUS STYLESHEET
+   🪐 LIK RESTARTED STYLING MATRIX - PREMIUM CLEAN SYSTEM (STANDALONE LOGO)
    ========================================================================== */
 
 :root {
+    /* STABLE PLATFORM PALETTE TOKENS */
     --bg-main: #ffffff;
     --bg-outside: #fafafa;
     --card-color: #ffffff;
@@ -17,9 +18,10 @@
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-card: 20px;
+    --radius-img: 16px;
     --radius-pill: 50px;
-    --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --transition-smooth: all 0.2s ease;
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+    --transition-smooth: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -37,16 +39,17 @@ body {
 }
 
 /* ==========================================================================
-   🧱 BASE LAYOUT CORES (STANDARD CENTER FEEDS)
+   🧱 MASTER GRID RE-ENGINEERING (SLIM NAVIGATION SIDEBAR)
    ========================================================================== */
 
 .app-container {
     display: grid;
-    grid-template-columns: 90px 1fr;
+    grid-template-columns: 90px 1fr; /* Slim layout columns explicitly mapped around standalone icon graphic */
     width: 100%;
     min-height: 100vh;
 }
 
+/* FIXED SLIM NAVIGATION SYSTEM */
 header {
     position: fixed;
     top: 0;
@@ -63,6 +66,7 @@ header {
     z-index: 1000;
 }
 
+/* Strips out plain text headers completely to center icon purely */
 .brand-wrapper {
     display: flex;
     justify-content: center;
@@ -123,6 +127,7 @@ header {
     transform: scale(1.05);
 }
 
+/* MAIN VIEW FEED WINDOW AXIS SPACE */
 main {
     margin-left: 90px;
     padding: 40px 24px;
@@ -153,12 +158,12 @@ main {
 }
 
 /* ==========================================================================
-   🖼️ TRADITIONAL SOCIAL APP POST CONTAINER COMPONENTS
+   🖼️ CHRONOLOGICAL FEED CARDS LAYOUT (IMAGE ON TOP)
    ========================================================================== */
 
 #wall-feed-container, .feed-column-wrapper {
     width: 100%;
-    max-width: 500px;
+    max-width: 480px;
 }
 
 .feed-master-card-shell {
@@ -167,12 +172,14 @@ main {
     border-radius: var(--radius-card);
     width: 100%;
     padding: 24px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.01);
 }
 
 .search-wrapper-block {
     width: 100%;
-    margin-bottom: 24px;
 }
 
 .search-input-field {
@@ -187,20 +194,21 @@ main {
     outline: none;
 }
 
+/* RE-ARRANGED: MEDIA CANVAS FORCED ON TOP natively */
 .timeline-post-node {
     width: 100%;
     display: flex;
     flex-direction: column;
-    margin-bottom: 32px;
+    margin-bottom: 12px;
 }
 
 .post-media-box-wrapper {
     width: 100%;
     aspect-ratio: 1 / 1;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-img);
     overflow: hidden;
-    background-color: var(--input-bg);
-    margin-bottom: 14px;
+    background-color: #e2e2e6;
+    margin-bottom: 16px;
     border: 1px solid var(--card-border);
 }
 
@@ -210,6 +218,7 @@ main {
     object-fit: cover;
 }
 
+/* USER DETAILS FLOW UNDERNEATH THE SQUARE IMAGE CARDS SCREEN */
 .post-metadata-tray {
     display: flex;
     align-items: center;
@@ -276,7 +285,7 @@ main {
 .action-icon-trigger.delete-mode:hover { color: var(--accent-red); }
 
 /* ==========================================================================
-   👤 PROFILE COMPONENT LAYOUTS
+   👤 ISOLATED DATA PROFILE BLOCKS (TONY STARK & COUPLE MATRIX DESIGN)
    ========================================================================== */
 
 .profile-meta-block {
@@ -289,6 +298,7 @@ main {
     border-radius: var(--radius-card);
     padding: 28px;
     margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 
 .profile-meta-top-row {
@@ -305,6 +315,7 @@ main {
     border-radius: 50%;
     border: 1px solid var(--card-border);
     overflow: hidden;
+    background-color: var(--input-bg);
 }
 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -330,15 +341,7 @@ main {
 
 .profile-bio-text { font-size: 0.95rem; line-height: 1.5; color: #334155; margin-top: 4px; }
 
-#user-moments {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    width: 100%;
-}
-.user-moment-card { aspect-ratio: 1/1; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--card-border); }
-.user-moment-card img { width: 100%; height: 100%; object-fit: cover; }
-
+/* Sticky Lower Corner Quick Access Pill Component */
 .floating-right-account-pill {
     position: fixed; bottom: 32px; right: 48px; background-color: var(--pill-dark-bg); color: #ffffff !important; border-radius: var(--radius-pill); padding: 10px 24px 10px 12px; display: flex; align-items: center; gap: 12px; text-decoration: none; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
@@ -350,3 +353,7 @@ main {
 
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 16px; }
 .modal-content { background: #ffffff; border: 1px solid var(--card-border); border-radius: var(--radius-card); width: 100%; max-width: 440px; padding: 32px; }
+
+input[type="text"], input[type="number"], textarea {
+    width: 100%; background-color: var(--input-bg); border: 1px solid transparent; border-radius: var(--radius-md); padding: 14px 16px; color: var(--text-main); font-family: inherit; font-size: 0.95rem; outline: none;
+}
