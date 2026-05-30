@@ -22,7 +22,7 @@ const avatarInput = document.getElementById('avatar-input');
 const removePicBtn = document.getElementById('remove-pic-btn');
 const profileLogoutBtn = document.getElementById('logout-btn-profile');
 
-// Read the URL query parameters
+// Read the incoming URL query parameters
 const urlParams = new URLSearchParams(window.location.search);
 const targetProfileUid = urlParams.get('uid');
 
@@ -43,12 +43,24 @@ async function loadProfileData(uid, isViewingSelf) {
         if (!userSnap.exists()) return;
         const userData = userSnap.data();
 
+        // 🪐 Dynamic Relationship Indicator Tag Engine
+        let statusBadgeHtml = "";
+        if (userData.relationshipStatus === "couple") {
+            statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 59, 48, 0.12); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; letter-spacing: 0.3px; margin-left: 2px;">❤️ Couple</span>`;
+        } else {
+            statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 255, 255, 0.04); color: var(--text-muted); border: 1px solid var(--card-border); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; vertical-align: middle; margin-left: 2px;">Single</span>`;
+        }
+
         if (usernameLabel) {
             usernameLabel.innerHTML = `
-                ${userData.name || "User"} 
-                <span style="display: block; font-size: 0.95rem; color: var(--text-muted); font-weight: 400; margin-top: 4px;">${userData.username || '/user'}</span>
+                <div style="display: flex; align-items: center; gap: 8px; width: 100%; flex-wrap: wrap;">
+                    <span style="color: var(--text-main); font-weight: 700; font-size: 1.35rem;">${userData.name || "User"}</span>
+                    ${statusBadgeHtml}
+                </div>
+                <span style="display: block; font-size: 0.95rem; color: var(--text-muted); font-weight: 400; margin-top: 6px; width: 100%; letter-spacing: 0px;">${userData.username || '/user'}</span>
             `;
         }
+        
         if (bioContainer) bioContainer.textContent = userData.bio || "No biography set yet.";
         
         if (avatarPreview) {
@@ -65,7 +77,6 @@ async function loadProfileData(uid, isViewingSelf) {
         const momentsQuery = query(collection(db, "moments"), where("userId", "==", uid));
         const momentsSnap = await getDocs(momentsQuery);
         const activeMomentsCount = momentsSnap.size;
-
         const swappedArray = userData.swappedWith || [];
 
         if (statsTray) {
@@ -76,20 +87,19 @@ async function loadProfileData(uid, isViewingSelf) {
             `;
         }
 
-        // Configure View Bounds (Self Management vs Visiting Stranger Profile)
+        // Configure Layout Control Options
         if (isViewingSelf) {
             if (openEditBtn) openEditBtn.style.display = "block";
             if (openDeleteBtn) openDeleteBtn.style.display = "block";
             if (profileLogoutBtn) profileLogoutBtn.style.display = "block";
             
-            let foreignSwapBtn = document.getElementById('profile-dynamic-swap-btn');
-            if (foreignSwapBtn) foreignSwapBtn.remove();
+            removeDynamicProfileButtons();
         } else {
             if (openEditBtn) openEditBtn.style.display = "none";
             if (openDeleteBtn) openDeleteBtn.style.display = "none";
             if (profileLogoutBtn) profileLogoutBtn.style.display = "none";
             
-            injectSwapActionButton(uid);
+            await injectForeignProfileButtons(uid);
         }
 
         if (userMomentsGrid) {
@@ -117,81 +127,139 @@ async function loadProfileData(uid, isViewingSelf) {
     } catch (err) { console.error(err); }
 }
 
-async function injectSwapActionButton(targetUid) {
-    const currentUserId = auth.currentUser.uid;
-    let existingBtn = document.getElementById('profile-dynamic-swap-btn');
-    if (existingBtn) existingBtn.remove();
+function removeDynamicProfileButtons() {
+    document.getElementById('profile-dynamic-swap-btn')?.remove();
+    document.getElementById('profile-dynamic-couple-btn')?.remove();
+}
 
-    const container = document.createElement('div');
-    container.id = "profile-dynamic-swap-btn";
-    container.style = "margin-bottom: 32px;";
+async function injectForeignProfileButtons(targetUid) {
+    const currentUserId = auth.currentUser.uid;
+    removeDynamicProfileButtons();
 
     const myProfileSnap = await getDoc(doc(db, "users", currentUserId));
     const myData = myProfileSnap.data();
     
+    const mutualIds = myData.swappedWith || [];
     const incomingIds = myData.swapRequestsIn || [];
     const sentIds = myData.swapRequestsOut || [];
-    const mutualIds = myData.swappedWith || [];
 
-    const btn = document.createElement('button');
-    btn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition-smooth);";
+    // 🪐 BUTTON CONTAINER A: CORE PROFILE SWAP ACTIONS
+    const swapContainer = document.createElement('div');
+    swapContainer.id = "profile-dynamic-swap-btn";
+    swapContainer.style = "margin-bottom: 12px;";
+
+    const swapBtn = document.createElement('button');
+    swapBtn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; transition: 0.2s;";
     
-    function setBtnStyle(labelText) {
-        btn.textContent = labelText;
-        if (labelText === "Unswap Connection") {
-            btn.style.background = "transparent";
-            btn.style.color = "var(--text-main)";
-            btn.style.border = "1px solid var(--card-border)";
-        } else if (labelText === "Requested") {
-            btn.style.background = "rgba(255,255,255,0.05)";
-            btn.style.color = "var(--text-muted)";
-            btn.style.border = "1px solid var(--card-border)";
-        } else {
-            btn.style.background = "var(--accent-color)";
-            btn.style.color = "#fff";
-            btn.style.border = "1px solid transparent";
-        }
+    if (mutualIds.includes(targetUid)) {
+        swapBtn.textContent = "Unswap Connection";
+        swapBtn.style.background = "transparent";
+        swapBtn.style.color = "var(--text-main)";
+        swapBtn.style.border = "1px solid var(--card-border)";
+    } else if (sentIds.includes(targetUid)) {
+        swapBtn.textContent = "Requested";
+        swapBtn.style.background = "rgba(255,255,255,0.05)";
+        swapBtn.style.color = "var(--text-muted)";
+        swapBtn.style.border = "1px solid var(--card-border)";
+    } else if (incomingIds.includes(targetUid)) {
+        swapBtn.textContent = "Accept Swap Request";
+        swapBtn.style.background = "var(--accent-color)";
+        swapBtn.style.color = "#fff";
+        swapBtn.style.border = "1px solid transparent";
+    } else {
+        swapBtn.textContent = "Swap Profile";
+        swapBtn.style.background = "var(--accent-color)";
+        swapBtn.style.color = "#fff";
+        swapBtn.style.border = "1px solid transparent";
     }
 
-    if (mutualIds.includes(targetUid)) setBtnStyle("Unswap Connection");
-    else if (sentIds.includes(targetUid)) setBtnStyle("Requested");
-    else if (incomingIds.includes(targetUid)) setBtnStyle("Accept Swap Request");
-    else setBtnStyle("Swap Profile");
-
-    btn.onclick = async () => {
-        btn.disabled = true;
-        const currentLabel = btn.textContent;
-        
+    swapBtn.onclick = async () => {
+        swapBtn.disabled = true;
+        const currentLabel = swapBtn.textContent;
         try {
             if (currentLabel === "Swap Profile") {
-                await Promise.all([
-                    updateDoc(doc(db, "users", currentUserId), { swapRequestsOut: arrayUnion(targetUid) }),
-                    updateDoc(doc(db, "users", targetUid), { swapRequestsIn: arrayUnion(currentUserId) })
-                ]);
-                setBtnStyle("Requested");
+                await updateDoc(doc(db, "users", currentUserId), { swapRequestsOut: arrayUnion(targetUid) });
+                await updateDoc(doc(db, "users", targetUid), { swapRequestsIn: arrayUnion(currentUserId) });
             } else if (currentLabel === "Unswap Connection") {
                 if (!confirm("Disconnect swap link?")) return;
-                await Promise.all([
-                    updateDoc(doc(db, "users", currentUserId), { swappedWith: arrayRemove(targetUid) }),
-                    updateDoc(doc(db, "users", targetUid), { swappedWith: arrayRemove(currentUserId) })
-                ]);
-                setBtnStyle("Swap Profile");
+                await updateDoc(doc(db, "users", currentUserId), { swappedWith: arrayRemove(targetUid), relationshipStatus: "single", partnerUid: "" });
+                await updateDoc(doc(db, "users", targetUid), { swappedWith: arrayRemove(currentUserId), relationshipStatus: "single", partnerUid: "" });
             } else if (currentLabel === "Accept Swap Request") {
-                await Promise.all([
-                    updateDoc(doc(db, "users", currentUserId), { swapRequestsIn: arrayRemove(targetUid), swappedWith: arrayUnion(targetUid) }),
-                    updateDoc(doc(db, "users", targetUid), { swapRequestsOut: arrayRemove(currentUserId), swappedWith: arrayUnion(currentUserId) })
-                ]);
-                setBtnStyle("Unswap Connection");
+                await updateDoc(doc(db, "users", currentUserId), { swapRequestsIn: arrayRemove(targetUid), swappedWith: arrayUnion(targetUid) });
+                await updateDoc(doc(db, "users", targetUid), { swapRequestsOut: arrayRemove(currentUserId), swappedWith: arrayUnion(currentUserId) });
             }
             await loadProfileData(targetUid, false);
         } catch(err) { console.error(err); }
-        finally { btn.disabled = false; }
+        finally { swapBtn.disabled = false; }
     };
+    swapContainer.appendChild(swapBtn);
+    userMomentsGrid.parentNode.insertBefore(swapContainer, userMomentsGrid);
 
-    container.appendChild(btn);
-    userMomentsGrid.parentNode.insertBefore(container, userMomentsGrid);
+    // 🪐 BUTTON CONTAINER B: MUTUAL RELATIONSHIP SUB-ENGINE
+    if (mutualIds.includes(targetUid)) {
+        const coupleContainer = document.createElement('div');
+        coupleContainer.id = "profile-dynamic-couple-btn";
+        coupleContainer.style = "margin-bottom: 32px;";
+
+        const coupleBtn = document.createElement('button');
+        coupleBtn.style = "width: 100%; padding: 12px; font-weight: 700; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; transition: 0.2s;";
+        
+        const myCoupleStatus = myData.relationshipStatus || "single";
+        const myPartnerUid = myData.partnerUid || "";
+        const myCoupleReqOut = myData.coupleRequestOut || "";
+        const myCoupleReqIn = myData.coupleRequestIn || "";
+
+        if (myCoupleStatus === "couple" && myPartnerUid === targetUid) {
+            coupleBtn.textContent = "Break Up (Remove Couple)";
+            coupleBtn.style.background = "transparent";
+            coupleBtn.style.color = "var(--accent-red)";
+            coupleBtn.style.border = "1px solid rgba(255,59,48,0.2)";
+        } else if (myCoupleReqOut === targetUid) {
+            coupleBtn.textContent = "Couple Proposal Sent...";
+            coupleBtn.style.background = "rgba(255,255,255,0.03)";
+            coupleBtn.style.color = "var(--text-muted)";
+            coupleBtn.style.border = "1px solid var(--card-border)";
+        } else if (myCoupleReqIn === targetUid) {
+            coupleBtn.textContent = "Accept Couple Request ❤️";
+            coupleBtn.style.background = "#ff3b30";
+            coupleBtn.style.color = "#fff";
+            coupleBtn.style.border = "1px solid transparent";
+        } else if (myCoupleStatus === "single") {
+            coupleBtn.textContent = "Add Couple ➕";
+            coupleBtn.style.background = "rgba(255,255,255,0.04)";
+            coupleBtn.style.color = "var(--text-main)";
+            coupleBtn.style.border = "1px solid var(--card-border)";
+        } else {
+            // Already coupled with someone else, hide choice entirely
+            coupleContainer.style.display = "none";
+        }
+
+        coupleBtn.onclick = async () => {
+            coupleBtn.disabled = true;
+            const actionText = coupleBtn.textContent;
+            try {
+                if (actionText.includes("Add Couple")) {
+                    await updateDoc(doc(db, "users", currentUserId), { coupleRequestOut: targetUid });
+                    await updateDoc(doc(db, "users", targetUid), { coupleRequestIn: currentUserId });
+                } else if (actionText.includes("Accept Couple Request")) {
+                    await updateDoc(doc(db, "users", currentUserId), { coupleRequestIn: "", relationshipStatus: "couple", partnerUid: targetUid });
+                    await updateDoc(doc(db, "users", targetUid), { coupleRequestOut: "", relationshipStatus: "couple", partnerUid: currentUserId });
+                } else if (actionText.includes("Break Up")) {
+                    if (!confirm("Are you sure you want to dissolve couple status records?")) return;
+                    await updateDoc(doc(db, "users", currentUserId), { relationshipStatus: "single", partnerUid: "" });
+                    await updateDoc(doc(db, "users", targetUid), { relationshipStatus: "single", partnerUid: "" });
+                }
+                await loadProfileData(targetUid, false);
+            } catch (err) { console.error(err); }
+            finally { coupleBtn.disabled = false; }
+        };
+
+        coupleContainer.appendChild(coupleBtn);
+        userMomentsGrid.parentNode.insertBefore(coupleContainer, userMomentsGrid);
+    }
 }
 
+// Global modal toggle event registers
 if (openEditBtn) openEditBtn.onclick = () => editModal.style.display = 'flex';
 if (closeEditBtn) closeEditBtn.onclick = () => editModal.style.display = 'none';
 if (openDeleteBtn) openDeleteBtn.onclick = () => deleteModal.style.display = 'flex';
