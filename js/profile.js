@@ -6,21 +6,15 @@ const usernameLabel = document.getElementById('lbl-username-display');
 const bioContainer = document.getElementById('profile-bio-container');
 const statsTray = document.getElementById('stats-numbers-tray');
 const userMomentsGrid = document.getElementById('user-moments');
+const partnerStatusDisplayFrame = document.getElementById('partner-status-display-frame');
 
 const editModal = document.getElementById('edit-profile-modal');
 const openEditBtn = document.getElementById('open-edit-modal-btn');
 const closeEditBtn = document.getElementById('close-edit-modal-btn');
 const editForm = document.getElementById('edit-profile-form');
-
-const deleteModal = document.getElementById('delete-profile-modal');
-const openDeleteBtn = document.getElementById('open-delete-modal-btn');
-const closeDeleteBtn = document.getElementById('close-delete-modal-btn');
-const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-
 const avatarPreview = document.getElementById('avatar-preview');
 const avatarInput = document.getElementById('avatar-input');
 const removePicBtn = document.getElementById('remove-pic-btn');
-const profileLogoutBtn = document.getElementById('logout-btn-profile');
 
 const urlParams = new URLSearchParams(window.location.search);
 const targetProfileUid = urlParams.get('uid');
@@ -44,8 +38,14 @@ async function loadProfileData(uid, isViewingSelf) {
         let statusBadgeHtml = "";
         if (userData.relationshipStatus === "couple") {
             statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 59, 48, 0.12); color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700;">❤️ Committed</span>`;
+            
+            // Fetch and render the partner's info sub-card layout dynamically
+            if (partnerStatusDisplayFrame && userData.partnerUid) {
+                renderPartnerDetailsCard(userData.partnerUid, isViewingSelf);
+            }
         } else {
             statusBadgeHtml = `<span id="relationship-status-badge" style="background: rgba(255, 255, 255, 0.04); color: var(--text-muted); border: 1px solid var(--card-border); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 600;">Single</span>`;
+            if (partnerStatusDisplayFrame) partnerStatusDisplayFrame.innerHTML = "";
         }
 
         if (usernameLabel) {
@@ -107,13 +107,9 @@ async function loadProfileData(uid, isViewingSelf) {
 
         if (isViewingSelf) {
             if (openEditBtn) openEditBtn.style.display = "block";
-            if (openDeleteBtn) openDeleteBtn.style.display = "block";
-            if (profileLogoutBtn) profileLogoutBtn.style.display = "block";
             removeDynamicProfileButtons();
         } else {
             if (openEditBtn) openEditBtn.style.display = "none";
-            if (openDeleteBtn) openDeleteBtn.style.display = "none";
-            if (profileLogoutBtn) profileLogoutBtn.style.display = "none";
             await injectForeignProfileButtons(uid);
         }
 
@@ -137,6 +133,43 @@ async function loadProfileData(uid, isViewingSelf) {
             document.getElementById('edit-user-name').value = userData.name || "";
             document.getElementById('edit-user-age').value = userData.age || "";
             document.getElementById('edit-user-bio').value = userData.bio || "";
+        }
+    } catch (err) { console.error(err); }
+}
+
+// 🪐 DYNAMIC COMPONENT: Renders committed partner data records box card link context frame
+async function renderPartnerDetailsCard(partnerUid, isViewingSelf) {
+    try {
+        const partnerSnap = await getDoc(doc(db, "users", partnerUid));
+        if (!partnerSnap.exists()) return;
+        const partnerData = partnerSnap.data();
+
+        partnerStatusDisplayFrame.innerHTML = `
+            <div class="post-card" style="margin-bottom: 0; padding: 14px; display: flex; align-items: center; gap: 12px; background: rgba(255, 59, 48, 0.03); border-color: rgba(255, 59, 48, 0.15); cursor: pointer;">
+                <div class="post-avatar" style="width: 38px; height: 38px; font-size: 0.85rem; border-color: rgba(255, 59, 48, 0.2);" onclick="window.location.href='profile.html?uid=${partnerUid}'">
+                    ${partnerData.profilePic ? `<img src="${partnerData.profilePic}">` : (partnerData.name || "U").charAt(0).toUpperCase()}
+                </div>
+                <div style="display: flex; flex-direction: column; flex: 1;" onclick="window.location.href='profile.html?uid=${partnerUid}'">
+                    <span style="font-size: 0.82rem; color: #ff3b30; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Partner</span>
+                    <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-main);">${partnerData.name}</span>
+                </div>
+                ${isViewingSelf ? `<button id="btn-break-up-direct" class="btn-secondary" style="padding: 6px 14px; font-size: 0.78rem; font-weight: 700; color: var(--accent-red); border-color: rgba(255,59,48,0.2); border-radius: 20px;">Break Up</button>` : ''}
+            </div>
+        `;
+
+        if (isViewingSelf) {
+            partnerStatusDisplayFrame.querySelector('#btn-break-up-direct').onclick = async (e) => {
+                e.stopPropagation();
+                if (!confirm("Are you sure you want to break up and dissolve relationship profiles link tracking data records?")) return;
+                const currentUserId = auth.currentUser.uid;
+                try {
+                    await Promise.all([
+                        updateDoc(doc(doc(db, "users", currentUserId)), { relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" }),
+                        updateDoc(doc(doc(db, "users", partnerUid)), { relationshipStatus: "single", partnerUid: "", coupleRequestIn: "", coupleRequestOut: "" })
+                    ]);
+                    await loadProfileData(currentUserId, true);
+                } catch(err) { console.error(err); }
+            };
         }
     } catch (err) { console.error(err); }
 }
@@ -261,9 +294,6 @@ async function injectForeignProfileButtons(targetUid) {
 if (openEditBtn) openEditBtn.onclick = () => editModal.style.display = 'flex';
 if (closeEditBtn) closeEditBtn.onclick = () => editModal.style.display = 'none';
 
-if (openDeleteBtn) openDeleteBtn.onclick = () => deleteModal.style.display = 'flex';
-if (closeDeleteBtn) closeDeleteBtn.onclick = () => deleteModal.style.display = 'none';
-
 if (editForm) {
     editForm.onsubmit = async (e) => {
         e.preventDefault();
@@ -299,44 +329,5 @@ if (avatarInput) {
                 await loadProfileData(auth.currentUser.uid, true);
             } catch (err) { alert(err.message); }
         };
-    };
-}
-
-if (profileLogoutBtn) {
-    profileLogoutBtn.onclick = async () => {
-        const { signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
-        signOut(auth).then(() => { window.location.href = "index.html"; });
-    };
-}
-
-if (confirmDeleteBtn) {
-    confirmDeleteBtn.onclick = async () => {
-        const user = auth.currentUser;
-        if (!user) return;
-        confirmDeleteBtn.disabled = true;
-        confirmDeleteBtn.textContent = "Deleting Account...";
-        try {
-            await deleteDoc(doc(db, "users", user.uid));
-            const { signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
-            signOut(auth).then(() => { window.location.href = "index.html"; });
-        } catch (err) { 
-            alert(err.message); 
-            confirmDeleteBtn.disabled = false;
-            confirmDeleteBtn.textContent = "Confirm Delete";
-        }
-    };
-}
-
-const themeBtn = document.getElementById('theme-toggle-btn');
-if (themeBtn) {
-    const savedTheme = localStorage.getItem('lik-theme') || 'dark';
-    themeBtn.innerHTML = savedTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
-    themeBtn.onclick = (e) => {
-        e.preventDefault();
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('lik-theme', newTheme);
-        themeBtn.innerHTML = newTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
     };
 }

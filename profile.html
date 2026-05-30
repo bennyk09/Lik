@@ -18,8 +18,6 @@
                 <a href="upload.html">Upload</a>
                 <a href="swaps.html">Swaps</a>
                 <a href="profile.html" class="active">Profile</a>
-                <!-- Moved theme toggle up into header navigation options -->
-                <a href="#" id="theme-toggle-btn" style="cursor: pointer;">☀️ Light</a>
             </nav>
         </header>
         
@@ -37,14 +35,14 @@
                     </h2>
                     <div class="stats-row" id="stats-numbers-tray"></div>
                     <div id="profile-bio-container" class="profile-bio-text">Syncing profile metadata parameters...</div>
+                    
+                    <div id="partner-status-display-frame" style="width: 100%; margin-top: 14px;"></div>
                 </div>
             </div>
             
-            <!-- Restored Action Control Row Grid Framework -->
             <div style="display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; max-width: 600px; margin-left: auto; margin-right: auto;">
                 <button id="open-edit-modal-btn" class="btn-secondary" style="flex: 1; display: none;">Edit Profile</button>
-                <button id="logout-btn-profile" class="btn-primary" style="flex: 1;">Logout</button>
-                <button id="open-delete-modal-btn" class="btn-secondary" style="color: var(--accent-red); border-color: rgba(255,59,48,0.2); flex: 1; display: none;">Delete Account</button>
+                <button id="open-settings-page-btn" class="btn-primary" style="flex: 1;" onclick="window.location.href='settings.html'">Settings</button>
             </div>
 
             <h4 style="margin: 24px auto 16px auto; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px; max-width: 600px; padding-left: 4px;">Live Timeline</h4>
@@ -59,7 +57,6 @@
         </nav>
     </div>
 
-    <!-- Edit Profile Modal Layer -->
     <div id="edit-profile-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <h3 style="margin-top: 0; font-weight:700; margin-bottom: 16px;">Update Profile</h3>
@@ -81,18 +78,6 @@
                     <button type="submit" class="btn-primary" style="flex: 1;">Save</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <!-- Restored Account Deletion Warning Dialog Confirmation Container Overlay Modal -->
-    <div id="delete-profile-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="border-color: var(--accent-red);">
-            <h3 style="margin-top: 0; font-weight:700; color: var(--accent-red); margin-bottom: 12px;">Delete Account</h3>
-            <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 20px; line-height: 1.4;">Warning: This action is permanent. All your moments data records, swap configurations, and timeline items will be deleted instantly.</p>
-            <div style="display: flex; gap: 12px;">
-                <button type="button" id="close-delete-modal-btn" class="btn-secondary" style="flex: 1;">Cancel</button>
-                <button type="button" id="confirm-delete-btn" class="btn-primary" style="background: var(--accent-red); flex: 1;">Confirm Delete</button>
-            </div>
         </div>
     </div>
 

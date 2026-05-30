@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LIK - Settings</title>
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('lik-theme') || 'dark');
+    </script>
+    <link rel="stylesheet" href="css/style.css?v=2.0.0">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1 onclick="window.location.href='index.html'">LIK</h1>
+            <nav class="desktop-nav">
+                <a href="index.html">Wall</a>
+                <a href="upload.html">Upload</a>
+                <a href="swaps.html">Swaps</a>
+                <a href="profile.html" class="active">Profile</a>
+            </nav>
+        </header>
+        
+        <main style="max-width: 600px; margin: 0 auto;">
+            <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 24px;">Settings</h2>
+            
+            <div class="post-card" style="display: flex; flex-direction: column; gap: 16px; padding: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
+                    <div>
+                        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Interface Theme</h4>
+                        <p style="font-size: 0.82rem; color: var(--text-muted);">Toggle between dark and light appearance modes.</p>
+                    </div>
+                    <button id="theme-toggle-btn" class="btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;">☀️ Light Mode</button>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
+                    <div>
+                        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Session Management</h4>
+                        <p style="font-size: 0.82rem; color: var(--text-muted);">Securely sign out of your account on this device.</p>
+                    </div>
+                    <button id="logout-btn-settings" class="btn-primary" style="padding: 10px 20px; font-size: 0.85rem;">Logout</button>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px;">
+                    <div>
+                        <h4 style="font-size: 1rem; font-weight: 700; color: var(--accent-red); margin-bottom: 4px;">Danger Zone</h4>
+                        <p style="font-size: 0.82rem; color: var(--text-muted);">Permanently discard all account profiles data.</p>
+                    </div>
+                    <button id="open-delete-modal-btn" class="btn-secondary" style="color: var(--accent-red); border-color: rgba(255,59,48,0.2); padding: 8px 16px; font-size: 0.85rem;">Delete Account</button>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="index.html">Wall</a>
+            <a href="upload.html">Upload</a>
+            <a href="swaps.html">Swaps</a>
+            <a href="profile.html" class="active">Profile</a>
+        </nav>
+    </div>
+
+    <div id="delete-profile-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="border-color: var(--accent-red);">
+            <h3 style="margin-top: 0; font-weight:700; color: var(--accent-red); margin-bottom: 12px;">Delete Account</h3>
+            <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 20px; line-height: 1.4;">Warning: This action is permanent. All your moments data records, swap configurations, and timeline items will be deleted instantly.</p>
+            <div style="display: flex; gap: 12px;">
+                <button type="button" id="close-delete-modal-btn" class="btn-secondary" style="flex: 1;">Cancel</button>
+                <button type="button" id="confirm-delete-btn" class="btn-primary" style="background: var(--accent-red); flex: 1;">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/auth-google.js"></script>
+    <script type="module" src="js/settings.js"></script>
+</body>
+</html>
