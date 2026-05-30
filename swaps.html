@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIK - Swaps Manager</title>
-    <link rel="stylesheet" href="css/style.css?v=11.0.5">
+    <link rel="stylesheet" href="css/style.css?v=11.0.7">
 </head>
 <body>
     <div class="app-container">
@@ -19,8 +19,16 @@
         </header>
         
         <main>
-            <div style="max-width: 600px; margin: 0 auto;">
+            <div style="max-width: 600px; margin: 0 auto; position: relative;">
                 
+                <div class="search-wrapper" style="margin-bottom: 32px; position: relative;">
+                    <div class="form-group" style="margin-bottom: 0; position: relative;">
+                        <input type="text" id="swaps-search-input" placeholder="Search profiles by handle... (e.g. benny)" style="padding-left: 38px; height: 42px; background: var(--card-color); border: 1px solid var(--card-border); border-radius: var(--radius-md); color: var(--text-main); width: 100%; font-size: 0.9rem;">
+                        <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.6; font-size: 0.85rem;">🔍</span>
+                    </div>
+                    <div id="swaps-search-results" class="post-card" style="display: none; margin-top: 6px; padding: 6px; margin-bottom: 0; position: absolute; width: 100%; z-index: 2000; border-color: var(--card-border); background: #16161a; box-shadow: 0 12px 32px rgba(0,0,0,0.5);"></div>
+                </div>
+
                 <div style="margin-bottom: 32px;">
                     <h4 style="margin: 0 0 16px 4px; font-size:0.8rem; text-transform:uppercase; color:var(--accent-color); letter-spacing:0.5px;">Swap Requests (Incoming)</h4>
                     <div id="incoming-requests-list" style="display: flex; flex-direction: column; gap: 10px;">
